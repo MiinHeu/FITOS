@@ -107,19 +107,24 @@ export default function Sidebar() {
           Create Lead
         </Link>
 
-        <Link href="/dashboard" className="sidebar-link">
+        <Link
+          href="/dashboard/sales"
+          className={`sidebar-link ${isActive('/dashboard/sales') ? 'active' : ''}`}
+        >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
           {t.side_sales}
         </Link>
 
-        <Link href="/dashboard" className="sidebar-link">
+        <Link
+          href="/dashboard/create-sale"
+          className={`sidebar-link ${isActive('/dashboard/create-sale') ? 'active' : ''}`}
+        >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-            <path d="M16 21v-2a4 4 0 00-8 0v2" />
-            <circle cx="12" cy="7" r="4" />
+            <path d="M12 5v14M5 12h14"/>
           </svg>
-          {t.side_memberships}
+          Create Sale
         </Link>
 
         <p
@@ -129,19 +134,37 @@ export default function Sidebar() {
           {t.side_operate}
         </p>
 
-        <Link href="/dashboard" className="sidebar-link">
+        <Link
+          href="/dashboard/schedule"
+          className={`sidebar-link ${isActive('/dashboard/schedule') ? 'active' : ''}`}
+        >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <rect x="3" y="4" width="18" height="18" rx="2" />
             <path d="M16 2v4M8 2v4M3 10h18" />
           </svg>
-          {t.side_classes}
+          Schedule
         </Link>
 
-        <Link href="/dashboard" className="sidebar-link">
+        <Link
+          href="/dashboard/bookings"
+          className={`sidebar-link ${isActive('/dashboard/bookings') ? 'active' : ''}`}
+        >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           {t.side_bookings}
+        </Link>
+
+        <Link
+          href="/dashboard/customers"
+          className={`sidebar-link ${isActive('/dashboard/customers') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+          Customers
         </Link>
 
         <Link
@@ -163,6 +186,90 @@ export default function Sidebar() {
             <path d="M6 4v6m0 4v6M18 4v6m0 4v6M3 10h18M3 14h18"/>
           </svg>
           Trainer
+        </Link>
+
+        <Link
+          href="/dashboard/workout-builder"
+          className={`sidebar-link ${isActive('/dashboard/workout-builder') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 10h16M4 14h10M4 18h6"/>
+          </svg>
+          Workout Builder
+        </Link>
+
+        <p
+          className="text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2"
+          style={{color: '#3D4139'}}
+        >
+          MEMBER
+        </p>
+
+        <Link
+          href="/dashboard/member"
+          className={`sidebar-link ${isActive('/dashboard/member') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Member Dashboard
+        </Link>
+
+        <Link
+          href="/dashboard/member/book"
+          className={`sidebar-link ${isActive('/dashboard/member/book') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+          </svg>
+          Book Session
+        </Link>
+
+        <Link
+          href="/dashboard/member/progress"
+          className={`sidebar-link ${isActive('/dashboard/member/progress') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path d="M3 3v18h18" /><path d="M7 16l4-8 4 4 4-6" />
+          </svg>
+          Progress
+        </Link>
+
+        <Link
+          href="/dashboard/member/ai-coach"
+          className={`sidebar-link ${isActive('/dashboard/member/ai-coach') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path d="M12 2a7 7 0 017 7c0 3.87-3.13 7-7 7s-7-3.13-7-7a7 7 0 017-7z"/>
+            <path d="M12 16v6M8 22h8"/>
+          </svg>
+          AI Coach
+        </Link>
+
+        <Link
+          href="/dashboard/member/payments"
+          className={`sidebar-link ${isActive('/dashboard/member/payments') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <rect x="1" y="4" width="22" height="16" rx="2"/>
+            <path d="M1 10h22"/>
+          </svg>
+          Payments
+        </Link>
+
+        <Link
+          href="/dashboard/member/profile"
+          className={`sidebar-link ${isActive('/dashboard/member/profile') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Profile
         </Link>
       </nav>
 

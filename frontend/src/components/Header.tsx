@@ -48,7 +48,7 @@ export default function Header() {
           {[
             { href: '/', label: t.nav_home },
             { href: '/plans', label: t.nav_plans },
-            { href: '/plans#classes', label: t.nav_classes },
+            { href: '/classes', label: t.nav_classes },
             { href: '#coaches', label: t.nav_coaches },
           ].map((item) => (
             <Link
@@ -95,7 +95,14 @@ export default function Header() {
             {t.nav_login}
           </Link>
           <Link
-            href="/login"
+            href="/register"
+            className="text-sm font-medium transition-colors"
+            style={{color: '#ECEDE6'}}
+          >
+            Register
+          </Link>
+          <Link
+            href="/register"
             className="btn-lime text-xs"
             style={{padding: '8px 20px'}}
           >
