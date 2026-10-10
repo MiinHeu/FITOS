@@ -4,7 +4,9 @@ import { useTranslations, Locale } from '@/lib/i18n';
 
 export default function MemberJourney() {
   const [locale, setLocale] = useState<Locale>('en');
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     const sync = () => {
       const s = localStorage.getItem('locale') as Locale | null;
       if (s) setLocale(s);
@@ -13,7 +15,7 @@ export default function MemberJourney() {
     window.addEventListener('locale-changed', sync);
     return () => window.removeEventListener('locale-changed', sync);
   }, []);
-  const t = useTranslations(locale);
+  const t = useTranslations(mounted ? locale : 'en');
 
   return (
     <section style={{background: '#171A16', padding: '64px 0'}}>

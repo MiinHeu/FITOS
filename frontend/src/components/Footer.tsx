@@ -5,7 +5,9 @@ import Link from 'next/link';
 
 export default function Footer() {
   const [locale, setLocale] = useState<Locale>('en');
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     const sync = () => {
       const s = localStorage.getItem('locale') as Locale | null;
       if (s) setLocale(s);
@@ -14,7 +16,7 @@ export default function Footer() {
     window.addEventListener('locale-changed', sync);
     return () => window.removeEventListener('locale-changed', sync);
   }, []);
-  const t = useTranslations(locale);
+  const t = useTranslations(mounted ? locale : 'en');
 
   return (
     <footer style={{background: '#171A16'}} className="py-8">

@@ -5,9 +5,11 @@ import Link from 'next/link';
 
 export default function Header() {
   const [locale, setLocale] = useState<Locale>('en');
+  const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const saved = localStorage.getItem('locale') as Locale | null;
     if (saved) setLocale(saved);
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -21,7 +23,7 @@ export default function Header() {
     window.dispatchEvent(new Event('locale-changed'));
   };
 
-  const t = useTranslations(locale);
+  const t = useTranslations(mounted ? locale : 'en');
 
   return (
     <header
