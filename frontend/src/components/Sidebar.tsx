@@ -96,6 +96,17 @@ export default function Sidebar() {
           {t.side_crm}
         </Link>
 
+        <Link
+          href="/dashboard/create-lead"
+          className={`sidebar-link ${isActive('/dashboard/create-lead') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v8M8 12h8"/>
+          </svg>
+          Create Lead
+        </Link>
+
         <Link href="/dashboard" className="sidebar-link">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -131,6 +142,27 @@ export default function Sidebar() {
             <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           {t.side_bookings}
+        </Link>
+
+        <Link
+          href="/dashboard/member"
+          className={`sidebar-link ${isActive('/dashboard/member') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Members
+        </Link>
+
+        <Link
+          href="/dashboard/trainer"
+          className={`sidebar-link ${isActive('/dashboard/trainer') ? 'active' : ''}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+            <path d="M6 4v6m0 4v6M18 4v6m0 4v6M3 10h18M3 14h18"/>
+          </svg>
+          Trainer
         </Link>
       </nav>
 
