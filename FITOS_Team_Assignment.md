@@ -1,904 +1,1511 @@
-# FITOS — PHÂN CÔNG NHÓM 4 NGƯỜI (Fullstack Cross-Layer)
-
-> **Triết lý:** Mỗi người làm **đủ mọi layer** trên mỗi feature — Database schema, Migration, API (Spring Boot), Frontend (Next.js), AI tích hợp, Docker, CI/CD — để khi vấn đáp có thể giải thích toàn bộ flow từ click UI đến DB.
->
-> **Không chia FE riêng / BE riêng.** Mỗi người nhận 1 nhóm feature và tự lo từ đầu đến cuối.
->
-> **Thời gian:** 4–5 tuần | **Team:** 4 người
+# FITOS — PHÂN CÔNG 4 NGƯỜI × 5 TUẦN
+# (Mỗi người bắt buộc đụng: DB + BE + FE + AI + OPS)
 
 ---
 
-## TỔNG QUAN — AI LÀM GÌ
+## NGUYÊN TẮC PHÂN CÔNG
+
+> **Mỗi người = 1 feature nhỏ × đủ 5 layer = DB + BE + FE + AI tích hợp + OPS**
+>
+> Không ai được chỉ làm FE hoặc chỉ làm BE.
+> Mỗi feature được giao cho 1 người, người đó tự lo từ schema → API → UI → AI hook → Dockerfile → test.
+> Khi vấn đáp, hỏi bất kỳ layer nào trong feature của mình → phải trả lời được.
+
+### 5 Layer bắt buộc mỗi người phải có trong CV
+
+| Layer | Tối thiểu phải làm |
+|-------|--------------------|
+| **DB** | Viết SQL schema, Flyway migration, index |
+| **BE** | Spring Boot Controller + Service + Repository + Business logic |
+| **FE** | Next.js page + component + Tailwind + state management |
+| **AI** | Gọi AI service (Python FastAPI) hoặc viết AI service hoặc dùng AI output trong FE |
+| **OPS** | Viết Dockerfile, docker-compose service, GitHub Actions job |
+
+---
+
+## TỔNG QUAN PHÂN CÔNG
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  Người A   │  Auth + User + CRM (Lead → Customer) + Manager Dashboard       │
-│            │  DB ✦ API ✦ FE ✦ Security ✦ Docker ✦ CI                        │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  Người B   │  Plans + Order + Payment + Membership + PT Package              │
-│            │  DB ✦ API ✦ FE ✦ Payment logic ✦ Docker ✦ Deploy               │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  Người C   │  Class + Schedule + Booking + Check-in + Attendance + Trainer  │
-│            │  DB ✦ API ✦ FE ✦ Concurrency ✦ Docker ✦ Integration test       │
-├─────────────────────────────────────────────────────────────────────────────┤
-│  Người D   │  Workout + Progress + AI Coach + Reports + DevOps lead          │
-│            │  DB ✦ API ✦ FE ✦ Python AI service ✦ Full Docker stack         │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌──────────┬────────────────────────────────┬───────────────────────────────────────────┐
+│ Người    │ Feature chính                  │ Tất cả layer đều đụng                     │
+├──────────┼────────────────────────────────┼───────────────────────────────────────────┤
+│ Người A  │ Auth + CRM Lead                │ DB:users/leads  BE:JWT/RBAC  FE:login/CRM │
+│          │                                │ AI:lead scoring  OPS:Dockerfile backend   │
+├──────────┼────────────────────────────────┼───────────────────────────────────────────┤
+│ Người B  │ Commerce + Membership          │ DB:orders/memberships  BE:payment flow    │
+│          │                                │ FE:sales/membership  AI:renewal predict   │
+│          │                                │ OPS:Dockerfile frontend + deploy          │
+├──────────┼────────────────────────────────┼───────────────────────────────────────────┤
+│ Người C  │ Class + Booking + Attendance   │ DB:sessions/bookings  BE:concurrency      │
+│          │                                │ FE:schedule/checkin  AI:schedule suggest  │
+│          │                                │ OPS:docker-compose + CI test job          │
+├──────────┼────────────────────────────────┼───────────────────────────────────────────┤
+│ Người D  │ Workout + Progress + AI Coach  │ DB:workout/ai tables  BE:workout API      │
+│          │                                │ FE:workout/progress  AI:FastAPI service   │
+│          │                                │ OPS:AI Dockerfile + CD deploy pipeline    │
+└──────────┴────────────────────────────────┴───────────────────────────────────────────┘
 ```
 
-> Mỗi người đều có: Schema SQL + Migration + Spring Boot Controller/Service/Repository + Next.js pages/components + Dockerfile + Test
-
 ---
 
-## TECH STACK CHUNG (tất cả đều đụng)
+## CHECKLIST 5 LAYER — MỖI NGƯỜI TỰ KIỂM TRA
 
-| Layer | Công nghệ | Ai đụng |
-|-------|-----------|---------|
-| Database | PostgreSQL 15 + Flyway migration | **Tất cả** |
-| Backend | Java Spring Boot 3 + Spring Security + JPA | **Tất cả** |
-| Frontend | Next.js 14 + TypeScript + Tailwind CSS | **Tất cả** |
-| AI Service | Python FastAPI + OpenAI API | A (proxy) + **D (chính)** |
-| Cache | Redis | A (session) + B (idempotency) |
-| Auth | JWT access + refresh token | **A làm, tất cả dùng** |
-| Container | Docker + Docker Compose | **Tất cả** (D lead) |
-| CI/CD | GitHub Actions | **Tất cả** (D lead) |
-| API Docs | Swagger / OpenAPI | **Tất cả** |
-| Test | JUnit + Mockito + Playwright | **Tất cả** |
+Trước khi nộp, mỗi người tick đủ 5 ô này:
+
+```
+Người A:  [ ] DB  [ ] BE  [ ] FE  [ ] AI  [ ] OPS
+Người B:  [ ] DB  [ ] BE  [ ] FE  [ ] AI  [ ] OPS
+Người C:  [ ] DB  [ ] BE  [ ] FE  [ ] AI  [ ] OPS
+Người D:  [ ] DB  [ ] BE  [ ] FE  [ ] AI  [ ] OPS
+```
 
 ---
 
 ---
 
-# 👤 NGƯỜI A — AUTH + USER + CRM + DASHBOARD
+# NGƯỜI A — AUTH + CRM LEAD
 
-## Mày làm gì để giải thích với nhà tuyển dụng?
-> *"Tôi xây hệ thống auth JWT từ đầu, thiết kế RBAC 5 roles, viết toàn bộ CRM lead lifecycle từ DB schema đến UI, xây Manager Dashboard tổng hợp data cross-module."*
+## Layer DB (bắt buộc)
 
----
+**File:** `backend/src/main/resources/db/migration/V1__auth_crm.sql`
 
-## TUẦN 1 — Auth Foundation (tất cả đều chờ mày)
-
-### 🗄️ Database (Flyway migration)
 ```sql
--- V1__auth_users.sql
+-- USERS
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email VARCHAR(255) UNIQUE NOT NULL,
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email         VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(50) NOT NULL,  -- ADMIN/MANAGER/RECEPTIONIST/TRAINER/CUSTOMER
-  status VARCHAR(20) DEFAULT 'ACTIVE',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  role          VARCHAR(50)  NOT NULL CHECK (role IN ('ADMIN','MANAGER','RECEPTIONIST','TRAINER','CUSTOMER')),
+  status        VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',
+  created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
--- V2__crm_leads.sql
+-- LEADS
 CREATE TABLE leads (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  full_name VARCHAR(255) NOT NULL,
-  phone VARCHAR(20) NOT NULL,
-  email VARCHAR(255),
-  date_of_birth DATE,
-  goal VARCHAR(50),
-  source VARCHAR(50),
-  status VARCHAR(50) DEFAULT 'NEW',
-  assigned_to UUID REFERENCES users(id),
-  notes TEXT,
-  created_by UUID REFERENCES users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  full_name    VARCHAR(255) NOT NULL,
+  phone        VARCHAR(20)  NOT NULL,
+  email        VARCHAR(255),
+  goal         VARCHAR(50),   -- WEIGHT_LOSS | MUSCLE_GAIN | STRENGTH | GENERAL_FITNESS
+  source       VARCHAR(50),   -- WALK_IN | FACEBOOK | INSTAGRAM | REFERRAL | WEBSITE
+  status       VARCHAR(50)  NOT NULL DEFAULT 'NEW',
+  assigned_to  UUID REFERENCES users(id),
+  notes        TEXT,
+  lead_score   INT DEFAULT 0,  -- AI scoring field
+  created_by   UUID REFERENCES users(id),
+  created_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
+-- LEAD ACTIVITIES
 CREATE TABLE lead_activities (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  lead_id UUID REFERENCES leads(id) NOT NULL,
-  actor_id UUID REFERENCES users(id) NOT NULL,
-  type VARCHAR(50) NOT NULL,  -- CALL/MESSAGE/CONSULTATION/TRIAL/FOLLOW_UP
-  note TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lead_id   UUID NOT NULL REFERENCES leads(id),
+  actor_id  UUID NOT NULL REFERENCES users(id),
+  type      VARCHAR(50) NOT NULL,  -- CALL | MESSAGE | CONSULTATION | TRIAL | FOLLOW_UP
+  note      TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- CUSTOMERS (sau khi convert lead)
 CREATE TABLE customers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id),
-  full_name VARCHAR(255) NOT NULL,
-  phone VARCHAR(20),
-  email VARCHAR(255),
-  date_of_birth DATE,
-  goal VARCHAR(50),
-  lead_id UUID REFERENCES leads(id),
-  joined_at TIMESTAMPTZ DEFAULT NOW()
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID REFERENCES users(id),
+  full_name    VARCHAR(255) NOT NULL,
+  phone        VARCHAR(20),
+  email        VARCHAR(255),
+  goal         VARCHAR(50),
+  lead_id      UUID REFERENCES leads(id),  -- giữ lịch sử lead
+  joined_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- AUDIT LOG
 CREATE TABLE audit_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  actor_id UUID REFERENCES users(id),
-  action VARCHAR(100) NOT NULL,
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  actor_id    UUID REFERENCES users(id),
+  action      VARCHAR(100) NOT NULL,
   entity_type VARCHAR(100),
-  entity_id UUID,
-  metadata JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  entity_id   UUID,
+  metadata    JSONB,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_leads_status   ON leads(status);
+CREATE INDEX idx_leads_assigned ON leads(assigned_to);
 ```
 
-### ⚙️ Backend (Spring Boot)
-- [ ] `POST /api/auth/register` — hash password BCrypt, tạo user, trả JWT
-- [ ] `POST /api/auth/login` — verify password, trả access token (15m) + refresh token (7d)
-- [ ] `POST /api/auth/refresh` — dùng refresh token lấy access token mới
-- [ ] `POST /api/auth/logout` — invalidate refresh token (Redis blacklist)
-- [ ] `POST /api/auth/forgot-password` — tạo reset token, gửi email mock
-- [ ] `POST /api/auth/reset-password` — validate token, đổi password
-- [ ] `PUT /api/auth/change-password`
-- [ ] JWT filter: đọc header `Authorization: Bearer <token>`, set SecurityContext
-- [ ] `@PreAuthorize("hasRole('MANAGER')")` annotation-based RBAC
-- [ ] Global exception handler (JSON chuẩn, không để 500 leak stack trace)
-- [ ] AuditLogAspect: `@Around` các method quan trọng để auto-log
-- [ ] Redis: lưu refresh tokens + blacklist logout
-
-### 🖥️ Frontend (Next.js)
-- [ ] `/login` — email + password form, lưu token vào httpOnly cookie, redirect theo role
-- [ ] `/register` — form với role selector (Member / Staff)
-- [ ] `AuthContext` provider — expose `user`, `role`, `logout`
-- [ ] `<ProtectedRoute>` — redirect `/login` nếu chưa auth
-- [ ] `<RoleGuard role="MANAGER">` — ẩn component nếu không đủ quyền
-- [ ] `middleware.ts` — check token trên server side
-
-### 🐳 Docker
-- [ ] `Dockerfile` cho Spring Boot backend
-- [ ] `docker-compose.yml` phần: postgres + redis + backend
+**Giải thích khi vấn đáp:** "Tôi dùng UUID thay INT để tránh enumerable IDs, CHECK constraint cho role để DB-level validation, lead_score là INT cho AI scoring sau này."
 
 ---
 
-## TUẦN 2 — CRM: Lead Management
+## Layer BE (bắt buộc)
 
-### ⚙️ Backend
-- [ ] `POST /api/leads` — tạo lead (RECEPTIONIST/MANAGER)
-- [ ] `GET /api/leads` — list + pagination + filter(status, source) + search(name, phone)
-- [ ] `GET /api/leads/:id` — detail + activities timeline
-- [ ] `PUT /api/leads/:id` — cập nhật thông tin
-- [ ] `PATCH /api/leads/:id/status` — đổi status (validate transition hợp lệ)
-- [ ] `POST /api/leads/:id/activities` — thêm activity
-- [ ] `PATCH /api/leads/:id/assign` — gán cho staff khác
-- [ ] `POST /api/leads/:id/convert` — **flow quan trọng nhất:**
-  ```
-  Validate status = INTERESTED/TRIAL
-  → Tạo Customer record
-  → Tạo User account (send invite email mock)
-  → Set lead.status = CONVERTED
-  → Preserve lead_activities (không xóa)
-  → Ghi audit log
-  ```
-- [ ] `PATCH /api/leads/:id/lost` — mark lost + ghi reason
+**Package:** `com.fitos.auth`, `com.fitos.crm`
 
-### 🖥️ Frontend
-- [ ] `/dashboard/leads` — data table: filter tabs (All/New/Contacted/Trial/Converted/Lost), search, assign
-- [ ] `/dashboard/leads/create` — form: name, phone, email, source, goal, notes
-- [ ] `/dashboard/leads/:id` — lead detail:
-  - Thông tin + edit inline
-  - Activity timeline (cuộn được)
-  - Add activity modal (type, note)
-  - Action buttons: Contact, Schedule Trial, Convert, Mark Lost
-- [ ] Convert modal: chọn plan → preview order → confirm
+### Auth endpoints
+```
+POST   /api/auth/register          - tạo user, hash BCrypt, trả JWT
+POST   /api/auth/login             - verify password, trả access(15m) + refresh(7d)
+POST   /api/auth/refresh           - dùng refresh token → access token mới
+POST   /api/auth/logout            - blacklist refresh token vào Redis
+POST   /api/auth/forgot-password   - tạo reset token, mock email
+POST   /api/auth/reset-password    - validate token, đổi password
+PUT    /api/auth/change-password   - đổi password khi đang login
+```
 
----
+**JWT Filter logic:**
+```java
+// JwtAuthFilter.java
+// 1. Đọc header Authorization: Bearer <token>
+// 2. Verify signature + expiry
+// 3. Load UserDetails từ DB
+// 4. Set SecurityContextHolder
+```
 
-## TUẦN 3 — Customer + User Admin + Renewal
+**RBAC:**
+```java
+@PreAuthorize("hasRole('MANAGER')")
+public ResponseEntity<?> createLead(...) { ... }
+```
 
-### ⚙️ Backend
-- [ ] `GET /api/customers` — list + filter + search
-- [ ] `GET /api/customers/:id` — full profile aggregate (join membership từ B, bookings từ C, workouts từ D)
-- [ ] `PUT /api/customers/:id` — edit profile
-- [ ] `GET /api/users` (ADMIN) — list users
-- [ ] `POST /api/users` — tạo user
-- [ ] `PUT /api/users/:id` — edit
-- [ ] `PATCH /api/users/:id/disable`
-- [ ] `PATCH /api/users/:id/role` — change role
-- [ ] `GET /api/renewals` — customers có membership hết hạn trong 7 ngày
-- [ ] Cron job `@Scheduled`: mỗi ngày 8AM check expiring memberships
+**Global Exception Handler:**
+```java
+@RestControllerAdvice
+// Bắt NotFoundException → 404
+// Bắt AccessDeniedException → 403
+// Không để 500 leak stack trace ra client
+```
 
-### 🖥️ Frontend
-- [ ] `/dashboard/customers` — table với plan badge, status, expiry
-- [ ] `/dashboard/customers/:id` — 6 tabs: Overview | Membership | Bookings | Workouts | Payments | Activity
-- [ ] `/dashboard/users` (ADMIN) — quản lý users, change role, disable
-- [ ] `/dashboard/profile` — xem/sửa profile, đổi password
+**AuditLog AOP:**
+```java
+@Around("@annotation(Auditable)")
+// Tự động ghi audit_logs sau mỗi action quan trọng
+```
 
-### 📊 Manager Dashboard
-- [ ] `GET /api/dashboard/summary` — active members, new leads, conversion rate, revenue
-- [ ] `/dashboard` — 4 KPI cards + renewal widget + recent activity feed
+### CRM endpoints
+```
+POST   /api/leads                  - tạo lead
+GET    /api/leads                  - list + filter(status,source) + search(name,phone) + pagination
+GET    /api/leads/:id              - detail + activity timeline
+PUT    /api/leads/:id              - cập nhật
+PATCH  /api/leads/:id/status       - đổi status (validate transition)
+POST   /api/leads/:id/activities   - thêm activity
+PATCH  /api/leads/:id/assign       - gán staff
+POST   /api/leads/:id/convert      - convert → tạo Customer + User account
+PATCH  /api/leads/:id/lost         - mark lost
+GET    /api/customers              - list + filter
+GET    /api/customers/:id          - full profile (join membership/bookings/payments từ module khác)
+PUT    /api/customers/:id          - edit
+GET    /api/users                  - (ADMIN) list
+PATCH  /api/users/:id/role         - change role
+PATCH  /api/users/:id/disable      - disable
+```
 
----
-
-## TUẦN 4 — Testing + Integration
-
-- [ ] Unit test `AuthService`: register, login, refresh, logout
-- [ ] Unit test `LeadService`: status transitions, convert validation
-- [ ] Integration test: Lead NEW → CONTACTED → TRIAL → CONVERTED → Customer created
-- [ ] Test: disabled user không login được
-- [ ] Test: CUSTOMER role không access `/api/leads`
-- [ ] Swagger docs hoàn chỉnh
-
-### 📝 CV / Vấn đáp:
-- JWT auth với access + refresh token, Redis blacklist
-- RBAC với Spring Security @PreAuthorize
-- Lead lifecycle state machine (NEW → CONVERTED với validation)
-- Audit log cross-cutting với AOP @Around
-- Customer aggregate API join data từ nhiều domain
-
----
+**Convert Lead — business logic quan trọng nhất:**
+```
+Validate: lead.status IN [INTERESTED, TRIAL]
+→ Tạo Customer record
+→ Tạo User account (role=CUSTOMER)
+→ Mock send invitation email
+→ lead.status = CONVERTED
+→ GIỮ NGUYÊN lead_activities (không xóa)
+→ Ghi audit_log
+```
 
 ---
 
-# 👤 NGƯỜI B — PLANS + ORDER + PAYMENT + MEMBERSHIP
+## Layer FE (bắt buộc)
 
-## Mày làm gì để giải thích với nhà tuyển dụng?
-> *"Tôi xây toàn bộ commerce flow: thiết kế DB cho payment idempotency, implement order với server-side price calculation, membership lifecycle state machine, tích hợp payment gateway sandbox."*
+**Pages và components mày tự viết:**
+
+```
+/login
+  - Form email + password
+  - Submit → POST /api/auth/login → lưu token httpOnly cookie
+  - Redirect theo role (MANAGER→/dashboard, CUSTOMER→/dashboard/member)
+
+/register
+  - Fields: name, email, password, role selector (Member/Staff)
+  - Submit → POST /api/auth/register
+
+src/context/AuthContext.tsx
+  - Provider: expose user, role, isLoading, logout
+  - Đọc token từ cookie, call GET /api/auth/me
+
+src/components/ProtectedRoute.tsx
+  - Redirect /login nếu chưa auth
+
+src/components/RoleGuard.tsx
+  - Props: role="MANAGER"
+  - Ẩn children nếu user không có role đó
+
+/dashboard/leads
+  - Filter tabs: All | New | Contacted | Trial | Converted | Lost
+  - Search input (debounce 300ms)
+  - Data table: name, phone, source, status badge, assigned to, actions
+
+/dashboard/leads/create
+  - Form: name*, phone*, email, source dropdown, goal dropdown, notes
+
+/dashboard/leads/:id
+  - Card: thông tin lead + edit
+  - Timeline: activity list (cuộn được)
+  - Modal: Add activity (type, note)
+  - Action buttons: Contact / Schedule Trial / Convert / Mark Lost
+
+/dashboard/customers
+  - Table với plan badge, expiry, status
+
+/dashboard/customers/:id
+  - 6 tabs: Overview | Membership | Bookings | Workouts | Payments | Activity
+```
 
 ---
 
-## TUẦN 1 — Schema + Plans
+## Layer AI (bắt buộc)
 
-### 🗄️ Database
+**Mày làm: Lead Scoring tự động**
+
+```
+Khi tạo/cập nhật lead → gọi AI service để tính lead_score (0-100)
+Score cao → ưu tiên follow-up hơn
+```
+
+**Spring Boot gọi AI:**
+```java
+// LeadService.java
+public Lead createLead(LeadRequest req) {
+    Lead lead = leadRepo.save(mapToEntity(req));
+
+    // Gọi AI service để score lead
+    int score = aiClient.scoreLead(AiScoreRequest.builder()
+        .goal(lead.getGoal())
+        .source(lead.getSource())
+        .hasEmail(lead.getEmail() != null)
+        .hasPhone(true)
+        .build());
+
+    lead.setLeadScore(score);
+    return leadRepo.save(lead);
+}
+```
+
+**AI service endpoint mày gọi** (Người D viết service, mày tích hợp):
+```
+POST /ai/score-lead
+Body: { goal, source, hasEmail, hasPhone }
+Response: { score: 75, reason: "High intent source with clear goal" }
+```
+
+**FE hiển thị:** Score badge màu (0-40 red, 41-70 yellow, 71-100 green) trên lead card và table.
+
+---
+
+## Layer OPS (bắt buộc)
+
+**File mày tự viết:**
+
+```dockerfile
+# backend/Dockerfile
+FROM eclipse-temurin:21-jdk-alpine AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+COPY --from=builder /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+```yaml
+# Phần backend trong docker-compose.yml
+backend:
+  build: ./backend
+  ports:
+    - "8080:8080"
+  environment:
+    - SPRING_DATASOURCE_URL=${DB_URL}
+    - SPRING_DATASOURCE_USERNAME=${DB_USER}
+    - SPRING_DATASOURCE_PASSWORD=${DB_PASS}
+    - JWT_SECRET=${JWT_SECRET}
+    - REDIS_URL=${REDIS_URL}
+  depends_on:
+    - postgres
+    - redis
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+```
+
+```yaml
+# .github/workflows/ci.yml — job của mày
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { java-version: '21' }
+      - run: cd backend && mvn test
+      - run: cd backend && mvn package -DskipTests
+```
+
+---
+
+## Tests mày phải viết
+
+```java
+// AuthServiceTest.java
+@Test void register_success()
+@Test void register_duplicate_email_throws()
+@Test void login_wrong_password_throws()
+@Test void refresh_token_expired_throws()
+@Test void disabled_user_cannot_login()
+
+// LeadServiceTest.java
+@Test void convert_lead_creates_customer()
+@Test void convert_already_converted_throws()
+@Test void lead_score_assigned_after_create()
+@Test void lost_lead_cannot_be_converted()
+```
+
+---
+
+## Mày nói gì khi vấn đáp / ghi CV
+
+```
+DB    → "Thiết kế schema users/leads với UUID PK, CHECK constraint role, index status+assigned_to"
+BE    → "JWT access+refresh token, Redis blacklist logout, RBAC @PreAuthorize, AOP audit log"
+FE    → "AuthContext với httpOnly cookie, ProtectedRoute redirect, RoleGuard hide UI"
+AI    → "Lead scoring: gọi AI service để tự động tính điểm ưu tiên follow-up, hiển thị badge màu"
+OPS   → "Multi-stage Dockerfile giảm image size, healthcheck, GitHub Actions test backend"
+```
+
+---
+---
+
+# NGƯỜI B — COMMERCE + MEMBERSHIP
+
+## Layer DB (bắt buộc)
+
+**File:** `V2__commerce.sql`
+
 ```sql
--- V3__commerce.sql
+-- PLANS
 CREATE TABLE service_plans (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  type VARCHAR(50) NOT NULL,  -- MEMBERSHIP / PT_PACKAGE
-  description TEXT,
-  price NUMERIC(12,2) NOT NULL,
-  duration_days INT,
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name             VARCHAR(255) NOT NULL,
+  type             VARCHAR(50)  NOT NULL CHECK (type IN ('MEMBERSHIP','PT_PACKAGE')),
+  description      TEXT,
+  price            NUMERIC(12,2) NOT NULL CHECK (price >= 0),
+  duration_days    INT,
   included_sessions INT,
-  status VARCHAR(20) DEFAULT 'ACTIVE',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  status           VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ORDERS
 CREATE TABLE orders (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  plan_id UUID REFERENCES service_plans(id) NOT NULL,
-  status VARCHAR(20) DEFAULT 'PENDING',
-  subtotal NUMERIC(12,2) NOT NULL,
-  discount NUMERIC(12,2) DEFAULT 0,
-  total NUMERIC(12,2) NOT NULL,
-  notes TEXT,
-  created_by UUID REFERENCES users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id  UUID NOT NULL REFERENCES customers(id),
+  plan_id      UUID NOT NULL REFERENCES service_plans(id),
+  status       VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  subtotal     NUMERIC(12,2) NOT NULL,
+  discount     NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (discount >= 0),
+  total        NUMERIC(12,2) NOT NULL CHECK (total >= 0),
+  created_by   UUID REFERENCES users(id),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- PAYMENTS
 CREATE TABLE payments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_id UUID REFERENCES orders(id) NOT NULL,
-  method VARCHAR(50) NOT NULL,  -- CASH/BANK_TRANSFER/VNPAY/STRIPE
-  reference VARCHAR(255) UNIQUE NOT NULL,  -- idempotency key
-  amount NUMERIC(12,2) NOT NULL,
-  status VARCHAR(20) DEFAULT 'PENDING',
-  paid_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id   UUID NOT NULL REFERENCES orders(id),
+  method     VARCHAR(50) NOT NULL,
+  reference  VARCHAR(255) UNIQUE NOT NULL,  -- idempotency key
+  amount     NUMERIC(12,2) NOT NULL,
+  status     VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  paid_at    TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- MEMBERSHIPS
 CREATE TABLE memberships (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  plan_id UUID REFERENCES service_plans(id) NOT NULL,
-  order_id UUID REFERENCES orders(id),
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  status VARCHAR(20) DEFAULT 'ACTIVE',
-  paused_at TIMESTAMPTZ,
-  paused_days INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  plan_id     UUID NOT NULL REFERENCES service_plans(id),
+  order_id    UUID REFERENCES orders(id),
+  start_date  DATE NOT NULL,
+  end_date    DATE NOT NULL,
+  status      VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  paused_at   TIMESTAMPTZ,
+  paused_days INT NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- PT PACKAGES
 CREATE TABLE pt_packages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  plan_id UUID REFERENCES service_plans(id) NOT NULL,
-  order_id UUID REFERENCES orders(id),
-  total_sessions INT NOT NULL,
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id        UUID NOT NULL REFERENCES customers(id),
+  plan_id            UUID NOT NULL REFERENCES service_plans(id),
+  order_id           UUID REFERENCES orders(id),
+  total_sessions     INT NOT NULL CHECK (total_sessions > 0),
   remaining_sessions INT NOT NULL,
-  expires_at DATE,
-  status VARCHAR(20) DEFAULT 'ACTIVE',
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  expires_at         DATE,
+  status             VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_memberships_customer ON memberships(customer_id);
+CREATE INDEX idx_memberships_status   ON memberships(status);
+CREATE INDEX idx_orders_customer      ON orders(customer_id);
 ```
 
-### ⚙️ Backend — Plans
-- [ ] `GET /api/plans` (public) — list active plans
-- [ ] `GET /api/plans/:id` — detail
-- [ ] `POST /api/plans` (MANAGER) — tạo plan
-- [ ] `PUT /api/plans/:id` — cập nhật
-- [ ] `PATCH /api/plans/:id/status` — activate/deactivate
-
-### 🖥️ Frontend
-- [ ] `/plans` (public) — 3 plan cards: Move / Perform / PT Focus
-- [ ] `/dashboard/plans` (MANAGER) — quản lý plans
+**Giải thích vấn đáp:** "Tôi để `reference UNIQUE` trong payments để DB tự enforce idempotency — dù application có bug gọi 2 lần thì DB constraint sẽ reject cái thứ 2."
 
 ---
 
-## TUẦN 2 — Order + Payment
+## Layer BE (bắt buộc)
 
-### ⚙️ Backend
-- [ ] `POST /api/orders` — tạo order (server-side tính total, không nhận từ client)
-- [ ] `GET /api/orders` (MANAGER/RECEPTIONIST) — list với filter
-- [ ] `GET /api/orders/me` (CUSTOMER) — own orders
-- [ ] `GET /api/orders/:id` — detail
-- [ ] `PATCH /api/orders/:id/cancel` — chỉ khi status = PENDING
-- [ ] `POST /api/payments` — tạo payment + trigger activation nếu SUCCESS
-- [ ] `POST /api/payments/vnpay/callback` — **Idempotency**:
-  ```java
-  if (paymentRepo.existsByReference(ref)) {
-    return ResponseEntity.ok("already processed");
-  }
-  ```
-- [ ] `ServiceActivationService.activate()`:
-  ```
-  MEMBERSHIP → tạo Membership ACTIVE
-  PT_PACKAGE → tạo PtPackage với remaining_sessions
-  Order.status = PAID
-  ```
+```
+GET    /api/plans              - list plans (public)
+GET    /api/plans/:id          - detail
+POST   /api/plans              - tạo (MANAGER)
+PUT    /api/plans/:id          - cập nhật (MANAGER)
+PATCH  /api/plans/:id/status   - toggle active/inactive
 
-### 🖥️ Frontend
-- [ ] `/dashboard/sales` — KPI cards + transaction table
-- [ ] `/dashboard/create-sale` — 3-step wizard:
-  1. Search + select customer
-  2. Plan card selection
-  3. Order summary + payment method + confirm
-- [ ] `/dashboard/payment-confirmed` — success screen với receipt
+POST   /api/orders             - tạo order (server-side tính total)
+GET    /api/orders             - list (MANAGER/RECEPTIONIST)
+GET    /api/orders/me          - own orders (CUSTOMER)
+GET    /api/orders/:id         - detail
+PATCH  /api/orders/:id/cancel  - cancel (chỉ PENDING)
+
+POST   /api/payments           - tạo payment + trigger activation
+POST   /api/payments/callback  - webhook (idempotent)
+GET    /api/payments           - list
+GET    /api/payments/me        - own payments
+
+GET    /api/memberships        - list (MANAGER)
+GET    /api/memberships/me     - own (CUSTOMER)
+GET    /api/memberships/:id    - detail
+PATCH  /api/memberships/:id/pause
+PATCH  /api/memberships/:id/resume
+PATCH  /api/memberships/:id/cancel
+POST   /api/memberships/:id/renew
+GET    /api/memberships/expiring   - sắp hết hạn 7 ngày
+
+GET    /api/pt-packages/me     - own PT packages
+PATCH  /api/pt-packages/:id/use - decrement session (idempotent)
+```
+
+**Business logic quan trọng — Server-side price:**
+```java
+// OrderService.java — KHÔNG nhận total từ client
+public Order createOrder(UUID customerId, UUID planId, BigDecimal discountAmount) {
+    ServicePlan plan = planRepo.findById(planId).orElseThrow();
+    BigDecimal subtotal = plan.getPrice();
+    BigDecimal discount = discountAmount != null ? discountAmount : BigDecimal.ZERO;
+    BigDecimal total = subtotal.subtract(discount);
+    if (total.compareTo(BigDecimal.ZERO) < 0) throw new InvalidOrderException("Total cannot be negative");
+    // tạo order...
+}
+```
+
+**Payment idempotency:**
+```java
+// PaymentService.java
+@Transactional
+public Payment processPayment(PaymentRequest req) {
+    // DB UNIQUE constraint đã block duplicate reference
+    // Nhưng cũng check thêm ở application layer
+    if (paymentRepo.existsByReference(req.getReference())) {
+        return paymentRepo.findByReference(req.getReference());
+    }
+    Payment payment = createPayment(req);
+    if (payment.getStatus() == SUCCESS) {
+        serviceActivationService.activate(req.getOrderId());
+    }
+    return payment;
+}
+```
+
+**Membership pause/resume:**
+```java
+public void pause(UUID membershipId) {
+    Membership m = findActive(membershipId);
+    m.setStatus(PAUSED);
+    m.setPausedAt(Instant.now());
+}
+
+public void resume(UUID membershipId) {
+    Membership m = findPaused(membershipId);
+    long daysPaused = ChronoUnit.DAYS.between(m.getPausedAt(), Instant.now());
+    m.setEndDate(m.getEndDate().plusDays(daysPaused));  // cộng thêm số ngày đã pause
+    m.setPausedDays((int)(m.getPausedDays() + daysPaused));
+    m.setStatus(ACTIVE);
+}
+```
+
+**MembershipValidator — Người C dùng:**
+```java
+@Component
+public class MembershipValidator {
+    public void requireActive(UUID customerId) {
+        boolean active = membershipRepo.existsActiveByCustomerId(customerId);
+        if (!active) throw new MembershipRequiredException();
+    }
+}
+```
 
 ---
 
-## TUẦN 3 — Membership Lifecycle
+## Layer FE (bắt buộc)
 
-### ⚙️ Backend
-- [ ] `GET /api/memberships` — list, filter status
-- [ ] `GET /api/memberships/me` — own membership
-- [ ] `PATCH /api/memberships/:id/pause` — lưu paused_at
-- [ ] `PATCH /api/memberships/:id/resume` — tính days_paused, cộng vào end_date
-- [ ] `PATCH /api/memberships/:id/cancel`
-- [ ] `POST /api/memberships/:id/renew` — tạo order mới
-- [ ] `GET /api/memberships/expiring` — sắp hết hạn 7 ngày
-- [ ] **Middleware** `MembershipValidator.requireActive(customerId)` — Người C dùng
-- [ ] `PATCH /api/pt-packages/:id/use` — idempotent decrement với @Version optimistic locking
+```
+/plans  (public page)
+  - 3 plan cards: Move | Perform (highlighted) | PT Focus
+  - Price, features list, "Get started" button
+  - "NO JOINING FEE" badge
 
-### 🖥️ Frontend
-- [ ] `/dashboard/member/payments` — membership card + payment history
-- [ ] Membership status badge, pause/resume/cancel buttons
-- [ ] Tab Membership trong customer detail
+/dashboard/plans  (MANAGER)
+  - Table: name, type, price, status toggle
+  - Create plan form modal
 
-### 🐳 Docker
-- [ ] Cấu hình env vars cho payment sandbox trong docker-compose
+/dashboard/sales  (RECEPTIONIST)
+  - KPI cards: Today Revenue | Month Revenue | Pending Orders
+  - Transactions table: customer, plan, amount, method, status, date
 
----
+/dashboard/create-sale  (RECEPTIONIST)
+  - Step 1: Search customer (search by name/phone, show results dropdown)
+  - Step 2: Plan cards (click to select, lime border on selected)
+  - Step 3: Order summary + Payment method (Cash/Bank/Sandbox) + Confirm button
 
-## TUẦN 4 — Testing + Deploy
+/dashboard/payment-confirmed
+  - ✓ checkmark (lime circle, 80px)
+  - "Payment confirmed!" heading
+  - Receipt card: member, plan, amount, method, date, receipt number
+  - Buttons: Print receipt | Back to sales
+  - Auto-redirect countdown: "Back in 10s..."
 
-- [ ] Unit test: price calculation, discount, validate customer
-- [ ] Unit test: idempotency — gọi 2 lần cùng reference → chỉ activate 1 lần
-- [ ] Unit test: pause/resume date calculation
-- [ ] Test: payment success → membership ACTIVE
-- [ ] Test: payment callback duplicate → không tạo 2 memberships
-- [ ] Deploy backend lên Railway/Render + configure env vars
-
-### 📝 CV / Vấn đáp:
-- Payment idempotency với unique reference + Redis check
-- Server-side price calculation, không trust client input
-- Membership pause/resume với date arithmetic
-- Optimistic locking để prevent double-use PT session
-- Service activation tách biệt khỏi payment logic
+/dashboard/member/payments  (CUSTOMER)
+  - Membership card: plan name, status badge, expiry date, "Pause" / "Cancel" buttons
+  - Payment history table: date, description, amount, status
+```
 
 ---
 
+## Layer AI (bắt buộc)
+
+**Mày làm: Renewal Risk Prediction**
+
+Khi Manager vào dashboard xem expiring members, mỗi member có thêm AI-predicted renewal probability.
+
+**Spring Boot gọi AI:**
+```java
+// RenewalService.java
+public List<RenewalRisk> getExpiringWithRisk() {
+    List<Membership> expiring = membershipRepo.findExpiringIn7Days();
+
+    return expiring.stream().map(m -> {
+        // Lấy thêm data: attendance rate, payment history, last active
+        RenewalContext ctx = buildContext(m.getCustomerId());
+
+        // Gọi AI
+        RenewalPrediction pred = aiClient.predictRenewal(ctx);
+
+        return RenewalRisk.builder()
+            .membership(m)
+            .renewalProbability(pred.getProbability())  // 0.0 - 1.0
+            .riskLevel(pred.getRiskLevel())             // LOW/MEDIUM/HIGH
+            .suggestion(pred.getSuggestion())           // "Offer 10% discount"
+            .build();
+    }).toList();
+}
+```
+
+**FE hiển thị:** Renewal risk table trong dashboard — cột "Risk" có badge LOW/MEDIUM/HIGH màu, cột "AI Suggestion" hiển thị text gợi ý.
+
 ---
 
-# 👤 NGƯỜI C — CLASS + SCHEDULE + BOOKING + TRAINER + CHECK-IN
+## Layer OPS (bắt buộc)
 
-## Mày làm gì để giải thích với nhà tuyển dụng?
-> *"Tôi giải quyết bài toán concurrency trong booking: khi 2 user cùng book slot cuối cùng, chỉ 1 người thành công. Tôi dùng SELECT FOR UPDATE + UNIQUE constraint để đảm bảo correctness."*
+```dockerfile
+# frontend/Dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+```yaml
+# Phần frontend trong docker-compose.yml
+frontend:
+  build: ./frontend
+  ports:
+    - "3000:3000"
+  environment:
+    - NEXT_PUBLIC_API_URL=http://backend:8080
+  depends_on:
+    - backend
+```
+
+```yaml
+# GitHub Actions job của mày
+test-frontend:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with: { node-version: '20' }
+    - run: cd frontend && npm ci
+    - run: cd frontend && npm run build
+
+deploy-frontend:
+  needs: test-frontend
+  steps:
+    - run: echo "Deploy to Vercel or Railway"
+```
 
 ---
 
-## TUẦN 1 — Schema + Trainer + Class
+## Tests mày phải viết
 
-### 🗄️ Database
+```java
+@Test void order_total_calculated_server_side()
+@Test void order_total_cannot_be_negative()
+@Test void payment_idempotency_duplicate_reference()
+@Test void payment_success_creates_membership()
+@Test void membership_pause_resume_date_correct()
+@Test void pt_session_use_decrements_once()
+```
+
+---
+
+## Mày nói gì khi vấn đáp / ghi CV
+
+```
+DB  → "UNIQUE constraint trên payment.reference enforce idempotency ở DB level"
+BE  → "Server-side price calculation, payment idempotency, membership pause/resume với date math"
+FE  → "3-step sale wizard, payment method selector, receipt screen với auto-redirect"
+AI  → "Renewal risk prediction: AI tính xác suất gia hạn dựa trên attendance + payment history"
+OPS → "Multi-stage Next.js Dockerfile với standalone output, deploy Vercel/Railway"
+```
+
+---
+---
+
+# NGƯỜI C — CLASS + BOOKING + ATTENDANCE
+
+## Layer DB (bắt buộc)
+
+**File:** `V3__operations.sql`
+
 ```sql
--- V4__operations.sql
+-- TRAINERS
 CREATE TABLE trainers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) UNIQUE,
-  full_name VARCHAR(255) NOT NULL,
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id        UUID UNIQUE REFERENCES users(id),
+  full_name      VARCHAR(255) NOT NULL,
   specialization VARCHAR(255),
-  bio TEXT,
-  status VARCHAR(20) DEFAULT 'ACTIVE'
+  bio            TEXT,
+  status         VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'
 );
 
+-- TRAINER ASSIGNMENTS
 CREATE TABLE trainer_assignments (
-  trainer_id UUID REFERENCES trainers(id) NOT NULL,
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  assigned_at TIMESTAMPTZ DEFAULT NOW(),
+  trainer_id  UUID NOT NULL REFERENCES trainers(id),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (trainer_id, customer_id)
 );
 
+-- CLASSES
 CREATE TABLE classes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  type VARCHAR(50),  -- YOGA/HIIT/CYCLING/STRENGTH/BOXING
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        VARCHAR(255) NOT NULL,
+  type        VARCHAR(50),   -- YOGA | HIIT | CYCLING | STRENGTH | BOXING
   description TEXT,
-  status VARCHAR(20) DEFAULT 'ACTIVE'
+  status      VARCHAR(20) NOT NULL DEFAULT 'ACTIVE'
 );
 
+-- CLASS SESSIONS (lịch cụ thể)
 CREATE TABLE class_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  class_id UUID REFERENCES classes(id) NOT NULL,
-  trainer_id UUID REFERENCES trainers(id),
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  class_id     UUID NOT NULL REFERENCES classes(id),
+  trainer_id   UUID REFERENCES trainers(id),
   session_date DATE NOT NULL,
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  room VARCHAR(100),
-  capacity INT NOT NULL,
-  booked_count INT DEFAULT 0,
-  status VARCHAR(20) DEFAULT 'SCHEDULED'
+  start_time   TIME NOT NULL,
+  end_time     TIME NOT NULL,
+  room         VARCHAR(100),
+  capacity     INT NOT NULL CHECK (capacity > 0),
+  booked_count INT NOT NULL DEFAULT 0 CHECK (booked_count >= 0),
+  status       VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED'
 );
 
+-- BOOKINGS
 CREATE TABLE bookings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  class_session_id UUID REFERENCES class_sessions(id) NOT NULL,
-  status VARCHAR(20) DEFAULT 'CONFIRMED',
-  booked_at TIMESTAMPTZ DEFAULT NOW(),
-  cancelled_at TIMESTAMPTZ,
-  UNIQUE(customer_id, class_session_id)  -- prevent duplicate
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id      UUID NOT NULL REFERENCES customers(id),
+  class_session_id UUID NOT NULL REFERENCES class_sessions(id),
+  status           VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
+  booked_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  cancelled_at     TIMESTAMPTZ,
+  UNIQUE (customer_id, class_session_id)  -- chặn duplicate ở DB level
 );
 
+-- PT SESSIONS
 CREATE TABLE pt_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  trainer_id UUID REFERENCES trainers(id) NOT NULL,
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  pt_package_id UUID REFERENCES pt_packages(id),
-  scheduled_at TIMESTAMPTZ NOT NULL,
-  duration_minutes INT DEFAULT 60,
-  status VARCHAR(20) DEFAULT 'SCHEDULED',
-  notes TEXT,
-  session_ref UUID UNIQUE DEFAULT gen_random_uuid()  -- idempotency
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trainer_id     UUID NOT NULL REFERENCES trainers(id),
+  customer_id    UUID NOT NULL REFERENCES customers(id),
+  pt_package_id  UUID REFERENCES pt_packages(id),
+  scheduled_at   TIMESTAMPTZ NOT NULL,
+  duration_min   INT NOT NULL DEFAULT 60,
+  status         VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED',
+  notes          TEXT,
+  completion_ref UUID UNIQUE DEFAULT gen_random_uuid()  -- idempotency khi complete
 );
 
+-- ATTENDANCE
 CREATE TABLE attendance (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id      UUID NOT NULL REFERENCES customers(id),
   class_session_id UUID REFERENCES class_sessions(id),
-  pt_session_id UUID REFERENCES pt_sessions(id),
-  checked_in_at TIMESTAMPTZ DEFAULT NOW(),
-  type VARCHAR(20)  -- CLASS/PT/GYM
+  pt_session_id    UUID REFERENCES pt_sessions(id),
+  type             VARCHAR(20) NOT NULL,  -- CLASS | PT | GYM
+  checked_in_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_bookings_session ON bookings(class_session_id);
-CREATE INDEX idx_sessions_date ON class_sessions(session_date);
+CREATE INDEX idx_bookings_session    ON bookings(class_session_id);
+CREATE INDEX idx_bookings_customer   ON bookings(customer_id);
+CREATE INDEX idx_sessions_date       ON class_sessions(session_date);
+CREATE INDEX idx_attendance_customer ON attendance(customer_id);
 ```
 
-### ⚙️ Backend — Trainer + Class
-- [ ] `GET /api/trainers` — list
-- [ ] `POST /api/trainers` (MANAGER)
-- [ ] `PUT /api/trainers/:id`
-- [ ] `PATCH /api/trainers/:id/assign` — assign customer
-- [ ] `GET /api/trainers/:id/schedule`
-- [ ] `GET /api/classes` — list
-- [ ] `POST /api/classes` (MANAGER)
-- [ ] `PUT /api/classes/:id`
-
-### 🖥️ Frontend
-- [ ] `/dashboard/trainer` — today's sessions timeline + my clients table
+**Giải thích vấn đáp:** "Tôi để `booked_count` denormalized trong class_sessions để tránh COUNT(*) mỗi lần check capacity. Và `UNIQUE(customer_id, class_session_id)` trong bookings để DB tự chặn duplicate booking dù có race condition."
 
 ---
 
-## TUẦN 2 — Sessions + Booking (core challenge)
+## Layer BE (bắt buộc)
 
-### ⚙️ Backend — Booking với Concurrency
-- [ ] `POST /api/sessions` (MANAGER) — tạo class session
-- [ ] `GET /api/sessions` — filter date/trainer/class
-- [ ] `PATCH /api/sessions/:id/cancel` — cancel + cancel all bookings
-- [ ] `POST /api/bookings` — **Concurrency-safe**:
-  ```java
-  @Transactional
-  public Booking createBooking(UUID customerId, UUID sessionId) {
-    // 1. Check membership active
+```
+POST   /api/trainers                     - tạo trainer (MANAGER)
+GET    /api/trainers                     - list
+PUT    /api/trainers/:id                 - cập nhật
+PATCH  /api/trainers/:id/assign          - assign customer
+GET    /api/trainers/:id/schedule        - schedule của trainer
+
+GET    /api/classes                      - list
+POST   /api/classes                      - tạo (MANAGER)
+PUT    /api/classes/:id                  - cập nhật
+
+GET    /api/sessions                     - list filter(date, trainer, class)
+POST   /api/sessions                     - tạo session (MANAGER)
+PUT    /api/sessions/:id                 - cập nhật
+PATCH  /api/sessions/:id/cancel          - cancel + cancel all bookings
+
+POST   /api/bookings                     - tạo booking (CONCURRENCY-SAFE)
+GET    /api/bookings/me                  - own bookings (CUSTOMER)
+GET    /api/bookings                     - all (MANAGER/RECEPTIONIST)
+PATCH  /api/bookings/:id/cancel          - cancel + decrement
+PATCH  /api/bookings/:id/no-show         - mark no-show
+
+POST   /api/checkin                      - check-in (validate membership)
+GET    /api/attendance                   - list (MANAGER)
+GET    /api/attendance/me                - own (CUSTOMER)
+
+POST   /api/pt-sessions                  - schedule PT
+GET    /api/pt-sessions                  - list
+PATCH  /api/pt-sessions/:id/reschedule   - đổi giờ
+PATCH  /api/pt-sessions/:id/cancel       - cancel
+PATCH  /api/pt-sessions/:id/complete     - complete (idempotent, gọi B's useSession)
+```
+
+**Booking concurrency — phần quan trọng nhất:**
+```java
+@Transactional(isolation = Isolation.READ_COMMITTED)
+public Booking createBooking(UUID customerId, UUID sessionId) {
+
+    // Step 1: Validate membership (gọi module B)
     membershipValidator.requireActive(customerId);
 
-    // 2. Lock session row
-    ClassSession session = sessionRepo.findByIdWithLock(sessionId);
-    // SQL: SELECT * FROM class_sessions WHERE id=? FOR UPDATE
+    // Step 2: Lock session row để serialize concurrent requests
+    ClassSession session = sessionRepo.findByIdWithPessimisticLock(sessionId);
+    // → SQL: SELECT * FROM class_sessions WHERE id = ? FOR UPDATE
 
-    // 3. Check capacity
+    // Step 3: Check capacity
     if (session.getBookedCount() >= session.getCapacity()) {
-      throw new ClassFullException();
+        throw new ClassFullException("No spots remaining");
     }
 
-    // 4. Create booking + increment (UNIQUE constraint catches duplicate)
+    // Step 4: Increment counter + create booking
+    // UNIQUE constraint sẽ bắt duplicate nếu race condition qua được lock
     session.setBookedCount(session.getBookedCount() + 1);
-    return bookingRepo.save(new Booking(customerId, sessionId));
-  }
-  ```
-- [ ] `GET /api/bookings/me` — own bookings
-- [ ] `GET /api/bookings` (MANAGER/RECEPTIONIST) — all bookings
-- [ ] `PATCH /api/bookings/:id/cancel` — cancel + decrement booked_count
-- [ ] `PATCH /api/bookings/:id/no-show`
+    sessionRepo.save(session);
 
-### 🖥️ Frontend
-- [ ] `/dashboard/schedule` — weekly calendar 7 columns (Mon-Sun), session cards màu theo type
-- [ ] `/dashboard/member/book` — date strip + class cards với Book button + capacity bar
-
----
-
-## TUẦN 3 — Check-in + PT Sessions
-
-### ⚙️ Backend
-- [ ] `POST /api/checkin` — search customer → validate membership → tạo attendance
-- [ ] `GET /api/attendance` — history filter date/customer
-- [ ] `GET /api/attendance/me` — own history
-- [ ] `POST /api/pt-sessions` — schedule PT (validate trainer available + package có sessions)
-- [ ] `GET /api/pt-sessions` — list filter
-- [ ] `PATCH /api/pt-sessions/:id/reschedule`
-- [ ] `PATCH /api/pt-sessions/:id/cancel`
-- [ ] `PATCH /api/pt-sessions/:id/complete` — idempotent via session_ref → gọi B's useSession
-
-### 🖥️ Frontend
-- [ ] `/dashboard/bookings` — check-in strip + stats cards + bookings table
-- [ ] PT Session management trong trainer view
-
----
-
-## TUẦN 4 — Testing + Reports
-
-- [ ] Unit test `BookingService`: duplicate prevention, capacity check
-- [ ] **Concurrency test**: 2 concurrent requests cho slot cuối → chỉ 1 thành công
-- [ ] Test: booking khi membership EXPIRED → 403
-- [ ] Test: PT complete 2 lần → sessions chỉ trừ 1 lần
-- [ ] `GET /api/reports/classes` — occupancy %, no-show rate
-
-### 📝 CV / Vấn đáp:
-- Concurrency trong booking: SELECT FOR UPDATE, UNIQUE constraint, transaction isolation
-- Denormalized `booked_count` để tránh COUNT(*) mỗi lần check capacity
-- Idempotent PT session completion với session_ref UUID
-- Calendar UI với 7-column grid và color coding
-- Integration: booking → check-in → attendance trong 1 flow
-
----
-
----
-
-# 👤 NGƯỜI D — WORKOUT + PROGRESS + AI COACH + DEVOPS
-
-## Mày làm gì để giải thích với nhà tuyển dụng?
-> *"Tôi xây AI coaching service bằng Python FastAPI, inject customer fitness context vào OpenAI API call, implement safety filter chặn medical advice, đồng thời setup toàn bộ CI/CD pipeline cho team."*
-
----
-
-## TUẦN 1 — Schema + Exercise Library + DevOps Setup
-
-### 🗄️ Database
-```sql
--- V5__workout.sql
-CREATE TABLE exercises (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  muscle_group VARCHAR(100),
-  equipment VARCHAR(100),
-  difficulty VARCHAR(20),
-  instructions TEXT,
-  created_by UUID REFERENCES users(id)
-);
-
-CREATE TABLE workout_plans (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  trainer_id UUID REFERENCES trainers(id),
-  goal VARCHAR(50),
-  start_date DATE,
-  end_date DATE,
-  status VARCHAR(20) DEFAULT 'DRAFT',
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE workout_plan_exercises (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  plan_id UUID REFERENCES workout_plans(id) NOT NULL,
-  day_number INT NOT NULL,
-  exercise_id UUID REFERENCES exercises(id) NOT NULL,
-  sets INT,
-  reps INT,
-  target_weight NUMERIC(6,2),
-  rest_seconds INT,
-  order_index INT DEFAULT 0
-);
-
-CREATE TABLE workout_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  plan_id UUID REFERENCES workout_plans(id),
-  performed_at TIMESTAMPTZ DEFAULT NOW(),
-  status VARCHAR(20) DEFAULT 'IN_PROGRESS',
-  notes TEXT
-);
-
-CREATE TABLE workout_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID REFERENCES workout_sessions(id) NOT NULL,
-  exercise_id UUID REFERENCES exercises(id) NOT NULL,
-  set_number INT NOT NULL,
-  reps_completed INT,
-  weight NUMERIC(6,2),
-  rpe INT,
-  notes TEXT
-);
-
-CREATE TABLE body_metrics (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  recorded_at DATE DEFAULT CURRENT_DATE,
-  weight NUMERIC(5,2),
-  body_fat NUMERIC(5,2),
-  muscle_mass NUMERIC(5,2),
-  waist NUMERIC(5,2)
-);
-
-CREATE TABLE ai_conversations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE ai_messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  conversation_id UUID REFERENCES ai_conversations(id) NOT NULL,
-  role VARCHAR(20) NOT NULL,  -- user/assistant
-  content TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE ai_recommendations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  customer_id UUID REFERENCES customers(id) NOT NULL,
-  title VARCHAR(255),
-  reason TEXT,
-  suggested_changes JSONB,
-  status VARCHAR(20) DEFAULT 'PENDING',  -- PENDING/ACCEPTED/DISMISSED
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+    Booking booking = new Booking(customerId, sessionId, CONFIRMED);
+    return bookingRepo.save(booking);
+    // Nếu duplicate → DataIntegrityViolationException → trả lỗi rõ ràng
+}
 ```
 
-### ⚙️ Backend — Exercises
-- [ ] `GET /api/exercises` — search + filter(muscle_group, equipment, difficulty)
-- [ ] `POST /api/exercises` (TRAINER/MANAGER)
-- [ ] `PUT /api/exercises/:id`
-- [ ] Seed 50 exercises phổ biến
+**Repository method:**
+```java
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+@Query("SELECT s FROM ClassSession s WHERE s.id = :id")
+ClassSession findByIdWithPessimisticLock(@Param("id") UUID id);
+```
 
-### 🐳 DevOps — Setup ngay tuần 1
-- [ ] `docker-compose.yml` đầy đủ:
-  ```yaml
+---
+
+## Layer FE (bắt buộc)
+
+```
+/dashboard/schedule  (MANAGER)
+  - Toggle: Week view | List view
+  - Week view: 7 columns Mon-Sun
+    - Mỗi cột: ngày + session cards xếp theo giờ
+    - Card màu theo type: Yoga=purple, HIIT=orange, Strength=lime, Cycling=blue
+    - Click card → drawer: trainer, capacity bar, booking list
+  - "Add session" button → modal form
+
+/dashboard/bookings  (RECEPTIONIST)
+  - Check-in strip (top):
+    - Search input "Search member name or code..."
+    - "Check in" button (lime, lớn)
+    - Real-time today stats: Checked In | Booked | No-show | Capacity %
+  - Bookings table: name, class, time, status badge, actions
+
+/dashboard/trainer  (TRAINER)
+  - Today's sessions: timeline list (time | client | type | status chip)
+  - My clients: table (name, plan, next session, notes)
+  - PT Session actions: schedule / reschedule / complete
+
+/dashboard/member/book  (CUSTOMER)
+  - Tabs: Classes | Personal Training
+  - Classes tab:
+    - Date strip (today + 6 ngày tới), click để chọn ngày
+    - Class cards: type badge | name | trainer | time | spots bar | Book button
+    - Book button → confirm modal → POST /api/bookings
+  - PT tab:
+    - Trainer cards: avatar | name | specialty | availability badge
+    - "Request session" button
+```
+
+---
+
+## Layer AI (bắt buộc)
+
+**Mày làm: Smart Schedule Suggestions**
+
+Khi Manager vào `/dashboard/schedule`, AI gợi ý thêm class nào để tối ưu occupancy.
+
+**Spring Boot gọi AI:**
+```java
+// ScheduleService.java
+public ScheduleSuggestion getAiSuggestion(LocalDate weekStart) {
+    // Lấy data tuần hiện tại
+    List<SessionSummary> currentWeek = sessionRepo.getWeeklySummary(weekStart);
+    List<String> lowOccupancySlots = findLowOccupancySlots(currentWeek);
+
+    // Gọi AI
+    return aiClient.suggestSchedule(ScheduleContext.builder()
+        .currentSessions(currentWeek)
+        .lowOccupancySlots(lowOccupancySlots)
+        .historicalData(getHistoricalOccupancy())
+        .build());
+}
+```
+
+**FE hiển thị:** Banner vàng trong schedule page: "AI suggests adding a HIIT class on Wednesday 7PM — historically 85% occupancy at this slot."
+
+---
+
+## Layer OPS (bắt buộc)
+
+```yaml
+# docker-compose.yml — phần của mày
+postgres:
+  image: postgres:15-alpine
+  environment:
+    POSTGRES_DB: ${DB_NAME}
+    POSTGRES_USER: ${DB_USER}
+    POSTGRES_PASSWORD: ${DB_PASS}
+  volumes:
+    - postgres_data:/var/lib/postgresql/data
+  ports:
+    - "5432:5432"
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
+redis:
+  image: redis:7-alpine
+  ports:
+    - "6379:6379"
+  command: redis-server --appendonly yes
+  volumes:
+    - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+```yaml
+# GitHub Actions — CI integration test job của mày
+integration-test:
+  runs-on: ubuntu-latest
   services:
-    postgres:     # port 5432
-    redis:        # port 6379
-    backend:      # Spring Boot port 8080
-    frontend:     # Next.js port 3000
-    ai-service:   # Python FastAPI port 8000
-  ```
-- [ ] `docker-compose.override.yml` cho dev (volumes, hot reload)
-- [ ] `.env.example` với tất cả variables cần thiết
-- [ ] `Makefile`: `make up`, `make down`, `make migrate`, `make seed`
-- [ ] GitHub Actions `ci.yml`:
-  ```yaml
-  jobs:
-    test-backend:   # mvn test
-    test-frontend:  # npm run build
-    build-images:   # docker build
-  ```
-
----
-
-## TUẦN 2 — Workout Plan + Log
-
-### ⚙️ Backend
-- [ ] `POST /api/workout-plans` (TRAINER)
-- [ ] `GET /api/workout-plans` — filter customer/trainer/status
-- [ ] `GET /api/workout-plans/:id` — detail với exercises grouped by day
-- [ ] `PUT /api/workout-plans/:id`
-- [ ] `PATCH /api/workout-plans/:id/activate` — chỉ 1 plan ACTIVE/lúc
-- [ ] `PATCH /api/workout-plans/:id/complete` / `cancel`
-- [ ] `POST /api/workout-sessions` — start session từ active plan
-- [ ] `PATCH /api/workout-sessions/:id/complete`
-- [ ] `POST /api/workout-logs` — log từng set (session_id, exercise_id, set_number, reps, weight, rpe)
-- [ ] `GET /api/workout-sessions/me` — own sessions với logs
-
-### 🖥️ Frontend
-- [ ] `/dashboard/workout-builder` — trainer view:
-  - Left: plan info + week tabs (W1/W2/W3/W4) + day cards grid (Mon-Sat)
-  - Right sidebar: exercise library với search + filter + "+" button
-- [ ] `/dashboard/member` — member home:
-  - Top cards: Membership, Next Booking, Streak
-  - This week grid (Mon-Sat) với exercises + completion dots
-  - Quick actions: Book / Log workout / Progress / AI Coach
-  - Recent activity feed
-
----
-
-## TUẦN 3 — Progress + AI Coach (Python)
-
-### ⚙️ Backend — Progress
-- [ ] `GET /api/progress/me` — computed:
-  ```json
-  {
-    "workoutsThisMonth": 12,
-    "attendanceCount": 15,
-    "currentStreak": 5,
-    "weeklyFrequency": [3,2,4,3,2,4,3,2],
-    "personalRecords": [
-      {"exercise": "Squat", "weight": 100, "reps": 5, "date": "2026-10-01"}
-    ]
-  }
-  ```
-- [ ] `POST /api/body-metrics` + `GET /api/body-metrics/me`
-
-### 🐍 AI Service (Python FastAPI)
-```
-ai/
-├── app/
-│   ├── main.py
-│   ├── routers/
-│   │   ├── chat.py        # POST /chat
-│   │   └── recommend.py   # POST /recommend
-│   ├── services/
-│   │   ├── context_loader.py   # Load customer data từ DB
-│   │   ├── llm_service.py      # OpenAI API call
-│   │   └── safety_filter.py    # Block medical advice
-│   └── schemas.py
-└── requirements.txt
+    postgres:
+      image: postgres:15
+      env:
+        POSTGRES_DB: fitos_test
+        POSTGRES_USER: test
+        POSTGRES_PASSWORD: test
+  steps:
+    - uses: actions/checkout@v4
+    - run: cd backend && mvn test -Dspring.profiles.active=test
 ```
 
-- [ ] `context_loader.py`:
-  ```python
-  def load_context(customer_id: str) -> dict:
-      # Query: profile + goals + active_plan + last_30_days_logs
-      return {"name", "goal", "active_plan", "recent_logs", "personal_records"}
-  ```
-- [ ] `llm_service.py` với system prompt:
-  ```
-  You are FITOS AI Coach. Answer fitness questions only.
-  Do NOT provide medical diagnosis or treatment.
-  Base advice on user's actual training data.
-  ```
-- [ ] `safety_filter.py` — detect medical intent → reject với message chuẩn
-- [ ] `POST /chat` — message + customer_id → load context → LLM → response
-- [ ] `POST /recommend` — phân tích logs → suggest changes (JSON)
+---
 
-### ⚙️ Backend — AI Proxy (Spring Boot)
-- [ ] `POST /api/ai/chat` — validate auth → gọi Python service → lưu message
-- [ ] `GET /api/ai/conversations/me` — load history
-- [ ] `POST /api/ai/recommend` → lưu recommendation
-- [ ] `PATCH /api/ai/recommendations/:id/accept` — apply vào workout plan
-- [ ] `PATCH /api/ai/recommendations/:id/dismiss`
+## Tests mày phải viết
 
-### 🖥️ Frontend
-- [ ] `/dashboard/member/ai-coach` — split:
-  - Left (60%): message bubbles + input + send + quick prompt chips
-  - Right (40%): "Your context" card + recommendation card (Accept/Dismiss)
-- [ ] `/dashboard/member/progress`:
-  - 4 stat cards: Workouts/month, Attendance, Streak, PRs
-  - Body metrics card + progress bar
-  - Weekly bar chart (pure CSS, 8 bars)
-  - Personal records table
-  - Recent workouts list
+```java
+// BookingServiceTest.java
+@Test void booking_success_decrements_available_spots()
+@Test void booking_when_full_throws_ClassFullException()
+@Test void duplicate_booking_throws_error()
+@Test void booking_expired_membership_throws_403()
+
+// Concurrency test — quan trọng nhất
+@Test void concurrent_bookings_only_one_succeeds_when_last_spot() {
+    // Tạo session capacity=1
+    // Gửi 2 CompletableFuture cùng lúc
+    // Assert: 1 success, 1 ClassFullException
+    var f1 = CompletableFuture.supplyAsync(() -> bookingService.create(customer1, session));
+    var f2 = CompletableFuture.supplyAsync(() -> bookingService.create(customer2, session));
+    // Đúng 1 thành công
+}
+
+@Test void pt_complete_is_idempotent_using_completion_ref()
+@Test void checkin_without_active_membership_throws()
+```
 
 ---
 
-## TUẦN 4 — Reports + Full DevOps
-
-### ⚙️ Backend — Reports
-- [ ] `GET /api/dashboard/stats` — Manager KPIs
-- [ ] `GET /api/dashboard/revenue-chart` — last 8 weeks
-- [ ] `GET /api/dashboard/crm-funnel` — lead count per stage
-- [ ] `GET /api/reports/sales` — revenue by period
-- [ ] `GET /api/reports/memberships` — active/expiring/expired
-- [ ] `GET /api/reports/classes` — occupancy, no-show
-- [ ] `GET /api/reports/renewals` — expiring customers
-
-### 🖥️ Frontend
-- [ ] `/dashboard` (Manager) — 4 KPI cards + revenue CSS bar chart + CRM funnel + class occupancy
-- [ ] `/dashboard/reports` — tabs: Sales | Members | Classes | Renewals
-
-### 🐳 DevOps — Production
-- [ ] Multi-stage Dockerfile: Spring Boot (builder + runtime, minimize size)
-- [ ] Multi-stage Dockerfile: Next.js
-- [ ] Dockerfile: Python AI service
-- [ ] GitHub Actions `deploy.yml` — build → push registry → deploy
-- [ ] Deploy lên Railway/Render/VPS:
-  - Backend, Frontend, AI service, PostgreSQL, Redis
-- [ ] HTTPS, secrets management, health check endpoints
-
-### Tests
-- [ ] Unit test AI safety filter: medical question → blocked
-- [ ] Unit test context loader: đúng customer, không leak data người khác
-- [ ] Test recommendation accept → workout plan thay đổi đúng
-
-### 📝 CV / Vấn đáp:
-- Python FastAPI microservice riêng biệt từ Spring Boot
-- Context injection cho LLM: load actual DB data trước khi gọi OpenAI
-- Safety filter để block medical advice
-- Multi-stage Docker builds giảm image size
-- GitHub Actions CI/CD pipeline end-to-end
-- Pure CSS charts không dùng library
-
----
-
----
-
-# TIMELINE TỔNG HỢP
+## Mày nói gì khi vấn đáp / ghi CV
 
 ```
+DB  → "UNIQUE(customer_id, session_id) trong bookings + booked_count denormalized để check capacity O(1)"
+BE  → "SELECT FOR UPDATE để serialize concurrent bookings, UNIQUE constraint làm safety net"
+FE  → "Weekly calendar 7 columns với color-coded class types, date strip cho member booking"
+AI  → "Schedule optimization: AI analyze occupancy patterns → suggest thêm class vào slot trống"
+OPS → "Docker Compose postgres + redis với healthcheck, GitHub Actions integration test với real DB"
+```
+
+---
+---
+
+# NGƯỜI D — WORKOUT + PROGRESS + AI COACH
+
+## Layer DB (bắt buộc)
+
+**File:** `V4__workout_ai.sql`
+
+```sql
+-- EXERCISES
+CREATE TABLE exercises (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name         VARCHAR(255) NOT NULL,
+  muscle_group VARCHAR(100),  -- CHEST | BACK | LEGS | SHOULDERS | ARMS | CORE
+  equipment    VARCHAR(100),  -- BARBELL | DUMBBELL | MACHINE | BODYWEIGHT | CABLE
+  difficulty   VARCHAR(20),   -- BEGINNER | INTERMEDIATE | ADVANCED
+  instructions TEXT,
+  created_by   UUID REFERENCES users(id),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- WORKOUT PLANS
+CREATE TABLE workout_plans (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  trainer_id  UUID REFERENCES trainers(id),
+  goal        VARCHAR(50),
+  start_date  DATE,
+  end_date    DATE,
+  status      VARCHAR(20) NOT NULL DEFAULT 'DRAFT',  -- DRAFT|ACTIVE|COMPLETED|CANCELLED
+  notes       TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- EXERCISES TRONG PLAN (theo ngày)
+CREATE TABLE workout_plan_exercises (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  plan_id       UUID NOT NULL REFERENCES workout_plans(id),
+  day_number    INT  NOT NULL CHECK (day_number BETWEEN 1 AND 7),
+  exercise_id   UUID NOT NULL REFERENCES exercises(id),
+  sets          INT,
+  reps          INT,
+  target_weight NUMERIC(6,2),
+  rest_seconds  INT,
+  order_index   INT NOT NULL DEFAULT 0
+);
+
+-- SESSION (mỗi lần tập)
+CREATE TABLE workout_sessions (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id  UUID NOT NULL REFERENCES customers(id),
+  plan_id      UUID REFERENCES workout_plans(id),
+  performed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  status       VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
+  notes        TEXT
+);
+
+-- LOG (từng set trong session)
+CREATE TABLE workout_logs (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id     UUID NOT NULL REFERENCES workout_sessions(id),
+  exercise_id    UUID NOT NULL REFERENCES exercises(id),
+  set_number     INT NOT NULL,
+  reps_completed INT,
+  weight         NUMERIC(6,2),
+  rpe            INT CHECK (rpe BETWEEN 1 AND 10),
+  notes          TEXT
+);
+
+-- BODY METRICS
+CREATE TABLE body_metrics (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id  UUID NOT NULL REFERENCES customers(id),
+  recorded_at  DATE NOT NULL DEFAULT CURRENT_DATE,
+  weight       NUMERIC(5,2),
+  body_fat     NUMERIC(5,2),
+  muscle_mass  NUMERIC(5,2),
+  waist        NUMERIC(5,2)
+);
+
+-- AI CONVERSATIONS
+CREATE TABLE ai_conversations (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- AI MESSAGES
+CREATE TABLE ai_messages (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID NOT NULL REFERENCES ai_conversations(id),
+  role            VARCHAR(20) NOT NULL CHECK (role IN ('user','assistant')),
+  content         TEXT NOT NULL,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- AI RECOMMENDATIONS
+CREATE TABLE ai_recommendations (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id      UUID NOT NULL REFERENCES customers(id),
+  title            VARCHAR(255),
+  reason           TEXT,
+  suggested_changes JSONB,  -- [{"exercise":"Squat","old_sets":3,"new_sets":4}]
+  status           VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_workout_sessions_customer ON workout_sessions(customer_id);
+CREATE INDEX idx_workout_logs_session      ON workout_logs(session_id);
+CREATE INDEX idx_ai_messages_conversation  ON ai_messages(conversation_id);
+```
+
+**Giải thích vấn đáp:** "Tôi lưu suggested_changes là JSONB để flexible — AI có thể suggest thay đổi bất kỳ field nào mà không cần thêm column. Khi ACCEPT thì parse JSONB và apply vào workout_plan_exercises."
+
+---
+
+## Layer BE (bắt buộc)
+
+```
+GET    /api/exercises              - search + filter
+POST   /api/exercises              - tạo (TRAINER/MANAGER)
+PUT    /api/exercises/:id          - cập nhật
+
+POST   /api/workout-plans          - tạo plan (TRAINER)
+GET    /api/workout-plans          - list filter(customer, trainer, status)
+GET    /api/workout-plans/:id      - detail với exercises grouped by day
+PUT    /api/workout-plans/:id      - cập nhật plan + exercises
+PATCH  /api/workout-plans/:id/activate
+PATCH  /api/workout-plans/:id/complete
+PATCH  /api/workout-plans/:id/cancel
+
+POST   /api/workout-sessions       - start session
+PATCH  /api/workout-sessions/:id/complete
+GET    /api/workout-sessions/me    - own sessions với logs
+
+POST   /api/workout-logs           - log 1 set
+GET    /api/workout-sessions/:id/logs
+
+POST   /api/body-metrics           - log metrics
+GET    /api/body-metrics/me        - list theo thời gian
+
+GET    /api/progress/me            - computed progress stats
+
+POST   /api/ai/chat                - chat với AI (lưu conversation)
+GET    /api/ai/conversations/me    - load conversation history
+POST   /api/ai/recommend           - trigger recommendation
+PATCH  /api/ai/recommendations/:id/accept   - apply changes
+PATCH  /api/ai/recommendations/:id/dismiss
+
+GET    /api/dashboard/stats            - Manager KPIs
+GET    /api/dashboard/revenue-chart    - 8 tuần gần nhất
+GET    /api/dashboard/crm-funnel       - lead counts per stage
+GET    /api/reports/sales
+GET    /api/reports/memberships
+GET    /api/reports/classes
+```
+
+**Progress computation:**
+```java
+public ProgressStats getMyProgress(UUID customerId) {
+    // Workouts this month
+    int workoutsThisMonth = sessionRepo.countCompletedThisMonth(customerId);
+
+    // Current streak (consecutive days with workout)
+    int streak = calculateStreak(customerId);
+
+    // Personal records: max weight per exercise in last 90 days
+    List<PersonalRecord> prs = logRepo.findPersonalRecords(customerId);
+
+    // Weekly frequency: last 8 weeks
+    List<Integer> weeklyFreq = sessionRepo.getWeeklyFrequency(customerId, 8);
+
+    return new ProgressStats(workoutsThisMonth, streak, prs, weeklyFreq);
+}
+```
+
+---
+
+## Layer FE (bắt buộc)
+
+```
+/dashboard/workout-builder  (TRAINER)
+  - Left panel (2/3): plan info form + week tabs (W1/W2/W3/W4)
+    - Day cards Mon-Sat: exercise list, sets×reps, drag handle icon
+    - "Add exercise" button per day → opens library sidebar
+  - Right panel (1/3): exercise library
+    - Search input (debounce)
+    - Filter chips: All | Push | Pull | Legs | Core | Cardio
+    - Exercise list items với "+" button để add vào ngày
+
+/dashboard/member  (CUSTOMER — member home)
+  - Page header: "Ready, [Name]?" + "Book a session" button
+  - Top row: 3 cards
+    - Membership: plan name, status badge, "X days left" progress bar
+    - Next Booking: class name, time, trainer
+    - Streak: current streak, week dots (filled/empty)
+  - This week grid (Mon-Sat cards):
+    - Exercise count per day, completion dots
+    - "Start workout" button on today's card
+  - Quick actions: Book class | Log workout | View progress | AI Coach
+  - Recent activity feed (5 items)
+
+/dashboard/member/progress  (CUSTOMER)
+  - 4 stat cards: Workouts/month | Attendance | Streak | Weight logged
+  - Body metrics card: current vs target weight, progress bar
+  - Weekly frequency chart (pure CSS — KHÔNG dùng chart library):
+    ```
+    8 bars, height proportional to session count
+    Labels: W1, W2, ... W8
+    Bars: bg-[#D7FF3F] với dynamic height style
+    ```
+  - Personal records table: Exercise | Best weight | Best reps | Date
+  - Recent workouts list: date | name | duration | exercise count
+
+/dashboard/member/ai-coach  (CUSTOMER)
+  - Split layout min-h-screen:
+    - Left (60%): chat area
+      - Message thread (scrollable): user bubble (right, lime bg) + AI bubble (left, white)
+      - Input bar (sticky bottom): textarea + send button
+    - Right (40%):
+      - "Quick prompts" card: 6 suggestion chips
+        ("What should I train today?", "Summarize my progress", ...)
+      - "Your context" card: current plan + goal + last workout
+      - AI recommendation card (if pending):
+        - Title + reason
+        - "Accept changes" button (lime) | "Dismiss" button (outline)
+```
+
+---
+
+## Layer AI (bắt buộc) — mày viết Python FastAPI service
+
+```python
+# ai/app/main.py
+from fastapi import FastAPI
+app = FastAPI()
+
+# Routes
+@app.post("/chat")           # AI chat với context
+@app.post("/recommend")      # Workout recommendation
+@app.post("/score-lead")     # Lead scoring (người A dùng)
+@app.post("/predict-renewal") # Renewal prediction (người B dùng)
+@app.post("/suggest-schedule") # Schedule suggestion (người C dùng)
+@app.get("/progress-summary") # Progress summary
+```
+
+**context_loader.py** — quan trọng nhất:
+```python
+def load_customer_context(customer_id: str, db) -> dict:
+    """Load toàn bộ fitness context của customer để inject vào LLM"""
+    return {
+        "name": ...,
+        "goal": ...,
+        "active_plan": {
+            "name": ...,
+            "exercises_this_week": [...]
+        },
+        "recent_sessions": [...],  # last 10 sessions với logs
+        "personal_records": [...],
+        "body_metrics": [...],     # last 3 measurements
+        "attendance_rate": "75%"
+    }
+```
+
+**llm_service.py:**
+```python
+SYSTEM_PROMPT = """
+You are FITOS AI Coach — a fitness assistant for gym members.
+
+RULES:
+1. Only answer fitness, training, and nutrition questions
+2. NEVER provide medical diagnosis, prescriptions, or treatment advice
+3. If asked about medical symptoms → say "Please consult a healthcare professional"
+4. Base ALL recommendations on the provided user context
+5. Keep responses concise (max 3 paragraphs)
+6. When suggesting workout changes, format as structured JSON
+"""
+
+async def chat(message: str, context: dict) -> str:
+    response = await openai.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": f"User context: {json.dumps(context)}"},
+            {"role": "user", "content": message}
+        ]
+    )
+    return response.choices[0].message.content
+```
+
+**safety_filter.py:**
+```python
+MEDICAL_KEYWORDS = ["diagnose", "diagnosis", "prescription", "medication",
+                    "disease", "symptom", "doctor", "treatment", "cure"]
+
+def is_medical_question(message: str) -> bool:
+    return any(kw in message.lower() for kw in MEDICAL_KEYWORDS)
+
+def safe_respond(message: str) -> str | None:
+    if is_medical_question(message):
+        return "This question requires medical expertise. Please consult a healthcare professional."
+    return None  # proceed with AI
+```
+
+---
+
+## Layer OPS (bắt buộc)
+
+```dockerfile
+# ai/Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app/ ./app/
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+```yaml
+# docker-compose.yml — phần AI service
+ai-service:
+  build: ./ai
+  ports:
+    - "8000:8000"
+  environment:
+    - OPENAI_API_KEY=${OPENAI_API_KEY}
+    - DATABASE_URL=${DATABASE_URL}
+  depends_on:
+    - postgres
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+```
+
+```yaml
+# GitHub Actions — CI/CD job của mày
+build-and-deploy:
+  runs-on: ubuntu-latest
+  needs: [test-backend, test-frontend]
+  steps:
+    - uses: actions/checkout@v4
+    - name: Build all images
+      run: docker compose build
+    - name: Push to registry
+      run: |
+        docker tag fitos-backend ghcr.io/${{ github.repository }}/backend:latest
+        docker tag fitos-frontend ghcr.io/${{ github.repository }}/frontend:latest
+        docker tag fitos-ai ghcr.io/${{ github.repository }}/ai:latest
+        docker push ghcr.io/${{ github.repository }}/backend:latest
+        docker push ghcr.io/${{ github.repository }}/frontend:latest
+        docker push ghcr.io/${{ github.repository }}/ai:latest
+    - name: Deploy to Railway/Render
+      run: curl -X POST ${{ secrets.DEPLOY_WEBHOOK }}
+```
+
+---
+
+## Tests mày phải viết
+
+```java
+// WorkoutPlanServiceTest.java
+@Test void activate_plan_deactivates_previous_active_plan()
+@Test void complete_session_logs_saved_correctly()
+@Test void progress_stats_calculation_correct()
+
+// AI recommendation
+@Test void accept_recommendation_updates_workout_plan()
+@Test void dismiss_recommendation_marks_dismissed()
+```
+
+```python
+# test_safety_filter.py
+def test_medical_question_blocked():
+    assert is_medical_question("diagnose my knee pain") == True
+    response = safe_respond("diagnose my knee pain")
+    assert response is not None  # blocked
+
+def test_fitness_question_allowed():
+    assert is_medical_question("how many sets for squat") == False
+    response = safe_respond("how many sets for squat")
+    assert response is None  # proceed to AI
+
+# test_context_loader.py
+def test_context_only_loads_own_customer():
+    ctx = load_customer_context(customer_a_id, db)
+    assert ctx["name"] != customer_b_name  # không leak data
+```
+
+---
+
+## Mày nói gì khi vấn đáp / ghi CV
+
+```
+DB  → "JSONB cho suggested_changes flexible, không cần thêm column khi AI suggest field mới"
+BE  → "Progress computation: streak calculation, personal records query, weekly frequency aggregation"
+FE  → "Pure CSS bar chart (không dùng recharts), chat bubble UI với real-time feel"
+AI  → "Python FastAPI service: context injection, safety filter chặn medical advice, structured recommendation output"
+OPS → "AI service Dockerfile, docker-compose orchestration toàn stack, GitHub Actions build+push+deploy pipeline"
+```
+
+---
+---
+
+# TIMELINE 5 TUẦN
+
+```
+         A                    B                    C                    D
 TUẦN 1
-├── A: Auth JWT + RBAC ← TẤT CẢ CẦN TRƯỚC
-├── B: Plans + DB schema
-├── C: Trainer + Class + DB schema
-└── D: Exercise Library + Docker Compose setup
+         DB schema users      DB schema commerce   DB schema operations DB schema workout/ai
+         Auth API (JWT)       Plans API + FE       Trainer + Class API  Exercise API
+         Login/Register FE    /plans public page   /dashboard/trainer   Exercise library FE
+         Dockerfile backend   Dockerfile frontend  docker-compose DB    Dockerfile AI service
+         ─────────────────────────────────────────────────────────────────────────────────
+         ← Auth xong → B, C, D clone và test với JWT ngay cuối tuần 1
 
 TUẦN 2
-├── A: Lead CRUD + Activities + Convert flow
-├── B: Order + Payment + Service Activation
-├── C: Sessions + Booking (concurrency!)
-└── D: Workout Plan + Workout Log
+         Lead CRUD API        Order + Payment API  Sessions + Booking   Workout Plan API
+         CRM FE (table+form)  Sales wizard FE      Schedule calendar FE Workout Builder FE
+         Lead scoring AI      Renewal predict AI   Schedule suggest AI  AI FastAPI service
+         CI test-backend job  CI test-frontend job CI integration job   CI build-images job
+         ─────────────────────────────────────────────────────────────────────────────────
+         ← B xong MembershipValidator → C bắt đầu dùng để gate booking
 
 TUẦN 3
-├── A: Customer detail + User admin + Renewal cron
-├── B: Membership lifecycle (pause/resume/renew)
-├── C: Check-in + PT Sessions + Attendance
-└── D: Progress API + AI Service Python + AI proxy
+         Customer detail      Membership lifecycle Check-in + PT        Workout Log + Progress
+         User admin           Pause/resume FE      Booking FE (member)  AI chat + recommend
+         Convert lead flow    PT package tracking  Attendance history   Progress charts FE
+         ─────────────────────────────────────────────────────────────────────────────────
+         ← C xong PT complete → D test workout trigger sau PT
 
 TUẦN 4
-├── A: Manager Dashboard + Auth hardening + tests
-├── B: Deploy + payment idempotency tests
-├── C: Concurrency tests + class reports
-└── D: Reports + Full CI/CD deploy + AI tests
+         Manager Dashboard    Deploy backend+DB    Concurrency tests    Reports + Dashboard
+         Renewal widget       Payment idempotency  Class reports        Deploy AI service
+         Auth security review Smoke test prod      E2E test booking     Full CD pipeline
+         ─────────────────────────────────────────────────────────────────────────────────
 
 TUẦN 5 (buffer)
-└── Tất cả: Bug fix, UI polish, demo prep, stretch features
+         Bug fix + polish UI + demo prep + stretch features
 ```
 
 ---
 
-# INTEGRATION CHECKPOINTS
+# BẢNG KIỂM TRA CUỐI — MỖI NGƯỜI TICK ĐỦ 5 Ô
 
-| Mốc | Thời điểm | Ai cần |
-|-----|-----------|--------|
-| Auth hoạt động | Cuối ngày 2 tuần 1 | B, C, D test với JWT |
-| Membership validator | Cuối tuần 2 | C gate booking |
-| PT Package useSession | Cuối tuần 3 | C gọi khi complete PT |
-| Customer aggregate API | Tuần 3 | B, C, D cung cấp data |
-| Full E2E test | Tuần 4 | Lead→Order→Pay→Book→Workout→AI |
-
----
-
-# MỖI NGƯỜI ĐỀU CÓ ĐỦ
-
-| Kỹ năng | A | B | C | D |
-|---------|---|---|---|---|
-| SQL Schema + Migration | ✅ | ✅ | ✅ | ✅ |
-| Spring Boot REST API | ✅ | ✅ | ✅ | ✅ |
-| Spring Security / Auth | ✅ lead | ✅ dùng | ✅ dùng | ✅ dùng |
-| Business logic phức tạp | State machine | Idempotency | Concurrency | AI context |
-| Next.js + TypeScript | ✅ | ✅ | ✅ | ✅ |
-| Tailwind CSS | ✅ | ✅ | ✅ | ✅ |
-| Docker | ✅ | ✅ | ✅ | ✅ lead |
-| Testing | JUnit | JUnit | JUnit+concurrent | JUnit+Python |
-| Thứ độc đáo cho CV | JWT/RBAC/AOP | Payment idempotency | Concurrency/locking | AI/Python/CI-CD |
+| Layer | Người A | Người B | Người C | Người D |
+|-------|---------|---------|---------|---------|
+| **DB** | users, leads, customers, audit_logs | service_plans, orders, payments, memberships | trainers, classes, sessions, bookings, attendance | exercises, workout_plans, workout_logs, ai_messages |
+| **BE** | Auth JWT, RBAC, CRM CRUD, Lead convert | Order pricing, Payment idempotency, Membership lifecycle | Booking concurrency, Check-in, PT session | Workout CRUD, Progress computation, AI proxy |
+| **FE** | /login, /register, /dashboard/leads, /dashboard/customers | /plans, /dashboard/sales, /dashboard/create-sale, /dashboard/member/payments | /dashboard/schedule, /dashboard/bookings, /dashboard/member/book | /dashboard/member, /dashboard/workout-builder, /dashboard/member/ai-coach, /dashboard/member/progress |
+| **AI** | Gọi AI score-lead → hiển thị badge | Gọi AI predict-renewal → hiển thị risk | Gọi AI suggest-schedule → hiển thị banner | Viết Python FastAPI service + tất cả AI endpoints |
+| **OPS** | Dockerfile backend, GitHub Actions test-backend job | Dockerfile frontend, GitHub Actions test-frontend + deploy frontend | docker-compose postgres + redis + healthcheck, GitHub Actions integration test | Dockerfile AI service, docker-compose ai-service, GitHub Actions build-push-deploy |
 
 ---
 
-# RỦI RO VÀ GIẢM THIỂU
+# CÂU HỎI VẤND ĐÁP MỖI NGƯỜI PHẢI TRẢ LỜI ĐƯỢC
 
-| Rủi ro | Giảm thiểu |
-|--------|-----------|
-| A chậm → cả team bị block | A ưu tiên Auth ngày 1-2 tuần 1 |
-| AI API tốn tiền | Mock response trong dev, real API chỉ khi demo |
-| Concurrency bug khó reproduce | C viết test với CompletableFuture parallel |
-| Integration fail cuối | Weekly checkpoint, không đợi tuần 4 |
-| Scope creep | MVP first, stretch features sau khi MVP xong |
+### Người A
+- Tại sao dùng UUID thay INT cho primary key?
+- JWT access token và refresh token khác nhau thế nào, mày handle như thế nào?
+- RBAC implement ở BE như thế nào, FE chỉ làm gì?
+- Convert lead flow có những bước gì, validate gì?
+- AOP audit log hoạt động thế nào?
+
+### Người B
+- Tại sao total phải tính server-side?
+- Payment idempotency là gì, mày handle bằng cách nào?
+- Membership pause/resume tính ngày như thế nào?
+- Service activation pattern: tại sao tách khỏi payment logic?
+- UNIQUE constraint trên payment.reference giải quyết vấn đề gì?
+
+### Người C
+- Concurrency problem trong booking là gì?
+- SELECT FOR UPDATE là gì, khi nào dùng?
+- Tại sao có UNIQUE(customer_id, session_id) khi đã có SELECT FOR UPDATE?
+- `booked_count` denormalized có rủi ro gì, handle thế nào?
+- Idempotency trong PT complete dùng completion_ref như thế nào?
+
+### Người D
+- Context injection trong AI là gì, tại sao cần thiết?
+- Safety filter hoạt động thế nào, tại sao cần?
+- JSONB cho suggested_changes có lợi gì so với column riêng?
+- Docker multi-stage build giảm image size thế nào?
+- CI/CD pipeline của mày: push code → production xảy ra gì?
 
 ---
 
-*Mỗi người khi đi phỏng vấn có thể giải thích flow từ UI click → API → business logic → DB → response. Không ai bị "chỉ làm FE" hay "chỉ làm BE".*
+*Version 3.0 — Mỗi người đụng đủ DB + BE + FE + AI + OPS. Không ai thiếu layer nào.*
