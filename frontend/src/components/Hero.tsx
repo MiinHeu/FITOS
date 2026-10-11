@@ -6,7 +6,10 @@ import Link from 'next/link';
 
 export default function Hero() {
   const [locale, setLocale] = useState<Locale>('en');
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     const sync = () => {
       const s = localStorage.getItem('locale') as Locale | null;
       if (s) setLocale(s);
@@ -15,105 +18,99 @@ export default function Hero() {
     window.addEventListener('locale-changed', sync);
     return () => window.removeEventListener('locale-changed', sync);
   }, []);
-  const t = useTranslations(locale);
+
+  const t = useTranslations(mounted ? locale : 'en');
+
+  if (!mounted) return null;
 
   return (
-    <section style={{background: '#F5F5F0', paddingTop: 80, paddingBottom: 64}}>
-      <div
-        className="mx-auto flex flex-col lg:flex-row items-center gap-[52px]"
-        style={{maxWidth: 1440, paddingLeft: 64, paddingRight: 64}}
-      >
-        {/* Left content */}
-        <div className="flex-1">
-          {/* Label */}
-          <div className="mb-5">
-            <span
-              className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-widest"
-              style={{background: '#D7FF3F', color: '#526B00'}}
-            >
-              {t.hero_badge}
-            </span>
-          </div>
+    <section className="bg-[#F5F5F0] pt-24 pb-20">
+      <div className="max-w-[1280px] mx-auto px-10">
+        <div className="flex flex-col lg:flex-row items-center gap-16">
 
-          {/* Heading */}
-          <h1
-            className="font-bold leading-tight mb-5"
-            style={{fontSize: 42, fontWeight: 700, color: '#111310', lineHeight: '1.2em'}}
-          >
-            {t.hero_title_1}<br />{t.hero_title_2}<br />{t.hero_title_3}
-          </h1>
-
-          {/* Subtitle */}
-          <p
-            className="mb-8 max-w-md"
-            style={{fontSize: 14, color: '#5E625A', lineHeight: 1.6}}
-          >
-            {t.hero_subtitle}
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-wrap items-center gap-3 mb-10">
-            <Link href="/plans" className="btn-lime">
-              {t.hero_cta}
-            </Link>
-            <Link href="#members" className="btn-outline">
-              ↗ {t.hero_cta2}
-            </Link>
-          </div>
-
-          {/* Stats */}
-          <div className="flex gap-10">
-            {[
-              { value: t.stat1_value, label: t.stat1_label },
-              { value: t.stat2_value, label: t.stat2_label },
-              { value: t.stat3_value, label: t.stat3_label },
-            ].map((s, i) => (
-              <div key={i}>
-                <p className="font-bold text-3xl" style={{color: '#111310'}}>{s.value}</p>
-                <p className="text-xs mt-1" style={{color: '#5E625A'}}>{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right image */}
-        <div className="relative flex-shrink-0" style={{width: 580}}>
-          <div
-            className="relative overflow-hidden"
-            style={{borderRadius: 24, height: 530}}
-          >
-            <Image
-              src="/assets/hero_athlete.jpg"
-              alt="Athlete training"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-          {/* Live capacity overlay */}
-          <div
-            className="absolute bottom-5 right-5 shadow-xl"
-            style={{background: '#fff',
-              borderRadius: 16,
-              border: '1px solid #DADCD3',
-              padding: 16,
-              width: 220,}}
-          >
-            <div className="flex items-center justify-between mb-2">
+          {/* LEFT: Text content */}
+          <div className="flex-1 lg:text-left text-center">
+            {/* Badge */}
+            <div className="mb-6 lg:flex lg:justify-start flex justify-center">
               <span
-                className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                style={{background: '#D7FF3F', color: '#526B00'}}
+                className="inline-flex items-center gap-2 bg-white border border-[#DADCD3] rounded-full px-4 py-1.5 text-sm font-medium"
+                style={{ color: '#526B00' }}
               >
-                LIVE CAPACITY
+                ✦ All-in-one gym platform
               </span>
-              <span style={{fontSize: 11, color: '#8A8E85'}}>18:30</span>
             </div>
-            <p className="font-bold text-sm mb-2" style={{color: '#111310'}}>Strength Fundamentals</p>
-            <div className="w-full rounded-full h-2 mb-1" style={{background: '#ECEDE6'}}>
-              <div className="rounded-full h-2" style={{width: '78%', background: '#D7FF3F'}} />
+
+            {/* Heading */}
+            <h1
+              className="font-bold mb-6"
+              style={{ fontSize: 52, lineHeight: 1.1, color: '#111310' }}
+            >
+              Your gym,<br />fully managed.
+            </h1>
+
+            {/* Subtitle */}
+            <p
+              className="mb-8 lg:mx-0 mx-auto"
+              style={{ fontSize: 18, color: '#5E625A', lineHeight: 1.6, maxWidth: 480 }}
+            >
+              FITOS gives studios and athletes everything they need — bookings, training, progress, and community in one place.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-3 mb-10 lg:justify-start justify-center">
+              <Link
+                href="/register"
+                className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-[#C4E82E] transition-colors"
+              >
+                Start free trial
+              </Link>
+              <Link
+                href="#members"
+                className="border border-[#171A16] text-[#111310] rounded-lg px-5 py-2.5 text-sm font-semibold hover:bg-[#171A16] hover:text-white transition-colors"
+              >
+                See how it works →
+              </Link>
             </div>
-            <p className="text-right text-xs" style={{color: '#8A8E85'}}>14/18</p>
+
+            {/* Stats */}
+            <div className="flex gap-8 lg:justify-start justify-center">
+              {[
+                { value: '2,400+', label: 'Members' },
+                { value: '98%', label: 'Retention' },
+                { value: '150+', label: 'Studios' },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p className="font-bold text-2xl" style={{ color: '#111310' }}>{stat.value}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#5E625A' }}>{stat.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* RIGHT: Hero image — hidden on mobile */}
+          <div className="hidden lg:block w-[520px] shrink-0">
+            <div className="relative w-full h-[480px] rounded-2xl overflow-hidden">
+              <Image
+                src="/assets/hero_athlete.jpg"
+                alt="Athlete training"
+                fill
+                className="object-cover"
+                priority
+              />
+              {/* Overlay card */}
+              <div
+                className="absolute bottom-4 right-4 bg-white rounded-xl p-4 shadow-lg"
+                style={{ minWidth: 200 }}
+              >
+                <p className="text-xs font-bold mb-1" style={{ color: '#526B00' }}>TODAY&apos;S CLASSES</p>
+                <p className="font-bold text-sm" style={{ color: '#111310' }}>12 booked</p>
+                <div className="mt-2 w-full rounded-full h-1.5" style={{ background: '#F5F5F0' }}>
+                  <div className="rounded-full h-1.5" style={{ width: '75%', background: '#D7FF3F' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
