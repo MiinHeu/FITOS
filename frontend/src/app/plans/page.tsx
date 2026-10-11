@@ -3,17 +3,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 
-// ─── Checkmark SVG helpers ────────────────────────────────────────────────────
-
 function CheckIcon({ dark }: { dark?: boolean }) {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      style={{ flexShrink: 0 }}
-    >
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
       <circle cx="8" cy="8" r="8" fill={dark ? '#D7FF3F' : '#526B00'} opacity={dark ? 1 : 0.12} />
       <path
         d="M4.5 8.5l2.5 2.5 4.5-5"
@@ -26,338 +18,286 @@ function CheckIcon({ dark }: { dark?: boolean }) {
   );
 }
 
-// ─── Shared styles ────────────────────────────────────────────────────────────
+const memberPlans = [
+  {
+    name: 'Move',
+    price: '$29',
+    period: '/mo',
+    desc: '8 classes per month',
+    features: [
+      'All group classes',
+      'App booking',
+      'Workout tracking',
+      'Progress dashboard',
+      'Cancel anytime',
+    ],
+    highlight: false,
+    badge: null,
+    cta: 'Get started',
+  },
+  {
+    name: 'Perform',
+    price: '$59',
+    period: '/mo',
+    desc: 'Unlimited classes',
+    features: [
+      'Unlimited class booking',
+      '2 PT sessions included',
+      'AI Coach insights',
+      'Priority booking',
+      'Nutrition brief',
+      'All Move features',
+      'Dedicated support',
+    ],
+    highlight: true,
+    badge: 'MOST POPULAR',
+    cta: 'Get started',
+  },
+  {
+    name: 'PT Focus',
+    price: '$99',
+    period: '/mo',
+    desc: '8 PT sessions / month',
+    features: [
+      'Dedicated trainer',
+      'Custom workout plan',
+      'Monthly body metrics',
+      'Nutrition coaching',
+      'Unlimited classes',
+      'Progress reports',
+      'VIP booking priority',
+      'All Perform features',
+    ],
+    highlight: false,
+    badge: null,
+    cta: 'Get started',
+  },
+];
 
-const labelStyle: React.CSSProperties = {
-  fontSize: 11,
-  fontWeight: 700,
-  color: '#526B00',
-  letterSpacing: '0.08em',
-  textTransform: 'uppercase',
-};
+const ptPackages = [
+  {
+    sessions: '5 sessions',
+    name: 'Starter Pack',
+    price: '$149',
+    features: ['Program assessment', 'Technique coaching', 'Session summary'],
+  },
+  {
+    sessions: '10 sessions',
+    name: 'Focus Pack',
+    price: '$249',
+    features: ['All Starter features', 'Weekly check-in', 'Nutrition brief'],
+  },
+  {
+    sessions: '20 sessions',
+    name: 'Transform Pack',
+    price: '$449',
+    features: ['All Focus features', 'Body composition tracking', 'Monthly progress report'],
+  },
+];
 
-const cardLight: React.CSSProperties = {
-  background: '#fff',
-  borderRadius: 16,
-  border: '1px solid #DADCD3',
-  padding: 28,
-  display: 'flex',
-  flexDirection: 'column',
-};
-
-const cardDark: React.CSSProperties = {
-  background: '#171A16',
-  borderRadius: 16,
-  padding: 28,
-  display: 'flex',
-  flexDirection: 'column',
-  position: 'relative',
-};
-
-const btnLime: React.CSSProperties = {
-  background: '#D7FF3F',
-  color: '#111310',
-  borderRadius: 10,
-  padding: '10px 20px',
-  fontWeight: 600,
-  fontSize: 14,
-  border: 'none',
-  cursor: 'pointer',
-  width: '100%',
-};
-
-const btnOutline: React.CSSProperties = {
-  background: 'transparent',
-  color: '#111310',
-  borderRadius: 10,
-  padding: '10px 20px',
-  fontWeight: 600,
-  fontSize: 14,
-  border: '1px solid #DADCD3',
-  cursor: 'pointer',
-  width: '100%',
-};
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+const faqs = [
+  { q: 'Can I pause my membership?', a: 'Yes, you can pause for up to 2 months per year. Request via the app or at the front desk.' },
+  { q: 'Is there a joining fee?', a: 'No joining fee, ever. You pay only for the plan you choose.' },
+  { q: 'How do I book PT sessions?', a: 'Book through the FITOS app or ask at reception. PT sessions are pre-loaded after purchase.' },
+  { q: 'Can I switch plans?', a: 'Yes. Upgrade or downgrade at the start of each billing cycle. Your history and bookings stay intact.' },
+  { q: 'What happens after my free trial?', a: 'After 14 days, choose a plan or your account pauses. No automatic charges without your confirmation.' },
+  { q: 'Do PT packages expire?', a: 'PT packages are valid for 3 months from purchase. Extensions can be arranged with your coach.' },
+];
 
 export default function PlansPage() {
   return (
     <>
       <Header />
-      <main style={{ background: '#F5F5F0', minHeight: '100vh', paddingTop: 80 }}>
+      <main>
 
-        {/* ── Section 1: Hero ─────────────────────────────────────────────── */}
-        <section style={{ background: '#F5F5F0', padding: '80px 24px 60px' }}>
-          <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
-            <span style={labelStyle}>MEMBERSHIPS &amp; PT · NO JOINING FEE</span>
-            <h1 style={{ fontSize: 42, fontWeight: 800, color: '#111310', margin: '12px 0 0' }}>
-              Choose your way to move.
-            </h1>
-            <p style={{ fontSize: 16, color: '#5E625A', marginTop: 12, maxWidth: 520, margin: '12px auto 0' }}>
-              Transparent monthly plans. Pause anytime. Your coach, bookings and progress stay together.
+        {/* 1. Hero */}
+        <section className="pt-24 pb-16 px-10" style={{ background: '#F5F5F0' }}>
+          <div className="max-w-[1280px] mx-auto text-center">
+            <p className="uppercase text-[11px] font-semibold tracking-[0.1em] mb-4" style={{ color: '#526B00' }}>
+              MEMBERSHIPS &amp; PT · NO JOINING FEE
             </p>
-          </div>
-        </section>
-
-        {/* ── Section 2: Pricing cards ─────────────────────────────────────── */}
-        <section style={{ padding: '60px 24px' }}>
-          <div
-            style={{
-              maxWidth: 1100,
-              margin: '0 auto',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 24,
-            }}
-            className="grid grid-cols-1 md:grid-cols-3"
-          >
-            {/* Card 1 — Move */}
-            <div style={cardLight}>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#111310', marginBottom: 16 }}>Move</h3>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 40, fontWeight: 800, color: '#111310' }}>đ890K</span>
-                <span style={{ fontSize: 14, color: '#8A8E85' }}>/month</span>
-              </div>
-              <p style={{ fontSize: 12, color: '#8A8E85', marginBottom: 24 }}>8 classes / month</p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {['All group classes', 'App booking', 'Workout tracking', 'Progress dashboard'].map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#111310' }}>
-                    <CheckIcon />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button style={btnOutline}>Get started</button>
-            </div>
-
-            {/* Card 2 — Perform (highlighted) */}
-            <div style={cardDark}>
-              {/* Most popular badge */}
+            <h1 className="font-bold mb-4" style={{ fontSize: 40, color: '#111310' }}>
+              Flexible plans for every fitness goal
+            </h1>
+            <p className="mx-auto mb-8" style={{ fontSize: 17, color: '#5E625A', maxWidth: 560 }}>
+              Transparent pricing, no contracts, no joining fees. Pause or cancel anytime.
+            </p>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
               <span
-                style={{
-                  position: 'absolute',
-                  top: 20,
-                  right: 20,
-                  background: '#D7FF3F',
-                  color: '#111310',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  padding: '3px 10px',
-                  borderRadius: 20,
-                  letterSpacing: '0.05em',
-                }}
+                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full"
+                style={{ background: '#fff', border: '1px solid #DADCD3', color: '#111310' }}
               >
-                MOST POPULAR
+                <span style={{ color: '#526B00' }}>✓</span> Cancel anytime
               </span>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#ECEDE6', marginBottom: 16, marginRight: 90 }}>
-                Perform
-              </h3>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 40, fontWeight: 800, color: '#D7FF3F' }}>đ1.49M</span>
-                <span style={{ fontSize: 14, color: '#5E625A' }}>/month</span>
-              </div>
-              <p style={{ fontSize: 12, color: '#5E625A', marginBottom: 24 }}>Unlimited classes</p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {['Unlimited booking', '2 PT sessions included', 'AI Coach insights', 'Priority class booking'].map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#ECEDE6' }}>
-                    <CheckIcon dark />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button style={btnLime}>Get started</button>
-            </div>
-
-            {/* Card 3 — PT Focus */}
-            <div style={cardLight}>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#111310', marginBottom: 16 }}>PT Focus</h3>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 40, fontWeight: 800, color: '#111310' }}>đ3.2M</span>
-                <span style={{ fontSize: 14, color: '#8A8E85' }}>/month</span>
-              </div>
-              <p style={{ fontSize: 12, color: '#8A8E85', marginBottom: 24 }}>8 PT sessions / month</p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {['Dedicated trainer', 'Custom workout plan', 'Monthly body metrics', 'All Perform benefits'].map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#111310' }}>
-                    <CheckIcon />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button style={btnOutline}>Get started</button>
+              <span
+                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full"
+                style={{ background: '#fff', border: '1px solid #DADCD3', color: '#111310' }}
+              >
+                <span style={{ color: '#526B00' }}>✓</span> 14-day free trial
+              </span>
             </div>
           </div>
         </section>
 
-        {/* ── Section 3: PT Packages ───────────────────────────────────────── */}
-        <section style={{ background: '#F5F5F0', padding: '60px 24px' }}>
-          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-            <div style={{ marginBottom: 40 }}>
-              <h2 style={{ fontSize: 32, fontWeight: 800, color: '#111310', marginBottom: 8 }}>
-                Personal Training
-              </h2>
-              <p style={{ fontSize: 14, color: '#5E625A' }}>
-                Results-focused PT packages with your dedicated coach.
-              </p>
-            </div>
-            <div
-              style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}
-              className="grid grid-cols-1 md:grid-cols-3"
-            >
-              {[
-                {
-                  sessions: '5 sessions',
-                  name: 'Starter Pack',
-                  price: 'đ3.5M',
-                  desc: '5 × 55-min PT sessions',
-                  features: ['Program assessment', 'Technique coaching', 'Session summary'],
-                },
-                {
-                  sessions: '10 sessions',
-                  name: 'Focus Pack',
-                  price: 'đ6.5M',
-                  desc: '10 × 55-min PT sessions',
-                  features: ['All Starter features', 'Weekly check-in', 'Nutrition brief'],
-                },
-                {
-                  sessions: '20 sessions',
-                  name: 'Transform Pack',
-                  price: 'đ11.5M',
-                  desc: '20 × 55-min PT sessions',
-                  features: ['All Focus features', 'Body composition tracking', 'Monthly progress report'],
-                },
-              ].map(pkg => (
+        {/* 2. Pricing cards */}
+        <section className="py-16 px-10 bg-white">
+          <div className="max-w-[1280px] mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {memberPlans.map((plan) => (
                 <div
-                  key={pkg.name}
+                  key={plan.name}
+                  className="relative flex flex-col"
                   style={{
-                    background: '#fff',
-                    borderRadius: 16,
-                    border: '1px solid #DADCD3',
-                    padding: 24,
-                    display: 'flex',
-                    flexDirection: 'column',
+                    background: plan.highlight ? '#171A16' : '#fff',
+                    border: plan.highlight ? 'none' : '1px solid #DADCD3',
+                    borderRadius: 12,
+                    padding: 28,
                   }}
                 >
-                  <span style={{ ...labelStyle, marginBottom: 12, display: 'block' }}>{pkg.sessions}</span>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: '#111310', marginBottom: 8 }}>
-                    {pkg.name}
+                  {plan.badge && (
+                    <span
+                      className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
+                      style={{ background: '#D7FF3F', color: '#111310' }}
+                    >
+                      {plan.badge}
+                    </span>
+                  )}
+                  <h3
+                    className="font-bold mb-3"
+                    style={{ fontSize: 18, color: plan.highlight ? '#ECEDE6' : '#111310', marginRight: plan.badge ? 90 : 0 }}
+                  >
+                    {plan.name}
                   </h3>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                    <span style={{ fontSize: 32, fontWeight: 800, color: '#111310' }}>{pkg.price}</span>
+                  <div className="flex items-baseline gap-1 mb-1">
+                    <span
+                      className="font-bold"
+                      style={{ fontSize: 40, color: plan.highlight ? '#D7FF3F' : '#111310' }}
+                    >
+                      {plan.price}
+                    </span>
+                    <span className="text-sm" style={{ color: plan.highlight ? '#5E625A' : '#8A8E85' }}>
+                      {plan.period}
+                    </span>
                   </div>
-                  <p style={{ fontSize: 12, color: '#8A8E85', marginBottom: 20 }}>{pkg.desc}</p>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {pkg.features.map(f => (
-                      <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#111310' }}>
-                        <CheckIcon />
+                  <p className="text-xs mb-6" style={{ color: plan.highlight ? '#5E625A' : '#8A8E85' }}>
+                    {plan.desc}
+                  </p>
+                  <ul className="flex-1 flex flex-col gap-2.5 mb-8">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-sm" style={{ color: plan.highlight ? '#ECEDE6' : '#111310' }}>
+                        <CheckIcon dark={plan.highlight} />
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <button style={btnLime}>Book a consultation</button>
+                  <Link
+                    href="/register"
+                    className="block text-center font-semibold text-sm w-full py-2.5 rounded-lg"
+                    style={{
+                      background: plan.highlight ? '#D7FF3F' : 'transparent',
+                      color: '#111310',
+                      border: plan.highlight ? 'none' : '1px solid #171A16',
+                    }}
+                  >
+                    {plan.cta}
+                  </Link>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── Section 4: FAQ ───────────────────────────────────────────────── */}
-        <section style={{ background: '#FFFFFF', padding: '60px 24px' }}>
-          <div style={{ maxWidth: 800, margin: '0 auto' }}>
-            <h2
-              style={{
-                fontSize: 28,
-                fontWeight: 800,
-                color: '#111310',
-                textAlign: 'center',
-                marginBottom: 40,
-              }}
-            >
-              Common questions
+        {/* 3. PT Packages */}
+        <section className="py-16 px-10" style={{ background: '#F5F5F0' }}>
+          <div className="max-w-[1280px] mx-auto">
+            <p className="uppercase text-[11px] font-semibold tracking-[0.1em] mb-3" style={{ color: '#526B00' }}>
+              PERSONAL TRAINING
+            </p>
+            <h2 className="font-bold mb-3" style={{ fontSize: 36, color: '#111310' }}>
+              Personal Training Packages
             </h2>
-            {[
-              {
-                q: 'Can I pause my membership?',
-                a: 'Yes, you can pause for up to 2 months per year. Request via the app or at the front desk.',
-              },
-              {
-                q: 'Is there a joining fee?',
-                a: 'No joining fee, ever. You pay only for the plan you choose.',
-              },
-              {
-                q: 'How do I book PT sessions?',
-                a: 'Book directly through the FITOS app or ask at reception. Your PT sessions are pre-loaded after purchase.',
-              },
-              {
-                q: 'Can I switch plans?',
-                a: 'Yes. Upgrade or downgrade at the start of each billing cycle. Your history and bookings stay intact.',
-              },
-            ].map((item, i, arr) => (
-              <div
-                key={item.q}
-                style={{
-                  background: '#FFFFFF',
-                  borderBottom: i < arr.length - 1 ? '1px solid #DADCD3' : 'none',
-                  padding: '20px 0',
-                }}
-              >
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#111310' }}>{item.q}</p>
-                <p style={{ fontSize: 14, color: '#5E625A', marginTop: 8 }}>{item.a}</p>
-              </div>
-            ))}
+            <p className="mb-10" style={{ fontSize: 16, color: '#5E625A', maxWidth: 520 }}>
+              Results-focused PT packages with your dedicated coach. Choose the commitment that suits your goals.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {ptPackages.map((pkg) => (
+                <div
+                  key={pkg.name}
+                  className="flex flex-col"
+                  style={{ background: '#fff', border: '1px solid #DADCD3', borderRadius: 12, padding: 24 }}
+                >
+                  <span
+                    className="uppercase text-[11px] font-semibold tracking-[0.08em] mb-3 block"
+                    style={{ color: '#526B00' }}
+                  >
+                    {pkg.sessions}
+                  </span>
+                  <h3 className="font-bold mb-2" style={{ fontSize: 18, color: '#111310' }}>{pkg.name}</h3>
+                  <div className="flex items-baseline gap-1 mb-1">
+                    <span className="font-bold" style={{ fontSize: 32, color: '#111310' }}>{pkg.price}</span>
+                  </div>
+                  <p className="text-xs mb-5" style={{ color: '#8A8E85' }}>one-time package</p>
+                  <ul className="flex-1 flex flex-col gap-2.5 mb-6">
+                    {pkg.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-sm" style={{ color: '#111310' }}>
+                        <CheckIcon />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className="w-full font-semibold text-sm py-2.5 rounded-lg"
+                    style={{ background: '#D7FF3F', color: '#111310' }}
+                  >
+                    Get started
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
-        {/* ── Section 5: Dark CTA ──────────────────────────────────────────── */}
-        <section
-          style={{
-            background: '#171A16',
-            padding: '80px 24px',
-            textAlign: 'center',
-          }}
-        >
-          <h2 style={{ fontSize: 36, fontWeight: 800, color: '#ECEDE6' }}>Ready to start?</h2>
-          <p style={{ fontSize: 16, color: '#5E625A', marginTop: 12 }}>
-            Join Pulse District 2 today. No contracts. No joining fee.
-          </p>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 12,
-              marginTop: 32,
-              flexWrap: 'wrap',
-            }}
-          >
-            <button
-              style={{
-                background: '#D7FF3F',
-                color: '#111310',
-                borderRadius: 10,
-                padding: '12px 28px',
-                fontWeight: 600,
-                fontSize: 15,
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Start free trial
-            </button>
-            <button
-              style={{
-                background: 'transparent',
-                color: '#ECEDE6',
-                borderRadius: 10,
-                padding: '12px 28px',
-                fontWeight: 600,
-                fontSize: 15,
-                border: '1px solid rgba(255,255,255,0.2)',
-                cursor: 'pointer',
-              }}
-            >
-              Talk to us
-            </button>
+        {/* 4. FAQ */}
+        <section className="py-16 px-10 bg-white">
+          <div className="max-w-[1280px] mx-auto">
+            <h2 className="font-bold mb-10 text-center" style={{ fontSize: 36, color: '#111310' }}>Plans FAQ</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">
+              {faqs.map((item, i) => (
+                <div key={i}>
+                  <p className="font-bold mb-2" style={{ fontSize: 15, color: '#111310' }}>{item.q}</p>
+                  <p className="text-sm leading-relaxed" style={{ color: '#5E625A' }}>{item.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Dark CTA */}
+        <section className="py-20 px-10" style={{ background: '#171A16' }}>
+          <div className="max-w-[1280px] mx-auto text-center">
+            <h2 className="font-bold mb-4" style={{ fontSize: 42, color: '#ECEDE6' }}>
+              Ready to transform your studio?
+            </h2>
+            <p className="mx-auto mb-10" style={{ fontSize: 18, color: '#8A8E85', maxWidth: 560 }}>
+              Start a free 14-day trial. No credit card required, no joining fee, no commitment.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/register"
+                className="font-semibold rounded-lg px-5 py-2.5 text-sm"
+                style={{ background: '#D7FF3F', color: '#111310' }}
+              >
+                Start free trial
+              </Link>
+              <button
+                type="button"
+                className="font-semibold rounded-lg px-5 py-2.5 text-sm"
+                style={{ border: '1px solid rgba(255,255,255,0.25)', color: '#ECEDE6' }}
+              >
+                Talk to sales
+              </button>
+            </div>
           </div>
         </section>
 

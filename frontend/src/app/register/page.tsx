@@ -3,403 +3,207 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function RegisterPage() {
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [studioCode, setStudioCode] = useState('');
   const [role, setRole] = useState<'member' | 'staff'>('member');
   const [agreed, setAgreed] = useState(false);
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex' }}>
-      {/* Left panel — dark */}
+    <div className="min-h-screen flex">
+
+      {/* LEFT COLUMN — dark panel */}
       <div
-        className="hidden lg:flex lg:flex-col"
-        style={{
-          width: 480,
-          flexShrink: 0,
-          background: '#171A16',
-          position: 'relative',
-          padding: 48,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}
+        className="hidden lg:flex flex-col justify-between shrink-0 p-12"
+        style={{ width: 480, background: '#171A16' }}
       >
-        {/* Background image overlay */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: "url('/assets/login_athlete.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.15,
-          }}
-        />
-
-        {/* Logo */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <div
-              style={{
-                width: 34,
-                height: 34,
-                background: '#D7FF3F',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#111310">
-                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <span style={{ color: '#ECEDE6', fontSize: 21, fontWeight: 800, letterSpacing: '-0.02em' }}>
-              FITOS
-            </span>
-          </Link>
-        </div>
-
-        {/* Tagline */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <h2
-            style={{
-              fontSize: 36,
-              fontWeight: 800,
-              color: '#ECEDE6',
-              lineHeight: 1.2,
-              marginBottom: 12,
-            }}
+        {/* Top: Logo */}
+        <Link href="/" className="flex items-center gap-2.5">
+          <div
+            className="flex items-center justify-center"
+            style={{ width: 34, height: 34, background: '#D7FF3F', borderRadius: 10 }}
           >
-            Bắt đầu hành trình<br />của bạn.
-          </h2>
-          <p style={{ fontSize: 15, color: '#5E625A', lineHeight: 1.6 }}>
-            Kết nối studio, huấn luyện chuyên nghiệp và tiến trình hội viên.
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#111310">
+              <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <span style={{ color: '#ECEDE6', fontSize: 21, fontWeight: 800, letterSpacing: '-0.02em' }}>FITOS</span>
+        </Link>
+
+        {/* Bottom: Quote card */}
+        <div className="rounded-2xl p-8" style={{ background: 'rgba(255,255,255,0.1)' }}>
+          <p className="font-medium leading-relaxed mb-4" style={{ fontSize: 22, color: '#ECEDE6' }}>
+            &ldquo;From the first free trial to a loyal member for years — FITOS handles every step.&rdquo;
           </p>
+          <div className="flex items-center gap-3 mt-4">
+            <div
+              className="flex items-center justify-center font-bold text-sm rounded-full shrink-0"
+              style={{ width: 40, height: 40, background: '#D7FF3F', color: '#111310' }}
+            >
+              BT
+            </div>
+            <div>
+              <p className="font-bold text-sm" style={{ color: '#ECEDE6' }}>Bảo Trần</p>
+              <p className="text-xs" style={{ color: '#8A8E85' }}>Owner · FitCore Saigon</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right panel */}
-      <div
-        style={{
-          flex: 1,
-          background: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 48,
-        }}
-      >
-        <div style={{ width: 400, maxWidth: '100%' }}>
+      {/* RIGHT COLUMN — form */}
+      <div className="flex-1 flex items-center justify-center bg-white p-8">
+        <div className="w-full" style={{ maxWidth: 400 }}>
+
           {/* Mobile logo */}
-          <Link
-            href="/"
-            style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32, textDecoration: 'none' }}
-            className="lg:hidden"
-          >
+          <Link href="/" className="flex items-center gap-2.5 mb-10 lg:hidden">
             <div
-              style={{
-                width: 34,
-                height: 34,
-                background: '#D7FF3F',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+              className="flex items-center justify-center"
+              style={{ width: 34, height: 34, background: '#D7FF3F', borderRadius: 10 }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#111310">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#111310">
                 <path d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <span style={{ fontSize: 21, fontWeight: 800, color: '#111310' }}>FITOS</span>
           </Link>
 
-          {/* Heading */}
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111310', marginBottom: 6 }}>
-            Tạo tài khoản của bạn
-          </h1>
-          <p style={{ fontSize: 14, color: '#5E625A', marginBottom: 24 }}>
-            Không cần thẻ tín dụng. Miễn phí 14 ngày.
-          </p>
+          <h1 className="font-bold mb-1" style={{ fontSize: 28, color: '#111310' }}>Create your account</h1>
+          <p className="mb-8" style={{ fontSize: 15, color: '#5E625A' }}>Join FITOS today</p>
 
-          <form onSubmit={e => e.preventDefault()}>
+          <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
             {/* Full name */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                Họ và tên
+            <div>
+              <label className="block font-medium mb-1" style={{ fontSize: 13, color: '#111310' }}>
+                Full name
               </label>
               <input
                 type="text"
-                placeholder="Nguyễn Văn A"
-                style={{
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                  width: '100%',
-                  fontSize: 14,
-                  outline: 'none',
-                  color: '#111310',
-                  background: '#fff',
-                  boxSizing: 'border-box',
-                }}
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Your full name"
+                className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                style={{ borderColor: '#DADCD3', color: '#111310' }}
               />
             </div>
 
             {/* Email */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                Email
+            <div>
+              <label className="block font-medium mb-1" style={{ fontSize: 13, color: '#111310' }}>
+                Email address
               </label>
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@studio.com"
-                style={{
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                  width: '100%',
-                  fontSize: 14,
-                  outline: 'none',
-                  color: '#111310',
-                  background: '#fff',
-                  boxSizing: 'border-box',
-                }}
+                className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                style={{ borderColor: '#DADCD3', color: '#111310' }}
               />
             </div>
 
             {/* Phone */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                Số điện thoại
+            <div>
+              <label className="block font-medium mb-1" style={{ fontSize: 13, color: '#111310' }}>
+                Phone number
               </label>
               <input
                 type="tel"
-                placeholder="0901 234 567"
-                style={{
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                  width: '100%',
-                  fontSize: 14,
-                  outline: 'none',
-                  color: '#111310',
-                  background: '#fff',
-                  boxSizing: 'border-box',
-                }}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+84 901 234 567"
+                className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                style={{ borderColor: '#DADCD3', color: '#111310' }}
               />
             </div>
 
             {/* Studio code */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                Mã studio
+            <div>
+              <label className="block font-medium mb-1" style={{ fontSize: 13, color: '#111310' }}>
+                Studio code{' '}
+                <span className="font-normal" style={{ color: '#8A8E85' }}>(optional)</span>
               </label>
               <input
                 type="text"
-                placeholder="Mã studio (nếu có)"
-                style={{
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                  width: '100%',
-                  fontSize: 14,
-                  outline: 'none',
-                  color: '#111310',
-                  background: '#fff',
-                  boxSizing: 'border-box',
-                }}
+                value={studioCode}
+                onChange={(e) => setStudioCode(e.target.value)}
+                placeholder="e.g. PULSE2"
+                className="w-full border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                style={{ borderColor: '#DADCD3', color: '#111310' }}
               />
             </div>
 
-            {/* Password */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                Mật khẩu
+            {/* Role toggle */}
+            <div>
+              <label className="block font-medium mb-2" style={{ fontSize: 13, color: '#111310' }}>
+                I am a
               </label>
-              <input
-                type="password"
-                placeholder="Tối thiểu 8 ký tự"
-                style={{
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                  width: '100%',
-                  fontSize: 14,
-                  outline: 'none',
-                  color: '#111310',
-                  background: '#fff',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            {/* Confirm password */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                Xác nhận mật khẩu
-              </label>
-              <input
-                type="password"
-                placeholder="Nhập lại mật khẩu"
-                style={{
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  padding: '10px 14px',
-                  width: '100%',
-                  fontSize: 14,
-                  outline: 'none',
-                  color: '#111310',
-                  background: '#fff',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            {/* Role selector */}
-            <div style={{ marginBottom: 16 }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                Vai trò
-              </label>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setRole('member')}
+                  className="flex-1 py-2 rounded-full text-sm font-semibold transition-all"
                   style={{
-                    flex: 1,
-                    padding: '10px 14px',
-                    borderRadius: 10,
-                    border: role === 'member' ? 'none' : '1px solid #DADCD3',
                     background: role === 'member' ? '#D7FF3F' : 'transparent',
-                    color: role === 'member' ? '#111310' : '#111310',
-                    fontWeight: 600,
-                    fontSize: 14,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
+                    color: '#111310',
+                    border: role === 'member' ? 'none' : '1px solid #DADCD3',
                   }}
                 >
-                  Hội viên
+                  I&apos;m a Member
                 </button>
                 <button
                   type="button"
                   onClick={() => setRole('staff')}
+                  className="flex-1 py-2 rounded-full text-sm font-semibold transition-all"
                   style={{
-                    flex: 1,
-                    padding: '10px 14px',
-                    borderRadius: 10,
-                    border: role === 'staff' ? 'none' : '1px solid #DADCD3',
                     background: role === 'staff' ? '#D7FF3F' : 'transparent',
-                    color: role === 'staff' ? '#111310' : '#111310',
-                    fontWeight: 600,
-                    fontSize: 14,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
+                    color: '#111310',
+                    border: role === 'staff' ? 'none' : '1px solid #DADCD3',
                   }}
                 >
-                  Nhân viên
+                  I&apos;m Staff
                 </button>
               </div>
             </div>
 
             {/* Terms checkbox */}
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 20 }}>
+            <div className="flex items-start gap-2.5">
               <input
                 type="checkbox"
                 id="terms"
                 checked={agreed}
-                onChange={e => setAgreed(e.target.checked)}
-                style={{ marginTop: 2, cursor: 'pointer', accentColor: '#D7FF3F' }}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-0.5 cursor-pointer"
+                style={{ accentColor: '#D7FF3F' }}
               />
-              <label htmlFor="terms" style={{ fontSize: 13, color: '#5E625A', cursor: 'pointer', lineHeight: 1.5 }}>
-                Tôi đồng ý với{' '}
-                <a href="#" style={{ color: '#526B00', fontWeight: 600 }}>Điều khoản dịch vụ</a>
-                {' '}và{' '}
-                <a href="#" style={{ color: '#526B00', fontWeight: 600 }}>Chính sách bảo mật</a>
+              <label htmlFor="terms" className="cursor-pointer leading-relaxed" style={{ fontSize: 13, color: '#5E625A' }}>
+                I agree to the{' '}
+                <a href="#" className="font-semibold" style={{ color: '#526B00' }}>Terms of Service</a>
+                {' '}and{' '}
+                <a href="#" className="font-semibold" style={{ color: '#526B00' }}>Privacy Policy</a>
               </label>
             </div>
 
             {/* Register button */}
             <button
               type="submit"
-              style={{
-                background: '#D7FF3F',
-                color: '#111310',
-                borderRadius: 10,
-                padding: '12px 16px',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: 15,
-                width: '100%',
-              }}
+              className="w-full font-semibold rounded-lg py-3 mt-4 text-sm"
+              style={{ background: '#D7FF3F', color: '#111310' }}
             >
-              Đăng ký
+              Create account
             </button>
           </form>
 
           {/* Bottom link */}
-          <p style={{ textAlign: 'center', fontSize: 13, color: '#8A8E85', marginTop: 20 }}>
-            Đã có tài khoản?{' '}
-            <Link href="/login" style={{ color: '#526B00', fontWeight: 600, textDecoration: 'none' }}>
-              Đăng nhập
+          <p className="text-center mt-6 text-sm" style={{ color: '#5E625A' }}>
+            Already have an account?{' '}
+            <Link href="/login" className="font-semibold" style={{ color: '#526B00' }}>
+              Sign in →
             </Link>
           </p>
         </div>
       </div>
+
     </div>
   );
 }
