@@ -1,209 +1,112 @@
-"use client";
-import { useState } from 'react';
-
-type ViewMode = 'week' | 'list';
-
-const schedule = [
-  { day: 0, time: '07:00', name: 'Yoga Flow',      instructor: 'Coach Thanh Hà',    spots: '12/15', type: 'Yoga' },
-  { day: 0, time: '08:30', name: 'HIIT Blast',     instructor: 'Coach Minh Tuấn',   spots: '18/20', type: 'HIIT' },
-  { day: 0, time: '18:30', name: 'Strength Lab',   instructor: 'Coach Đức Anh',     spots: '14/16', type: 'Strength' },
-  { day: 1, time: '07:00', name: 'Yin Yoga',       instructor: 'Coach Mai Anh',     spots: '10/15', type: 'Yoga' },
-  { day: 1, time: '09:00', name: 'Cycling Power',  instructor: 'Coach Phương Linh', spots: '20/20', type: 'Cycling' },
-  { day: 1, time: '19:00', name: 'HIIT Circuit',   instructor: 'Coach Hoàng Nam',   spots: '15/20', type: 'HIIT' },
-  { day: 2, time: '08:00', name: 'Boxing Basics',  instructor: 'Coach Đức Anh',     spots: '8/12',  type: 'Boxing' },
-  { day: 2, time: '09:30', name: 'Yoga Flow',      instructor: 'Coach Thanh Hà',    spots: '11/15', type: 'Yoga' },
-  { day: 2, time: '18:00', name: 'Cycling Power',  instructor: 'Coach Ngọc Bích',   spots: '19/20', type: 'Cycling' },
-  { day: 3, time: '07:30', name: 'Strength Lab',   instructor: 'Coach Văn Quân',    spots: '12/16', type: 'Strength' },
-  { day: 3, time: '08:30', name: 'HIIT Blast',     instructor: 'Coach Minh Tuấn',   spots: '20/20', type: 'HIIT' },
-  { day: 3, time: '19:00', name: 'Yin Yoga',       instructor: 'Coach Mai Anh',     spots: '9/15',  type: 'Yoga' },
-  { day: 4, time: '07:00', name: 'Cycling Power',  instructor: 'Coach Phương Linh', spots: '18/20', type: 'Cycling' },
-  { day: 4, time: '17:00', name: 'Boxing Basics',  instructor: 'Coach Đức Anh',     spots: '10/12', type: 'Boxing' },
-  { day: 4, time: '19:30', name: 'Strength Lab',   instructor: 'Coach Minh Tuấn',   spots: '13/16', type: 'Strength' },
-  { day: 5, time: '08:00', name: 'HIIT Blast',     instructor: 'Coach Hoàng Nam',   spots: '17/20', type: 'HIIT' },
-  { day: 5, time: '09:30', name: 'Yoga Flow',      instructor: 'Coach Thanh Hà',    spots: '14/15', type: 'Yoga' },
-  { day: 5, time: '10:30', name: 'Cycling Power',  instructor: 'Coach Ngọc Bích',   spots: '16/20', type: 'Cycling' },
-  { day: 6, time: '09:00', name: 'Strength Lab',   instructor: 'Coach Văn Quân',    spots: '15/16', type: 'Strength' },
-  { day: 6, time: '10:30', name: 'Yin Yoga',       instructor: 'Coach Mai Anh',     spots: '12/15', type: 'Yoga' },
+const days = [
+  { label: 'Mon', date: '14' },
+  { label: 'Tue', date: '15' },
+  { label: 'Wed', date: '16' },
+  { label: 'Thu', date: '17' },
+  { label: 'Fri', date: '18' },
+  { label: 'Sat', date: '19' },
+  { label: 'Sun', date: '20' },
 ];
 
-const typeStyle: Record<string, { bg: string; text: string; dot: string }> = {
-  Yoga:     { bg: '#F5F3FF', text: '#6D28D9', dot: '#7C3AED' },
-  HIIT:     { bg: '#FFF7ED', text: '#C2410C', dot: '#F97316' },
-  Strength: { bg: '#F0FDF4', text: '#15803D', dot: '#22C55E' },
-  Cycling:  { bg: '#EFF6FF', text: '#1D4ED8', dot: '#3B82F6' },
-  Boxing:   { bg: '#FFF1F2', text: '#BE123C', dot: '#F43F5E' },
-};
+const classes: { day: number; time: string; name: string; trainer: string; spots: string }[] = [
+  { day: 0, time: '07:00', name: 'Engine Room', trainer: 'Coach Minh', spots: '13/18' },
+  { day: 0, time: '09:00', name: 'Mobility Reset', trainer: 'Coach An', spots: '8/18' },
+  { day: 0, time: '18:30', name: 'Strength Lab', trainer: 'Coach Quân', spots: '14/16' },
 
-const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const dayDates  = ['14', '15', '16', '17', '18', '19', '20'];
-const todayCol  = 1; // Tuesday highlighted
+  { day: 1, time: '06:00', name: 'HIIT & Strength', trainer: 'Coach Liam', spots: '14/16' },
+  { day: 1, time: '09:00', name: 'Cycling Power', trainer: 'Coach Linh', spots: '20/20' },
+  { day: 1, time: '18:30', name: 'Boxing Basics', trainer: 'Coach Mai', spots: '10/12' },
+
+  { day: 2, time: '07:00', name: 'Yoga Flow', trainer: 'Coach Sarah', spots: '12/15' },
+  { day: 2, time: '18:00', name: 'HIIT Blast', trainer: 'Coach Marcus', spots: '17/20' },
+
+  { day: 3, time: '07:00', name: 'Engine Room', trainer: 'Coach Minh', spots: '16/18' },
+  { day: 3, time: '09:00', name: 'Strength Lab', trainer: 'Coach Quân', spots: '12/16' },
+  { day: 3, time: '19:00', name: 'Yin Yoga', trainer: 'Coach Sarah', spots: '9/15' },
+
+  { day: 4, time: '07:00', name: 'Cycling Power', trainer: 'Coach Linh', spots: '18/20' },
+  { day: 4, time: '17:00', name: 'Boxing Basics', trainer: 'Coach Mai', spots: '10/12' },
+  { day: 4, time: '19:30', name: 'Strength Lab', trainer: 'Coach Marcus', spots: '13/16' },
+
+  { day: 5, time: '08:00', name: 'HIIT Blast', trainer: 'Coach Liam', spots: '17/20' },
+  { day: 5, time: '09:30', name: 'Yoga Flow', trainer: 'Coach Sarah', spots: '14/15' },
+
+  { day: 6, time: '09:00', name: 'Strength Lab', trainer: 'Coach Quân', spots: '15/16' },
+  { day: 6, time: '10:30', name: 'Yin Yoga', trainer: 'Coach Sarah', spots: '12/15' },
+];
+
+const todayCol = 1; // Tuesday 15 Jul
 
 export default function SchedulePage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('week');
-
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div>
-          <span className="block text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#526B00' }}>
-            OPERATE
-          </span>
-          <h1 className="text-2xl font-bold" style={{ color: '#111310' }}>Class Schedule</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* Week / List toggle */}
-          <div className="flex items-center rounded-lg border border-[#DADCD3] overflow-hidden">
-            {(['week', 'list'] as ViewMode[]).map((mode) => (
-              <button
-                key={mode}
-                onClick={() => setViewMode(mode)}
-                className="text-xs font-medium px-4 py-2 capitalize"
-                style={{
-                  background: viewMode === mode ? '#D7FF3F' : '#fff',
-                  color: viewMode === mode ? '#526B00' : '#5E625A',
-                }}
-              >
-                {mode === 'week' ? 'Week' : 'List'}
-              </button>
-            ))}
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              OPERATE · SCHEDULE
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Schedule</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Week of 14–20 July 2025</p>
           </div>
-          <button
-            className="text-sm font-semibold rounded-lg px-4 py-2"
-            style={{ background: '#D7FF3F', color: '#111310' }}
-          >
-            + Add Class
+          <button className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2 text-sm">
+            + Add class
           </button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
+      {/* Page Content */}
+      <div className="p-8">
 
-        {viewMode === 'week' ? (
-          <>
-            {/* Week navigation */}
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <button
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-[#DADCD3]"
-                style={{ background: '#fff', color: '#5E625A' }}
-              >
-                ‹
-              </button>
-              <span className="text-sm font-semibold" style={{ color: '#111310' }}>This Week · Jul 14–20, 2025</span>
-              <button
-                className="w-8 h-8 rounded-lg flex items-center justify-center border border-[#DADCD3]"
-                style={{ background: '#fff', color: '#5E625A' }}
-              >
-                ›
-              </button>
-            </div>
+        {/* Week navigation */}
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-[#DADCD3] bg-white text-[#5E625A] text-base font-bold hover:bg-[#F5F5F0]">
+            ‹
+          </button>
+          <span className="text-sm font-semibold text-[#111310]">Mon 14 – Sun 20 July</span>
+          <button className="w-8 h-8 rounded-lg flex items-center justify-center border border-[#DADCD3] bg-white text-[#5E625A] text-base font-bold hover:bg-[#F5F5F0]">
+            ›
+          </button>
+        </div>
 
-            {/* Weekly grid */}
-            <div className="grid grid-cols-7 gap-3">
-              {dayLabels.map((day, colIndex) => {
-                const isToday = colIndex === todayCol;
-                const dayClasses = schedule.filter((c) => c.day === colIndex);
-                return (
-                  <div key={colIndex}>
-                    {/* Day header */}
-                    <div
-                      className="text-center mb-3 py-2 rounded-lg"
-                      style={{ background: isToday ? '#D7FF3F' : 'transparent' }}
-                    >
-                      <p
-                        className="text-xs font-semibold uppercase tracking-wide"
-                        style={{ color: isToday ? '#526B00' : '#5E625A' }}
-                      >
-                        {day}
-                      </p>
-                      <p
-                        className="text-lg font-bold"
-                        style={{ color: isToday ? '#526B00' : '#111310' }}
-                      >
-                        {dayDates[colIndex]}
-                      </p>
-                    </div>
-
-                    {/* Class pills */}
-                    <div className="space-y-2">
-                      {dayClasses.map((cls, ci) => {
-                        const style = typeStyle[cls.type] ?? typeStyle.HIIT;
-                        return (
-                          <div
-                            key={ci}
-                            className="rounded-lg p-2 cursor-pointer"
-                            style={{ background: style.bg }}
-                          >
-                            <p className="text-xs font-bold truncate" style={{ color: style.text }}>{cls.name}</p>
-                            <p className="text-[10px] mt-0.5" style={{ color: style.text, opacity: 0.8 }}>{cls.time}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Legend */}
-            <div className="flex items-center gap-4 mt-6">
-              {Object.entries(typeStyle).map(([type, style]) => (
-                <div key={type} className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: style.dot }} />
-                  <span className="text-xs" style={{ color: '#5E625A' }}>{type}</span>
+        {/* 7-column weekly grid */}
+        <div className="grid grid-cols-7 gap-3">
+          {days.map((day, colIndex) => {
+            const isToday = colIndex === todayCol;
+            const dayClasses = classes.filter((c) => c.day === colIndex);
+            return (
+              <div key={colIndex}>
+                {/* Day header */}
+                <div className={`text-center py-2 rounded-lg mb-3 ${isToday ? 'bg-[#D7FF3F]' : 'bg-transparent'}`}>
+                  <p className={`text-xs font-semibold uppercase tracking-[0.08em] ${isToday ? 'text-[#526B00]' : 'text-[#8A8E85]'}`}>
+                    {day.label}
+                  </p>
+                  <p className={`text-lg font-bold ${isToday ? 'text-[#526B00]' : 'text-[#111310]'}`}>
+                    {day.date}
+                  </p>
                 </div>
-              ))}
-            </div>
-          </>
-        ) : (
-          /* List view */
-          <div className="bg-white rounded-xl border border-[#DADCD3] overflow-hidden">
-            <div
-              className="grid px-5 py-3 text-xs font-medium uppercase tracking-wide"
-              style={{
-                background: '#F5F5F0',
-                color: '#5E625A',
-                gridTemplateColumns: '1fr 2fr 2fr 1.5fr 1fr',
-              }}
-            >
-              {['Day', 'Time & Class', 'Instructor', 'Type', 'Spots'].map((col) => (
-                <span key={col}>{col}</span>
-              ))}
-            </div>
 
-            <div className="divide-y divide-[#F0F0EB]">
-              {[...schedule]
-                .sort((a, b) => a.day - b.day || a.time.localeCompare(b.time))
-                .map((cls, i) => {
-                  const style = typeStyle[cls.type] ?? typeStyle.HIIT;
-                  return (
-                    <div
-                      key={i}
-                      className="grid px-5 py-3 items-center hover:bg-[#FAFAF8]"
-                      style={{ gridTemplateColumns: '1fr 2fr 2fr 1.5fr 1fr' }}
-                    >
-                      <span className="text-sm font-medium" style={{ color: '#111310' }}>{dayLabels[cls.day]}</span>
-                      <div>
-                        <p className="text-sm font-semibold" style={{ color: '#111310' }}>{cls.name}</p>
-                        <p className="text-xs" style={{ color: '#5E625A' }}>{cls.time}</p>
-                      </div>
-                      <span className="text-sm" style={{ color: '#5E625A' }}>{cls.instructor}</span>
-                      <div>
-                        <span
-                          className="text-xs font-medium px-2 py-0.5 rounded-full"
-                          style={{ background: style.bg, color: style.text }}
-                        >
-                          {cls.type}
-                        </span>
-                      </div>
-                      <span className="text-sm" style={{ color: '#5E625A' }}>{cls.spots}</span>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-        )}
+                {/* Class pills */}
+                {dayClasses.map((cls, ci) => (
+                  <div key={ci} className="bg-white border border-[#DADCD3] rounded-lg p-2.5 mb-2 text-xs">
+                    <p className="font-semibold text-[#111310] truncate">{cls.name}</p>
+                    <p className="text-[#8A8E85] mt-0.5">{cls.time}</p>
+                    <p className="text-[#5E625A] truncate">{cls.trainer}</p>
+                    <p className="text-[#526B00] font-semibold mt-1">{cls.spots}</p>
+                  </div>
+                ))}
+
+                {dayClasses.length === 0 && (
+                  <div className="h-10 flex items-center justify-center">
+                    <span className="text-xs text-[#DADCD3]">—</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
       </div>
     </div>
   );

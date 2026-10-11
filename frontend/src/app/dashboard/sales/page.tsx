@@ -1,164 +1,107 @@
-"use client";
-
-interface Transaction {
-  date: string;
-  member: string;
-  plan: string;
-  amount: string;
-  method: string;
-  status: 'paid' | 'pending' | 'failed';
-}
-
-const transactions: Transaction[] = [
-  { date: '15 Jul 2025', member: 'Nguyễn Thị Trâm', plan: 'Perform', amount: '$149', method: 'Bank Transfer', status: 'paid' },
-  { date: '15 Jul 2025', member: 'Lê Văn Hùng', plan: 'Move', amount: '$89', method: 'Cash', status: 'paid' },
-  { date: '14 Jul 2025', member: 'Phạm Minh Châu', plan: 'PT Focus × 8', amount: '$320', method: 'Card', status: 'paid' },
-  { date: '14 Jul 2025', member: 'Trần Thị Lan', plan: 'Perform', amount: '$149', method: 'Bank Transfer', status: 'pending' },
-  { date: '13 Jul 2025', member: 'Hoàng Đức Mạnh', plan: 'PT × 10 sessions', amount: '$650', method: 'Card', status: 'paid' },
-  { date: '13 Jul 2025', member: 'Vũ Thị Hoa', plan: 'Move', amount: '$89', method: 'Cash', status: 'paid' },
-  { date: '12 Jul 2025', member: 'Đỗ Quang Huy', plan: 'Perform', amount: '$149', method: 'Bank Transfer', status: 'failed' },
-  { date: '12 Jul 2025', member: 'Bùi Thị Ngọc', plan: 'PT Focus × 5', amount: '$350', method: 'Card', status: 'paid' },
+const sales = [
+  { date: '15 Jul 2025', member: 'Sophie Turner', plan: 'Perform — Monthly', amount: '£52', method: 'Card', staff: 'Jordan T.', status: 'Paid' },
+  { date: '15 Jul 2025', member: 'James Hargreaves', plan: 'Move — Monthly', amount: '£32', method: 'Direct Debit', staff: 'Sarah M.', status: 'Paid' },
+  { date: '14 Jul 2025', member: 'Priya Sharma', plan: 'PT Focus × 8', amount: '£320', method: 'Card', staff: 'Marcus L.', status: 'Paid' },
+  { date: '14 Jul 2025', member: 'Oliver Webb', plan: 'Perform — Monthly', amount: '£52', method: 'Direct Debit', staff: 'Jordan T.', status: 'Pending' },
+  { date: '13 Jul 2025', member: 'Chloe Adams', plan: 'Move — Monthly', amount: '£32', method: 'Cash', staff: 'Sarah M.', status: 'Paid' },
+  { date: '13 Jul 2025', member: 'Harry Wilson', plan: 'Perform — Monthly', amount: '£52', method: 'Card', staff: 'Marcus L.', status: 'Failed' },
+  { date: '12 Jul 2025', member: 'Grace Mitchell', plan: 'Move — Monthly', amount: '£32', method: 'Direct Debit', staff: 'Jordan T.', status: 'Paid' },
+  { date: '12 Jul 2025', member: 'Ethan Brown', plan: 'PT Focus × 5', amount: '£200', method: 'Card', staff: 'Sarah M.', status: 'Paid' },
+  { date: '11 Jul 2025', member: 'Jack Taylor', plan: 'Move — Monthly', amount: '£32', method: 'Cash', staff: 'Marcus L.', status: 'Paid' },
+  { date: '11 Jul 2025', member: 'Isabella Moore', plan: 'Perform — Monthly', amount: '£52', method: 'Card', staff: 'Jordan T.', status: 'Paid' },
 ];
 
-const statusBadge: Record<Transaction['status'], { background: string; color: string; label: string }> = {
-  paid:    { background: '#F0FDF4', color: '#15803D', label: 'Paid' },
-  pending: { background: '#FEFCE8', color: '#A16207', label: 'Pending' },
-  failed:  { background: '#FFF0F0', color: '#D93030', label: 'Failed' },
+const statusPill: Record<string, string> = {
+  Paid: 'bg-green-50 text-green-700',
+  Pending: 'bg-amber-50 text-amber-700',
+  Failed: 'bg-red-50 text-red-700',
 };
-
-const monthlyRevenue = [
-  { month: 'Jan', value: 52 },
-  { month: 'Feb', value: 48 },
-  { month: 'Mar', value: 61 },
-  { month: 'Apr', value: 55 },
-  { month: 'May', value: 67 },
-  { month: 'Jun', value: 72 },
-  { month: 'Jul', value: 85 },
-];
 
 export default function SalesPage() {
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div>
-          <span className="block text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#526B00' }}>
-            OPERATE
-          </span>
-          <h1 className="text-2xl font-bold" style={{ color: '#111310' }}>Sales &amp; Revenue</h1>
-        </div>
-        {/* Date range mock */}
-        <div
-          className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg border border-[#DADCD3]"
-          style={{ background: '#fff', color: '#5E625A' }}
-        >
-          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-            <rect x="3" y="4" width="18" height="18" rx="2" />
-            <path d="M16 2v4M8 2v4M3 10h18" />
-          </svg>
-          Jul 1 – Jul 15, 2025
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              GROW · SALES
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Sales</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Revenue and membership sales</p>
+          </div>
+          <button className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2 text-sm">
+            + Create sale
+          </button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
+      {/* Page Content */}
+      <div className="p-8">
 
         {/* KPI cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {[
-            { label: 'Monthly Revenue', value: '$12,400', change: '▲8% vs last month', changeColor: '#526B00' },
-            { label: 'Memberships Sold', value: '28', change: '+5 vs last month', changeColor: '#526B00' },
-            { label: 'PT Sessions', value: '45', change: '12 this week', changeColor: '#5E625A' },
-            { label: 'Avg Transaction', value: '$443', change: '▲3% vs last month', changeColor: '#526B00' },
-          ].map((card, i) => (
-            <div key={i} className="bg-white rounded-xl border border-[#DADCD3] p-5">
-              <p className="text-xs mb-2" style={{ color: '#5E625A' }}>{card.label}</p>
-              <p className="text-[28px] font-bold" style={{ color: '#111310' }}>{card.value}</p>
-              <p className="text-xs mt-1 font-medium" style={{ color: card.changeColor }}>{card.change}</p>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Revenue This Month</p>
+            <p className="text-3xl font-bold text-[#111310]">£18,450</p>
+            <p className="text-xs text-[#526B00] mt-1 font-medium">▲ +12% vs last month</p>
+          </div>
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">New Sales</p>
+            <p className="text-3xl font-bold text-[#111310]">42</p>
+            <p className="text-xs text-[#526B00] mt-1 font-medium">▲ +8 vs last month</p>
+          </div>
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Renewals</p>
+            <p className="text-3xl font-bold text-[#111310]">31</p>
+            <p className="text-xs text-[#5E625A] mt-1 font-medium">This month</p>
+          </div>
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Avg. Sale Value</p>
+            <p className="text-3xl font-bold text-[#111310]">£52</p>
+            <p className="text-xs text-[#526B00] mt-1 font-medium">▲ +3% vs last month</p>
+          </div>
         </div>
 
-        {/* Revenue chart */}
-        <div className="bg-white rounded-xl border border-[#DADCD3] p-5 mb-6">
-          <h2 className="text-sm font-bold mb-5" style={{ color: '#111310' }}>Monthly Revenue</h2>
-          <div className="flex items-end gap-3" style={{ height: 140 }}>
-            {monthlyRevenue.map((bar, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                <div
-                  className="w-full rounded-md"
-                  style={{
-                    height: `${bar.value * 1.5}px`,
-                    background: i === monthlyRevenue.length - 1 ? '#D7FF3F' : '#DADCD3',
-                  }}
-                />
-                <span className="text-[10px]" style={{ color: '#5E625A' }}>{bar.month}</span>
+        {/* Sales table */}
+        <div className="bg-white border border-[#DADCD3] rounded-xl overflow-hidden">
+          {/* Table header */}
+          <div className="grid grid-cols-[1.2fr_2fr_2fr_0.8fr_1.2fr_1fr_1fr] px-6 py-3 bg-[#F5F5F0]">
+            {['Date', 'Member', 'Plan', 'Amount', 'Payment method', 'Staff', 'Status'].map((col) => (
+              <span key={col} className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A8E85]">
+                {col}
+              </span>
+            ))}
+          </div>
+
+          {/* Rows */}
+          <div>
+            {sales.map((sale, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[1.2fr_2fr_2fr_0.8fr_1.2fr_1fr_1fr] px-6 items-center border-t border-[#DADCD3] py-3"
+              >
+                <span className="text-sm text-[#5E625A]">{sale.date}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-[#F0F0EB] flex items-center justify-center text-xs font-bold text-[#111310] flex-shrink-0">
+                    {sale.member.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium text-[#111310] truncate">{sale.member}</span>
+                </div>
+                <span className="text-sm text-[#5E625A] truncate">{sale.plan}</span>
+                <span className="text-sm font-semibold text-[#111310]">{sale.amount}</span>
+                <span className="text-sm text-[#5E625A]">{sale.method}</span>
+                <span className="text-sm text-[#5E625A]">{sale.staff}</span>
+                <div>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusPill[sale.status] ?? 'bg-[#F0F0EB] text-[#5E625A]'}`}>
+                    {sale.status}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Transactions table */}
-        <div className="bg-white rounded-xl border border-[#DADCD3] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#F0F0EB]">
-            <h2 className="text-sm font-bold" style={{ color: '#111310' }}>Recent Transactions</h2>
-          </div>
-
-          {/* Header */}
-          <div
-            className="grid px-5 py-3 text-xs font-medium uppercase tracking-wide"
-            style={{
-              background: '#F5F5F0',
-              color: '#5E625A',
-              gridTemplateColumns: '1fr 2fr 1.5fr 1fr 1.2fr 1fr',
-            }}
-          >
-            {['Date', 'Member', 'Plan / Item', 'Amount', 'Method', 'Status'].map((col) => (
-              <span key={col}>{col}</span>
-            ))}
-          </div>
-
-          {/* Rows */}
-          <div className="divide-y divide-[#F0F0EB]">
-            {transactions.map((tx, i) => {
-              const badge = statusBadge[tx.status];
-              return (
-                <div
-                  key={i}
-                  className="grid px-5 py-3 items-center hover:bg-[#FAFAF8]"
-                  style={{ gridTemplateColumns: '1fr 2fr 1.5fr 1fr 1.2fr 1fr' }}
-                >
-                  <span className="text-sm" style={{ color: '#5E625A' }}>{tx.date}</span>
-
-                  {/* Member */}
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                      style={{ background: '#F0F0EB', color: '#111310' }}
-                    >
-                      {tx.member.charAt(0)}
-                    </div>
-                    <span className="text-sm font-medium" style={{ color: '#111310' }}>{tx.member}</span>
-                  </div>
-
-                  <span className="text-sm" style={{ color: '#5E625A' }}>{tx.plan}</span>
-                  <span className="text-sm font-semibold" style={{ color: '#111310' }}>{tx.amount}</span>
-                  <span className="text-sm" style={{ color: '#5E625A' }}>{tx.method}</span>
-
-                  {/* Status */}
-                  <div>
-                    <span
-                      className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                      style={{ background: badge.background, color: badge.color }}
-                    >
-                      {badge.label}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -1,176 +1,148 @@
-"use client";
-import { useEffect, useState } from 'react';
-import { useTranslations, Locale } from '@/lib/i18n';
-
-const monthlyRevenue = [
-  { month: 'Jan', value: 52 },
-  { month: 'Feb', value: 48 },
-  { month: 'Mar', value: 61 },
-  { month: 'Apr', value: 55 },
-  { month: 'May', value: 67 },
-  { month: 'Jun', value: 72 },
-  { month: 'Jul', value: 85 },
-];
-
-const classOccupancy = [
-  { time: '07:00', name: 'Engine Room', instructor: 'Coach Minh', fill: 13, max: 18 },
-  { time: '12:15', name: 'Mobility Reset', instructor: 'Coach An', fill: 8, max: 18 },
-  { time: '18:30', name: 'Strength Lab', instructor: 'Coach Quân', fill: 14, max: 16 },
-  { time: '19:45', name: 'Boxing Basics', instructor: 'Coach Mai', fill: 20, max: 20 },
-];
-
-const expiringMembers = [
-  { name: 'Hà My', plan: 'Perform', days: 2 },
-  { name: 'Đức Anh', plan: 'Move', days: 5 },
-  { name: 'Yến Nhi', plan: 'PT Focus', days: 9 },
-  { name: 'Minh Khoa', plan: 'Perform', days: 12 },
-];
-
-const priorities = [
-  { label: 'Follow up with 12 trial members within 24 hours', badge: 'High', urgent: true },
-  { label: '3 memberships expire in 2 days — start renewal flow', badge: 'High', urgent: true },
-  { label: 'Engine Room (07:00) — 5 spots still available', badge: 'Med', urgent: false },
-];
-
 export default function DashboardPage() {
-  const [locale, setLocale] = useState<Locale>('en');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const sync = () => {
-      const s = localStorage.getItem('locale') as Locale | null;
-      if (s) setLocale(s);
-    };
-    sync();
-    window.addEventListener('locale-changed', sync);
-    return () => window.removeEventListener('locale-changed', sync);
-  }, []);
-
-  const t = useTranslations(mounted ? locale : 'en');
-
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-  });
-
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div>
-          <span className="block text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#526B00' }}>
-            OVERVIEW
-          </span>
-          <h1 className="text-2xl font-bold" style={{ color: '#111310' }}>
-            Good morning, Studio
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm" style={{ color: '#5E625A' }}>{today}</span>
-          <button
-            className="text-sm font-semibold rounded-lg px-4 py-2"
-            style={{ background: '#D7FF3F', color: '#111310' }}
-          >
-            + New
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              STUDIO MANAGER · CITY CENTRE
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Dashboard</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Tuesday, 15 July 2025</p>
+          </div>
+          <button className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2 text-sm">
+            + New lead
           </button>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
+      {/* Page Content */}
+      <div className="p-8">
 
-        {/* Row 1 — Stat cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {[
-            { label: 'Total Members', value: '248', change: '▲12%', changeColor: '#526B00' },
-            { label: 'Revenue MTD', value: '$12,400', change: '▲8%', changeColor: '#526B00' },
-            { label: 'Classes Today', value: '14', change: '4 in progress', changeColor: '#5E625A' },
-            { label: 'Active Leads', value: '32', change: '▲5 this week', changeColor: '#526B00' },
-          ].map((card, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl border border-[#DADCD3] p-5"
-            >
-              <p className="text-xs mb-2" style={{ color: '#5E625A' }}>{card.label}</p>
-              <p className="text-[28px] font-bold" style={{ color: '#111310' }}>{card.value}</p>
-              <p className="text-xs mt-1 font-medium" style={{ color: card.changeColor }}>{card.change}</p>
-            </div>
-          ))}
+        {/* Stat cards row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+          {/* MRR */}
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">MRR</p>
+            <p className="text-3xl font-bold text-[#111310]">£18,450</p>
+            <p className="text-xs text-[#526B00] mt-1 font-medium">▲ +12% vs last month</p>
+          </div>
+
+          {/* Active Members */}
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Active Members</p>
+            <p className="text-3xl font-bold text-[#111310]">2,412</p>
+            <p className="text-xs text-[#526B00] mt-1 font-medium">▲ +3% vs last month</p>
+          </div>
+
+          {/* Classes Today */}
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Classes Today</p>
+            <p className="text-3xl font-bold text-[#111310]">8</p>
+            <p className="text-xs text-[#5E625A] mt-1 font-medium">156 / 196 booked</p>
+          </div>
+
+          {/* Class Fill Rate */}
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Class Fill Rate</p>
+            <p className="text-3xl font-bold text-[#111310]">79.6%</p>
+            <p className="text-xs text-[#526B00] mt-1 font-medium">▲ +4% vs last week</p>
+          </div>
         </div>
 
-        {/* Row 2 — Revenue chart + CRM Funnel */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          {/* Revenue chart (col-span-2) */}
-          <div className="col-span-2 bg-white rounded-xl border border-[#DADCD3] p-5">
-            <h2 className="text-sm font-bold mb-5" style={{ color: '#111310' }}>Monthly Revenue</h2>
-            <div className="flex items-end gap-3" style={{ height: 140 }}>
-              {monthlyRevenue.map((bar, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-                  <div
-                    className="w-full rounded-md"
-                    style={{
-                      height: `${bar.value * 1.5}px`,
-                      background: i === monthlyRevenue.length - 1 ? '#D7FF3F' : '#DADCD3',
-                    }}
-                  />
-                  <span className="text-[10px]" style={{ color: '#5E625A' }}>{bar.month}</span>
-                </div>
-              ))}
+        {/* Second stats row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Lead Conversion</p>
+            <p className="text-3xl font-bold text-[#111310]">34%</p>
+            <p className="text-xs text-[#5E625A] mt-1 font-medium">This month</p>
+          </div>
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">PT Sessions</p>
+            <p className="text-3xl font-bold text-[#111310]">24</p>
+            <p className="text-xs text-[#5E625A] mt-1 font-medium">Today</p>
+          </div>
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">New Leads</p>
+            <p className="text-3xl font-bold text-[#111310]">87</p>
+            <p className="text-xs text-[#526B00] mt-1 font-medium">▲ +9 this week</p>
+          </div>
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Trials Active</p>
+            <p className="text-3xl font-bold text-[#111310]">34</p>
+            <p className="text-xs text-[#5E625A] mt-1 font-medium">Scheduled this week</p>
+          </div>
+        </div>
+
+        {/* Revenue + Member Funnel */}
+        <div className="grid grid-cols-2 gap-5 mb-8">
+          {/* Revenue placeholder chart */}
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">Revenue</p>
+            <h2 className="text-base font-bold text-[#111310] mb-4">Monthly Revenue — July 2025</h2>
+            <div className="h-52 bg-[#F5F5F0] rounded-xl flex items-center justify-center">
+              <span className="text-sm text-[#8A8E85]">Revenue chart</span>
             </div>
           </div>
 
-          {/* CRM Funnel */}
-          <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
-            <h2 className="text-sm font-bold mb-5" style={{ color: '#111310' }}>Lead Funnel</h2>
-            <div className="space-y-3">
+          {/* Member funnel */}
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">CRM</p>
+            <h2 className="text-base font-bold text-[#111310] mb-4">Member Funnel</h2>
+            <div className="space-y-4">
               {[
-                { stage: 'New', count: 24, pct: 100 },
-                { stage: 'Contacted', count: 18, pct: 75 },
-                { stage: 'Trial', count: 12, pct: 50 },
-                { stage: 'Converted', count: 8, pct: 33 },
-                { stage: 'Lost', count: 5, pct: 21 },
-              ].map((row, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="text-xs w-20 flex-shrink-0" style={{ color: '#5E625A' }}>{row.stage}</span>
-                  <div className="flex-1 h-2 rounded-full" style={{ background: '#F0F0EB' }}>
+                { label: 'Leads', count: 87, pct: 100 },
+                { label: 'Trials', count: 34, pct: 39 },
+                { label: 'Members', count: 2412, pct: 100 },
+              ].map((row) => (
+                <div key={row.label}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-sm font-medium text-[#111310]">{row.label}</span>
+                    <span className="text-sm font-bold text-[#111310]">{row.count.toLocaleString()}</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-[#F0F0EB]">
                     <div
-                      className="h-2 rounded-full"
-                      style={{ width: `${row.pct}%`, background: '#D7FF3F' }}
+                      className="h-2 rounded-full bg-[#D7FF3F]"
+                      style={{ width: `${row.pct}%` }}
                     />
                   </div>
-                  <span className="text-xs font-semibold w-6 text-right" style={{ color: '#111310' }}>{row.count}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Row 3 — Class occupancy + Expiring memberships */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          {/* Class occupancy (col-span-2) */}
-          <div className="col-span-2 bg-white rounded-xl border border-[#DADCD3] p-5">
-            <h2 className="text-sm font-bold mb-5" style={{ color: '#111310' }}>Today&apos;s Classes</h2>
+        {/* Class occupancy + Expiring memberships */}
+        <div className="grid grid-cols-2 gap-5 mb-8">
+          {/* Class occupancy this week */}
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">Schedule</p>
+            <h2 className="text-base font-bold text-[#111310] mb-4">Class Occupancy This Week</h2>
             <div className="space-y-4">
-              {classOccupancy.map((cls, i) => {
+              {[
+                { time: '07:00', name: 'Engine Room', trainer: 'Coach Minh', fill: 13, max: 18 },
+                { time: '09:00', name: 'Cycling Power', trainer: 'Coach Linh', fill: 20, max: 20 },
+                { time: '12:15', name: 'Mobility Reset', trainer: 'Coach An', fill: 8, max: 18 },
+                { time: '18:30', name: 'Strength Lab', trainer: 'Coach Quân', fill: 14, max: 16 },
+                { time: '19:45', name: 'Boxing Basics', trainer: 'Coach Mai', fill: 20, max: 20 },
+              ].map((cls) => {
                 const pct = Math.round((cls.fill / cls.max) * 100);
-                const barColor = pct >= 100 ? '#FF6B6B' : pct >= 80 ? '#FFB347' : '#D7FF3F';
                 return (
-                  <div key={i} className="flex items-center gap-4">
-                    <span className="text-xs font-bold w-12 flex-shrink-0" style={{ color: '#111310' }}>{cls.time}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold" style={{ color: '#111310' }}>{cls.name}</span>
-                          <span className="text-xs" style={{ color: '#5E625A' }}>{cls.instructor}</span>
-                        </div>
-                        <span className="text-xs" style={{ color: '#5E625A' }}>{cls.fill}/{cls.max} seats</span>
+                  <div key={cls.time + cls.name}>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-[#111310]">{cls.time}</span>
+                        <span className="text-sm font-medium text-[#111310]">{cls.name}</span>
+                        <span className="text-xs text-[#8A8E85]">{cls.trainer}</span>
                       </div>
-                      <div className="w-full h-1.5 rounded-full" style={{ background: '#F0F0EB' }}>
-                        <div
-                          className="h-1.5 rounded-full"
-                          style={{ width: `${pct}%`, background: barColor }}
-                        />
-                      </div>
+                      <span className="text-xs text-[#8A8E85]">{cls.fill}/{cls.max}</span>
+                    </div>
+                    <div className="w-full h-1.5 rounded-full bg-[#F0F0EB]">
+                      <div
+                        className={`h-1.5 rounded-full ${pct >= 100 ? 'bg-red-400' : pct >= 80 ? 'bg-amber-400' : 'bg-[#D7FF3F]'}`}
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
                   </div>
                 );
@@ -179,28 +151,26 @@ export default function DashboardPage() {
           </div>
 
           {/* Expiring memberships */}
-          <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
-            <h2 className="text-sm font-bold mb-5" style={{ color: '#111310' }}>Expiring Memberships</h2>
+          <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">Members</p>
+            <h2 className="text-base font-bold text-[#111310] mb-4">Expiring Memberships</h2>
             <div className="space-y-3">
-              {expiringMembers.map((m, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                    style={{ background: '#F0F0EB', color: '#111310' }}
-                  >
+              {[
+                { name: 'Sophie Turner', plan: 'Perform', renewal: '17 Jul 2025', days: 2 },
+                { name: 'James Hargreaves', plan: 'Move', renewal: '20 Jul 2025', days: 5 },
+                { name: 'Priya Sharma', plan: 'PT Focus', renewal: '24 Jul 2025', days: 9 },
+                { name: 'Oliver Webb', plan: 'Perform', renewal: '27 Jul 2025', days: 12 },
+                { name: 'Chloe Adams', plan: 'Move', renewal: '30 Jul 2025', days: 15 },
+              ].map((m) => (
+                <div key={m.name} className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#F0F0EB] flex items-center justify-center text-xs font-bold text-[#111310] flex-shrink-0">
                     {m.name.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate" style={{ color: '#111310' }}>{m.name}</p>
-                    <p className="text-xs" style={{ color: '#5E625A' }}>{m.plan}</p>
+                    <p className="text-sm font-semibold text-[#111310] truncate">{m.name}</p>
+                    <p className="text-xs text-[#8A8E85]">{m.plan} · {m.renewal}</p>
                   </div>
-                  <span
-                    className="text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0"
-                    style={{
-                      background: m.days <= 3 ? '#FFF0F0' : m.days <= 7 ? '#FFF8E6' : '#F0F0EB',
-                      color: m.days <= 3 ? '#D93030' : m.days <= 7 ? '#B87000' : '#5E625A',
-                    }}
-                  >
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${m.days <= 3 ? 'bg-red-50 text-red-700' : m.days <= 7 ? 'bg-amber-50 text-amber-700' : 'bg-[#F0F0EB] text-[#5E625A]'}`}>
                     {m.days}d
                   </span>
                 </div>
@@ -209,31 +179,29 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Row 4 — Today's Priorities */}
-        <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
-          <h2 className="text-sm font-bold mb-4" style={{ color: '#111310' }}>Today&apos;s Priorities</h2>
-          <div className="space-y-2">
-            {priorities.map((item, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg"
-                style={{ background: '#F5F5F0' }}
-              >
-                <input type="checkbox" className="flex-shrink-0 rounded" style={{ accentColor: '#D7FF3F' }} />
-                <span
-                  className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full flex-shrink-0"
-                  style={{
-                    background: item.urgent ? '#D7FF3F' : '#DADCD3',
-                    color: item.urgent ? '#526B00' : '#5E625A',
-                  }}
-                >
-                  {item.badge}
+        {/* Priorities strip */}
+        <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">Actions</p>
+          <h2 className="text-base font-bold text-[#111310] mb-4">Today&apos;s Priorities</h2>
+          <div className="flex gap-4">
+            {[
+              { label: 'Follow up 12 leads', urgency: 'High' },
+              { label: '14 trial conversions due this week', urgency: 'High' },
+              { label: '2 payment failures', urgency: 'Med' },
+            ].map((item) => (
+              <div key={item.label} className="flex-1 bg-[#F5F5F0] rounded-xl p-4 flex flex-col gap-2">
+                <span className={`text-[10px] font-bold uppercase tracking-[0.08em] px-2 py-0.5 rounded-full self-start ${item.urgency === 'High' ? 'bg-[#D7FF3F] text-[#526B00]' : 'bg-[#DADCD3] text-[#5E625A]'}`}>
+                  {item.urgency}
                 </span>
-                <span className="text-sm" style={{ color: '#111310' }}>{item.label}</span>
+                <p className="text-sm font-medium text-[#111310]">{item.label}</p>
+                <button className="bg-[#171A16] text-[#ECEDE6] font-semibold rounded-lg px-4 py-2 text-sm self-start mt-auto">
+                  Take action
+                </button>
               </div>
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );
