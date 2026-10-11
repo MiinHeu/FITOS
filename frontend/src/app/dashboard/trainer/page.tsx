@@ -1,260 +1,128 @@
-"use client";
-
-const today = new Date().toLocaleDateString("en-US", {
-  weekday: "long",
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
+import Link from 'next/link';
 
 const sessions = [
-  {
-    time: "06:30",
-    end: "07:30",
-    name: "Morning Yoga Flow",
-    attendees: 8,
-    capacity: 12,
-    full: false,
-  },
-  {
-    time: "08:00",
-    end: "09:00",
-    name: "HIIT Blast",
-    attendees: 15,
-    capacity: 15,
-    full: true,
-  },
-  {
-    time: "10:00",
-    end: "11:00",
-    name: "PT — Nguyễn Trâm",
-    attendees: 1,
-    capacity: 1,
-    full: false,
-  },
-  {
-    time: "11:30",
-    end: "12:30",
-    name: "PT — Lê Đức Thịnh",
-    attendees: 1,
-    capacity: 1,
-    full: false,
-  },
-  {
-    time: "18:30",
-    end: "19:30",
-    name: "Strength Lab",
-    attendees: 10,
-    capacity: 15,
-    full: false,
-  },
-  {
-    time: "19:45",
-    end: "20:45",
-    name: "Cycling Power",
-    attendees: 18,
-    capacity: 18,
-    full: true,
-  },
+  { time: '06:00', name: 'HIIT Circuit', studio: 'Studio A', attendees: 18, capacity: 20 },
+  { time: '09:30', name: 'Yoga Flow', studio: 'Studio B', attendees: 12, capacity: 15 },
+  { time: '12:00', name: 'Spin Class', studio: 'Cycle Studio', attendees: 22, capacity: 24 },
 ];
 
 const clients = [
-  { name: "Nguyễn Trâm", lastSession: "Today", progress: 82 },
-  { name: "Lê Đức Thịnh", lastSession: "Today", progress: 65 },
-  { name: "Phạm Lan Anh", lastSession: "Yesterday", progress: 45 },
-  { name: "Trần Hải Nam", lastSession: "3 days ago", progress: 78 },
-  { name: "Hoàng Bích Ngọc", lastSession: "5 days ago", progress: 91 },
+  { name: 'Marcus Webb', next: 'Thu 17 Jul, 07:00', programme: 'Strength Block 3', lastCheckIn: '12 Jul', note: 'Improving pull volume' },
+  { name: 'Chloe Hart', next: 'Fri 18 Jul, 06:30', programme: 'Fat Loss Phase', lastCheckIn: '13 Jul', note: 'On track — great consistency' },
+  { name: 'Tom Gallagher', next: 'Mon 21 Jul, 08:00', programme: 'Hypertrophy A/B', lastCheckIn: '10 Jul', note: 'Needs to increase protein' },
+  { name: 'Priya Nair', next: 'Thu 17 Jul, 09:00', programme: 'Beginners Foundation', lastCheckIn: '14 Jul', note: 'Great progress, form improving' },
+  { name: 'James Liu', next: 'Sat 19 Jul, 10:00', programme: 'Athletic Performance', lastCheckIn: '12 Jul', note: 'Passed squat depth milestone' },
+  { name: 'Anya Brennan', next: 'Wed 16 Jul, 07:30', programme: 'Post-rehab Strength', lastCheckIn: '09 Jul', note: 'No pain in last 2 sessions' },
+  { name: 'Luca Rossi', next: 'Fri 18 Jul, 07:00', programme: 'Strength Block 2', lastCheckIn: '11 Jul', note: 'Deadlift PR this week' },
+  { name: 'Sophie King', next: 'Thu 17 Jul, 06:00', programme: 'Fat Loss Phase', lastCheckIn: '13 Jul', note: 'Struggling with recovery' },
 ];
 
-function initials(name: string): string {
-  return name
-    .split(" ")
-    .slice(-2)
-    .map((w) => w[0])
-    .join("");
-}
+const quickActions = [
+  { label: 'Create workout', description: 'Build a new programme for a client', href: '/dashboard/workout-builder', emoji: '💪' },
+  { label: 'Log PT session', description: 'Record notes from a PT session', href: '/dashboard/trainer', emoji: '📋' },
+  { label: 'View progress', description: 'Check client stats and PRs', href: '/dashboard/trainer', emoji: '📈' },
+];
 
 export default function TrainerPage() {
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div>
-          <span
-            className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "#526B00" }}
-          >
-            TRAINER
-          </span>
-          <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
-            My Schedule
-          </h1>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              TRAINER · DAY VIEW
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Trainer Day</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Tuesday 15 July 2025</p>
+          </div>
+          <button className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2 text-sm hover:opacity-90">
+            Log session
+          </button>
         </div>
-        <span className="text-sm" style={{ color: "#5E625A" }}>
-          {today}
-        </span>
       </div>
 
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT — Today's sessions (col-span-2) */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <div className="flex items-center gap-3 mb-5">
-                <h2
-                  className="text-base font-semibold"
-                  style={{ color: "#111310" }}
-                >
-                  Today&apos;s Sessions
-                </h2>
-                <span
-                  className="text-xs font-bold px-2 py-0.5 rounded-full"
-                  style={{ background: "#D7FF3F", color: "#111310" }}
-                >
-                  {sessions.length}
-                </span>
-              </div>
-
-              {/* Current time indicator */}
-              <div
-                className="flex items-center gap-2 mb-4"
-                style={{ color: "#526B00" }}
-              >
-                <div
-                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                  style={{ background: "#D7FF3F" }}
-                />
-                <div
-                  className="flex-1 h-px"
-                  style={{ background: "#D7FF3F" }}
-                />
-                <span className="text-xs font-semibold">Now</span>
-              </div>
-
-              {/* Sessions timeline */}
-              <div className="flex flex-col">
-                {sessions.map((s, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-4 py-4 border-b border-[#F0F0EB] last:border-0"
-                  >
-                    {/* Time */}
-                    <div className="w-20 flex-shrink-0">
-                      <p
-                        className="text-sm font-bold"
-                        style={{ color: "#111310" }}
-                      >
-                        {s.time}
-                      </p>
-                      <p className="text-xs" style={{ color: "#8A8E85" }}>
-                        –{s.end}
-                      </p>
-                    </div>
-
-                    {/* Details */}
-                    <div className="flex-1">
-                      <p
-                        className="text-sm font-semibold"
-                        style={{ color: "#111310" }}
-                      >
-                        {s.name}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span
-                          className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                          style={
-                            s.full
-                              ? { background: "#D7FF3F", color: "#111310" }
-                              : { background: "#F0F0EB", color: "#5E625A" }
-                          }
-                        >
-                          {s.attendees}/{s.capacity}
-                          {s.full ? " · Full" : " attendees"}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* View button */}
-                    <button
-                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#DADCD3] hover:bg-[#F5F5F0] transition-colors flex-shrink-0"
-                      style={{ color: "#111310" }}
-                    >
-                      View
-                    </button>
+      <div className="p-8 space-y-8">
+        {/* Today's timeline */}
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-4">
+            Today's Classes
+          </h2>
+          <div className="grid grid-cols-3 gap-4">
+            {sessions.map((session, i) => (
+              <div key={i} className="bg-white border border-[#DADCD3] rounded-xl p-5">
+                <div className="flex items-start justify-between mb-2">
+                  <span className="text-xs font-semibold text-[#526B00] bg-[#D7FF3F] px-2 py-0.5 rounded-full">
+                    {session.time}
+                  </span>
+                  <span className="text-xs text-[#5E625A]">{session.studio}</span>
+                </div>
+                <p className="text-base font-bold text-[#111310] mt-2 mb-1">{session.name}</p>
+                <div className="flex items-center gap-1.5">
+                  <div className="flex-1 bg-[#F0F0EB] rounded-full h-1.5">
+                    <div
+                      className="bg-[#D7FF3F] h-1.5 rounded-full"
+                      style={{ width: `${(session.attendees / session.capacity) * 100}%` }}
+                    />
                   </div>
-                ))}
+                  <span className="text-xs text-[#5E625A]">{session.attendees}/{session.capacity}</span>
+                </div>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* PT Clients table */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#8A8E85]">
+              PT Clients
+            </h2>
+            <span className="text-xs text-[#5E625A]">{clients.length} clients</span>
+          </div>
+          <div className="bg-white border border-[#DADCD3] rounded-xl overflow-hidden">
+            <div className="grid px-6 py-3 bg-[#F5F5F0]" style={{ gridTemplateColumns: '2fr 2fr 2fr 1fr 3fr' }}>
+              {['Name', 'Next session', 'Programme', 'Last check-in', 'Progress note'].map((col) => (
+                <span key={col} className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A8E85]">
+                  {col}
+                </span>
+              ))}
+            </div>
+            <div>
+              {clients.map((client, i) => (
+                <div
+                  key={i}
+                  className="grid px-6 py-3 items-center border-t border-[#DADCD3]"
+                  style={{ gridTemplateColumns: '2fr 2fr 2fr 1fr 3fr' }}
+                >
+                  <p className="text-sm font-semibold text-[#111310]">{client.name}</p>
+                  <p className="text-sm text-[#5E625A]">{client.next}</p>
+                  <p className="text-sm text-[#5E625A]">{client.programme}</p>
+                  <p className="text-sm text-[#5E625A]">{client.lastCheckIn}</p>
+                  <p className="text-sm text-[#5E625A]">{client.note}</p>
+                </div>
+              ))}
             </div>
           </div>
+        </div>
 
-          {/* RIGHT — My Clients */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <h2
-                className="text-base font-semibold mb-1"
-                style={{ color: "#111310" }}
+        {/* Quick actions */}
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-4">
+            Quick actions
+          </h2>
+          <div className="grid grid-cols-3 gap-4">
+            {quickActions.map((action) => (
+              <Link
+                key={action.label}
+                href={action.href}
+                className="bg-white border border-[#DADCD3] rounded-xl p-5 hover:border-[#526B00] transition-colors group"
               >
-                My Clients
-              </h2>
-              <p
-                className="text-xs uppercase font-semibold mb-4"
-                style={{ color: "#526B00" }}
-              >
-                Active Clients
-              </p>
-
-              <div className="flex flex-col gap-4">
-                {clients.map((c, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 pb-4 border-b border-[#F0F0EB] last:border-0 last:pb-0"
-                  >
-                    {/* Avatar */}
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                      style={{ background: "#ECEDE6", color: "#111310" }}
-                    >
-                      {initials(c.name)}
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className="text-sm font-semibold truncate"
-                        style={{ color: "#111310" }}
-                      >
-                        {c.name}
-                      </p>
-                      <p className="text-xs" style={{ color: "#8A8E85" }}>
-                        Last: {c.lastSession}
-                      </p>
-                      {/* Progress bar */}
-                      <div
-                        className="w-full h-1.5 rounded-full mt-1.5"
-                        style={{ background: "#ECEDE6" }}
-                      >
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${c.progress}%`,
-                            background: "#D7FF3F",
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Progress % */}
-                    <span
-                      className="text-xs font-semibold flex-shrink-0"
-                      style={{ color: "#526B00" }}
-                    >
-                      {c.progress}%
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                <p className="text-2xl mb-3">{action.emoji}</p>
+                <p className="text-sm font-semibold text-[#111310] mb-1">{action.label}</p>
+                <p className="text-xs text-[#5E625A]">{action.description}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </div>

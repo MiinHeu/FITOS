@@ -1,233 +1,124 @@
-"use client";
-import Link from "next/link";
+import Link from 'next/link';
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-type DayStatus = "completed" | "planned" | "rest";
-
-const weekGrid: { day: string; status: DayStatus }[] = [
-  { day: "Mon", status: "completed" },
-  { day: "Tue", status: "completed" },
-  { day: "Wed", status: "completed" },
-  { day: "Thu", status: "planned" },
-  { day: "Fri", status: "planned" },
-  { day: "Sat", status: "rest" },
-  { day: "Sun", status: "rest" },
+const overviewCards = [
+  { label: 'Next class', value: 'HIIT 06:00', sub: 'Friday 18 Jul' },
+  { label: 'Weekly workouts', value: '3 / 4', sub: 'goal sessions' },
+  { label: 'Current streak', value: '12 days', sub: '🔥 Keep it up' },
+  { label: 'Membership', value: 'Perform', sub: 'Renews 14 Aug' },
 ];
 
-const activities = [
-  {
-    icon: "🏋️",
-    desc: "Attended Strength Lab with Coach Quân",
-    time: "2h ago",
-  },
-  { icon: "🏆", desc: "New PR: Squat 80kg × 5 reps", time: "Yesterday" },
-  { icon: "📅", desc: "Booked Yoga Flow for Wednesday 7am", time: "Yesterday" },
-  { icon: "📝", desc: "Logged Upper Push workout (55 min)", time: "2 days ago" },
-  {
-    icon: "✅",
-    desc: "Completed week 3 of Perform program",
-    time: "3 days ago",
-  },
+const weekDays = [
+  { day: 'Mon', status: 'done' },
+  { day: 'Tue', status: 'done' },
+  { day: 'Wed', status: 'done' },
+  { day: 'Thu', status: 'scheduled' },
+  { day: 'Fri', status: 'scheduled' },
+  { day: 'Sat', status: 'rest' },
+  { day: 'Sun', status: 'rest' },
 ];
 
 const quickActions = [
-  { label: "Book a class", icon: "📅", href: "/dashboard/member/book" },
-  { label: "Log workout", icon: "📝", href: "#" },
-  { label: "View progress", icon: "📈", href: "/dashboard/member/progress" },
-  { label: "AI Coach", icon: "🤖", href: "/dashboard/member/ai-coach" },
+  { label: 'Book a class', description: 'Find and reserve your next session', href: '/dashboard/member/book', emoji: '🗓️' },
+  { label: 'Log workout', description: 'Record a gym or home workout', href: '/dashboard/member', emoji: '💪' },
+  { label: 'Chat with AI coach', description: 'Get personalised training advice', href: '/dashboard/member/ai-coach', emoji: '🤖' },
 ];
 
-export default function MemberDashboardPage() {
+const recentActivity = [
+  { icon: '💪', title: 'Workout logged', desc: 'Upper body strength · 55 min', time: 'Today, 07:30' },
+  { icon: '🗓️', title: 'Class booked', desc: 'HIIT Circuit · Fri 18 Jul 06:00', time: 'Yesterday' },
+  { icon: '💪', title: 'Workout logged', desc: 'Lower body hypertrophy · 60 min', time: '13 Jul' },
+  { icon: '🏆', title: 'Personal record', desc: 'Squat — 102.5 kg', time: '12 Jul' },
+  { icon: '💪', title: 'Workout logged', desc: 'Push day · 50 min', time: '11 Jul' },
+];
+
+const statusStyle: Record<string, string> = {
+  done: 'bg-[#D7FF3F] text-[#526B00] border-[#D7FF3F]',
+  scheduled: 'bg-white text-[#5E625A] border-[#DADCD3]',
+  rest: 'bg-[#F0F0EB] text-[#8A8E85] border-[#DADCD3]',
+};
+
+export default function MemberPage() {
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div>
-          <span
-            className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "#526B00" }}
-          >
-            MEMBER
-          </span>
-          <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
-            My Dashboard
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium" style={{ color: "#5E625A" }}>
-            Hi, Trâm
-          </span>
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
-            style={{ background: "#D7FF3F", color: "#111310" }}
-          >
-            T
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              MEMBER · CITY CENTRE
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Welcome back, Jane</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Tuesday 15 July 2025</p>
           </div>
+          <Link href="/dashboard/member/book" className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2 text-sm hover:opacity-90">
+            Book a class
+          </Link>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
-        {/* Row 1 — 3 top cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          {/* Classes this week */}
-          <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#8A8E85" }}>
-              Classes This Week
-            </p>
-            <p className="text-3xl font-bold mb-1" style={{ color: "#111310" }}>
-              4
-              <span className="text-base font-normal" style={{ color: "#8A8E85" }}>
-                /5
-              </span>
-            </p>
-            <div className="w-full h-2 rounded-full" style={{ background: "#ECEDE6" }}>
-              <div
-                className="h-full rounded-full"
-                style={{ width: "80%", background: "#D7FF3F" }}
-              />
-            </div>
-          </div>
-
-          {/* Streak */}
-          <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#8A8E85" }}>
-              Streak
-            </p>
-            <p className="text-3xl font-bold mb-1" style={{ color: "#111310" }}>
-              12 <span className="text-2xl">🔥</span>
-            </p>
-            <p className="text-xs" style={{ color: "#5E625A" }}>
-              days in a row
-            </p>
-          </div>
-
-          {/* Next Class */}
-          <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#8A8E85" }}>
-              Next Class
-            </p>
-            <p className="text-base font-bold mb-1" style={{ color: "#111310" }}>
-              Yoga Flow
-            </p>
-            <span
-              className="text-xs font-semibold px-2 py-0.5 rounded-full"
-              style={{ background: "#E8FFAA", color: "#526B00" }}
-            >
-              Tomorrow 9am
-            </span>
-          </div>
-        </div>
-
-        {/* Row 2 — Workout week grid */}
-        <div className="grid grid-cols-7 gap-2 mb-6">
-          {weekGrid.map(({ day, status }) => (
-            <div
-              key={day}
-              className="rounded-xl p-3 text-center border"
-              style={
-                status === "completed"
-                  ? { background: "#D7FF3F", borderColor: "#D7FF3F" }
-                  : status === "planned"
-                  ? { background: "#fff", borderColor: "#DADCD3" }
-                  : { background: "#F5F5F0", borderColor: "#DADCD3" }
-              }
-            >
-              <p
-                className="text-xs font-semibold uppercase"
-                style={{
-                  color:
-                    status === "completed"
-                      ? "#111310"
-                      : status === "planned"
-                      ? "#111310"
-                      : "#8A8E85",
-                }}
-              >
-                {day}
-              </p>
-              <p
-                className="text-lg mt-1"
-                style={{
-                  color:
-                    status === "completed"
-                      ? "#111310"
-                      : status === "rest"
-                      ? "#DADCD3"
-                      : "#DADCD3",
-                }}
-              >
-                {status === "completed" ? "✓" : status === "planned" ? "○" : "—"}
-              </p>
+      <div className="p-8 space-y-6">
+        {/* Today overview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {overviewCards.map((card) => (
+            <div key={card.label} className="bg-white border border-[#DADCD3] rounded-xl p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-2">{card.label}</p>
+              <p className="text-xl font-bold text-[#111310]">{card.value}</p>
+              <p className="text-xs text-[#5E625A] mt-1">{card.sub}</p>
             </div>
           ))}
         </div>
 
-        {/* Row 3 — Activity feed + Quick actions */}
-        <div className="grid grid-cols-3 gap-4">
-          {/* Activity feed — col-span-2 */}
-          <div className="col-span-2">
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <h2
-                className="text-base font-semibold mb-4"
-                style={{ color: "#111310" }}
+        {/* Workout week strip */}
+        <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-3">This week</p>
+          <div className="flex gap-2">
+            {weekDays.map((d) => (
+              <div
+                key={d.day}
+                className={`flex-1 text-center rounded-lg border px-2 py-3 text-xs font-semibold ${statusStyle[d.status]}`}
               >
-                Recent Activity
-              </h2>
-              <div className="flex flex-col">
-                {activities.map((a, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 py-3 border-b border-[#F0F0EB] last:border-0"
-                  >
-                    <span className="text-xl flex-shrink-0">{a.icon}</span>
-                    <p
-                      className="flex-1 text-sm"
-                      style={{ color: "#111310" }}
-                    >
-                      {a.desc}
-                    </p>
-                    <span
-                      className="text-xs flex-shrink-0"
-                      style={{ color: "#8A8E85" }}
-                    >
-                      {a.time}
-                    </span>
-                  </div>
-                ))}
+                <p>{d.day}</p>
+                <p className="mt-1 font-normal text-[10px]">
+                  {d.status === 'done' ? '✓' : d.status === 'scheduled' ? '·' : '—'}
+                </p>
               </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          {/* Quick actions */}
+          <div className="col-span-2 space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-3">Quick actions</p>
+            <div className="grid grid-cols-3 gap-4">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.label}
+                  href={action.href}
+                  className="bg-white border border-[#DADCD3] rounded-xl p-5 hover:border-[#526B00] transition-colors"
+                >
+                  <p className="text-2xl mb-3">{action.emoji}</p>
+                  <p className="text-sm font-semibold text-[#111310] mb-1">{action.label}</p>
+                  <p className="text-xs text-[#5E625A]">{action.description}</p>
+                </Link>
+              ))}
             </div>
           </div>
 
-          {/* Quick actions */}
+          {/* Recent activity */}
           <div>
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <h2
-                className="text-base font-semibold mb-4"
-                style={{ color: "#111310" }}
-              >
-                Quick Actions
-              </h2>
-              <div className="flex flex-col gap-2">
-                {quickActions.map((action) => (
-                  <Link
-                    key={action.label}
-                    href={action.href}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-[#DADCD3] hover:border-[#D7FF3F] transition-colors"
-                    style={{ textDecoration: "none" }}
-                  >
-                    <span className="text-lg">{action.icon}</span>
-                    <span
-                      className="flex-1 text-sm font-semibold"
-                      style={{ color: "#111310" }}
-                    >
-                      {action.label}
-                    </span>
-                    <span style={{ color: "#8A8E85" }}>→</span>
-                  </Link>
-                ))}
-              </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-3">Recent activity</p>
+            <div className="bg-white border border-[#DADCD3] rounded-xl divide-y divide-[#DADCD3]">
+              {recentActivity.map((item, i) => (
+                <div key={i} className="flex items-start gap-3 px-4 py-3">
+                  <span className="text-base mt-0.5">{item.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-[#111310]">{item.title}</p>
+                    <p className="text-xs text-[#5E625A] truncate">{item.desc}</p>
+                  </div>
+                  <p className="text-[10px] text-[#8A8E85] whitespace-nowrap">{item.time}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

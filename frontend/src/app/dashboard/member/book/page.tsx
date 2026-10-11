@@ -1,258 +1,104 @@
-"use client";
-import { useState } from "react";
-import Link from "next/link";
+const today = new Date('2025-07-15');
 
-type Tab = "Classes" | "Personal Training";
+const datePills = Array.from({ length: 7 }, (_, i) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() + i);
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return {
+    day: days[d.getDay()],
+    date: d.getDate(),
+    month: d.toLocaleString('en-GB', { month: 'short' }),
+    isToday: i === 0,
+  };
+});
 
-function getWeekDays() {
-  const abbr = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const today = new Date();
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    return {
-      label: abbr[d.getDay()],
-      date: d.getDate(),
-      isToday: i === 0,
-    };
-  });
-}
-
-interface ClassItem {
-  time: string;
-  type: string;
-  name: string;
-  instructor: string;
-  duration: string;
-  spotsTaken: number;
-  spotsTotal: number;
-  booked: boolean;
-}
-
-const classes: ClassItem[] = [
-  {
-    time: "07:00",
-    type: "Yoga",
-    name: "Morning Yoga Flow",
-    instructor: "Coach Thanh Hà",
-    duration: "60 min",
-    spotsTaken: 7,
-    spotsTotal: 12,
-    booked: true,
-  },
-  {
-    time: "08:30",
-    type: "HIIT",
-    name: "HIIT Blast",
-    instructor: "Coach Minh Tuấn",
-    duration: "45 min",
-    spotsTaken: 15,
-    spotsTotal: 15,
-    booked: false,
-  },
-  {
-    time: "09:00",
-    type: "Cycling",
-    name: "Cycling Power",
-    instructor: "Coach Phương Linh",
-    duration: "50 min",
-    spotsTaken: 12,
-    spotsTotal: 18,
-    booked: false,
-  },
-  {
-    time: "18:30",
-    type: "Strength",
-    name: "Strength Lab",
-    instructor: "Coach Văn Quân",
-    duration: "60 min",
-    spotsTaken: 9,
-    spotsTotal: 15,
-    booked: false,
-  },
-  {
-    time: "19:00",
-    type: "Yoga",
-    name: "Yin Yoga",
-    instructor: "Coach Mai Anh",
-    duration: "75 min",
-    spotsTaken: 18,
-    spotsTotal: 18,
-    booked: false,
-  },
+const classes = [
+  { name: 'HIIT Circuit', trainer: 'Jordan T.', time: '06:00', spots: 4, category: 'HIIT' },
+  { name: 'Yoga Flow', trainer: 'Aisha M.', time: '07:30', spots: 8, category: 'Yoga' },
+  { name: 'Spin Endurance', trainer: 'Marcus L.', time: '09:00', spots: 2, category: 'Cycling' },
+  { name: 'Boxing Fundamentals', trainer: 'Sarah K.', time: '10:30', spots: 10, category: 'Boxing' },
+  { name: 'Power Yoga', trainer: 'Aisha M.', time: '12:00', spots: 6, category: 'Yoga' },
+  { name: 'Lunchtime HIIT', trainer: 'Jordan T.', time: '13:00', spots: 3, category: 'HIIT' },
 ];
 
-const typeChip: Record<string, { bg: string; color: string }> = {
-  Yoga: { bg: "#E9EDFF", color: "#3B4FA8" },
-  HIIT: { bg: "#D7FF3F", color: "#526B00" },
-  Cycling: { bg: "#FFF3E0", color: "#B87000" },
-  Strength: { bg: "#ECEDE6", color: "#5E625A" },
-};
+const tabs = ['All', 'HIIT', 'Yoga', 'Cycling', 'Boxing'];
 
-export default function BookPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("Classes");
-  const [selectedDay, setSelectedDay] = useState(0);
-  const days = getWeekDays();
-
+export default function BookClassPage() {
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard/member"
-            className="w-9 h-9 rounded-full flex items-center justify-center text-lg"
-            style={{ background: "#ECEDE6", color: "#111310", textDecoration: "none" }}
-          >
-            ←
-          </Link>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
           <div>
-            <span
-              className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
-              style={{ color: "#526B00" }}
-            >
-              MEMBER
-            </span>
-            <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
-              Book a Class
-            </h1>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              MEMBER · BOOK
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Book a Class</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Browse and reserve your next session</p>
           </div>
         </div>
       </div>
 
-      {/* Tab row */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 flex gap-6">
-        {(["Classes", "Personal Training"] as Tab[]).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className="py-4 text-sm font-semibold border-b-2 transition-colors"
-            style={
-              activeTab === tab
-                ? { borderColor: "#D7FF3F", color: "#111310" }
-                : { borderColor: "transparent", color: "#8A8E85" }
-            }
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
+      <div className="p-8">
         {/* Date strip */}
-        <div className="flex gap-2 mb-6 overflow-x-auto">
-          {days.map((d, i) => (
+        <div className="flex gap-2 mb-6">
+          {datePills.map((d, i) => (
             <button
               key={i}
-              onClick={() => setSelectedDay(i)}
-              className="rounded-xl px-4 py-3 text-center flex-shrink-0 border transition-colors min-w-[56px]"
-              style={
-                selectedDay === i
-                  ? { background: "#D7FF3F", borderColor: "#D7FF3F", color: "#111310" }
-                  : { background: "#fff", borderColor: "#DADCD3", color: "#5E625A" }
-              }
+              className={`flex-1 rounded-xl border py-3 text-center transition-colors ${
+                d.isToday
+                  ? 'bg-[#171A16] border-[#171A16] text-[#ECEDE6]'
+                  : 'bg-white border-[#DADCD3] text-[#5E625A] hover:border-[#526B00]'
+              }`}
             >
-              <p className="text-xs font-semibold">{d.label}</p>
-              <p className="text-xl font-bold mt-0.5">{d.date}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.08em]">{d.day}</p>
+              <p className="text-lg font-bold mt-0.5">{d.date}</p>
+              <p className="text-[10px] opacity-70">{d.month}</p>
             </button>
           ))}
         </div>
 
-        {/* Classes grid */}
-        {activeTab === "Classes" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {classes.map((cls, i) => {
-              const chip = typeChip[cls.type] ?? { bg: "#ECEDE6", color: "#5E625A" };
-              const spotsLeft = cls.spotsTotal - cls.spotsTaken;
-              const full = spotsLeft === 0;
-              const pct = Math.round((cls.spotsTaken / cls.spotsTotal) * 100);
+        {/* Category tabs */}
+        <div className="flex gap-2 mb-6">
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              className={`text-xs font-semibold px-4 py-1.5 rounded-full border transition-colors ${
+                tab === 'All'
+                  ? 'bg-[#D7FF3F] border-[#D7FF3F] text-[#526B00]'
+                  : 'bg-white border-[#DADCD3] text-[#5E625A] hover:border-[#526B00]'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-              return (
-                <div
-                  key={i}
-                  className="bg-white border border-[#DADCD3] rounded-xl p-5"
-                >
-                  {/* Top row: time + type chip */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold" style={{ color: "#111310" }}>
-                      {cls.time}
-                    </span>
-                    <span
-                      className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                      style={{ background: chip.bg, color: chip.color }}
-                    >
-                      {cls.type}
-                    </span>
-                  </div>
-
-                  {/* Class name */}
-                  <h3 className="text-base font-bold mb-0.5" style={{ color: "#111310" }}>
-                    {cls.name}
-                  </h3>
-                  <p className="text-sm mb-3" style={{ color: "#5E625A" }}>
-                    {cls.instructor} · {cls.duration}
-                  </p>
-
-                  {/* Spots */}
-                  <div className="mb-3">
-                    <div
-                      className="w-full h-1.5 rounded-full mb-1"
-                      style={{ background: "#ECEDE6" }}
-                    >
-                      <div
-                        className="h-full rounded-full"
-                        style={{
-                          width: `${pct}%`,
-                          background: full ? "#E53E3E" : "#D7FF3F",
-                        }}
-                      />
-                    </div>
-                    <p className="text-xs" style={{ color: full ? "#E53E3E" : "#5E625A" }}>
-                      {full ? "Class full" : `${spotsLeft} spots left`}
-                    </p>
-                  </div>
-
-                  {/* CTA */}
-                  {cls.booked ? (
-                    <button
-                      disabled
-                      className="w-full py-2.5 text-sm font-semibold rounded-lg"
-                      style={{ background: "#D7FF3F", color: "#111310", opacity: 0.7 }}
-                    >
-                      Booked ✓
-                    </button>
-                  ) : full ? (
-                    <button
-                      className="w-full py-2.5 text-sm font-semibold rounded-lg border border-[#DADCD3] hover:bg-[#F5F5F0] transition-colors"
-                      style={{ color: "#111310" }}
-                    >
-                      Join Waitlist
-                    </button>
-                  ) : (
-                    <button
-                      className="w-full py-2.5 text-sm font-semibold rounded-lg"
-                      style={{ background: "#D7FF3F", color: "#111310" }}
-                    >
-                      Book Now
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {activeTab === "Personal Training" && (
-          <div className="bg-white rounded-xl border border-[#DADCD3] p-8 text-center">
-            <p className="text-base font-semibold mb-2" style={{ color: "#111310" }}>
-              Request a PT Session
-            </p>
-            <p className="text-sm" style={{ color: "#5E625A" }}>
-              Select a date above and contact your assigned trainer.
-            </p>
-          </div>
-        )}
+        {/* Class cards grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {classes.map((cls, i) => (
+            <div key={i} className="bg-white border border-[#DADCD3] rounded-xl p-5">
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.08em] bg-[#F0F0EB] text-[#5E625A] px-2 py-0.5 rounded-full">
+                  {cls.category}
+                </span>
+                <span className="text-xs font-semibold text-[#526B00] bg-[#D7FF3F] px-2 py-0.5 rounded-full">
+                  {cls.time}
+                </span>
+              </div>
+              <p className="text-base font-bold text-[#111310] mb-1">{cls.name}</p>
+              <p className="text-xs text-[#5E625A] mb-4">with {cls.trainer}</p>
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-medium ${cls.spots <= 3 ? 'text-orange-600' : 'text-[#5E625A]'}`}>
+                  {cls.spots} {cls.spots === 1 ? 'spot' : 'spots'} left
+                </span>
+                <button className="bg-[#171A16] text-[#ECEDE6] font-semibold rounded-lg px-3 py-1.5 text-xs hover:opacity-90">
+                  Book
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

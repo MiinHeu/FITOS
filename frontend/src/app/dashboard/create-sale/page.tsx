@@ -1,360 +1,169 @@
-"use client";
-import { useState } from "react";
-import Link from "next/link";
+'use client';
 
-interface Plan {
-  id: string;
-  name: string;
-  price: string;
-  priceNum: number;
-  desc: string;
-}
+import Link from 'next/link';
+import { useState } from 'react';
 
-const plans: Plan[] = [
-  { id: "move", name: "Move", price: "$29", priceNum: 29, desc: "Access all group classes" },
-  { id: "perform", name: "Perform", price: "$59", priceNum: 59, desc: "Classes + open gym" },
-  { id: "pt", name: "PT Focus", price: "$99", priceNum: 99, desc: "Personal training included" },
+const plans = [
+  { id: 'move', name: 'Move', price: 29, description: 'Unlimited gym access, off-peak hours' },
+  { id: 'perform', name: 'Perform', price: 49, description: 'Full gym access, group classes included' },
+  { id: 'pt-focus', name: 'PT Focus', price: 89, description: '4 PT sessions/month + Perform access' },
 ];
 
-const paymentMethods = ["Card", "Cash", "Bank Transfer"];
-
 export default function CreateSalePage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMember, setSelectedMember] = useState<string | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [discount, setDiscount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Card");
+  const [selectedPlan, setSelectedPlan] = useState('move');
+  const [paymentMethod, setPaymentMethod] = useState('card');
 
-  const mockMembers = ["Nguyễn Thị Trâm", "Lê Văn Hùng", "Phạm Minh Châu"];
-  const showDropdown = searchQuery.length > 0 && !selectedMember;
-
-  const subtotal = selectedPlan ? selectedPlan.priceNum : 0;
-  const discountNum = parseFloat(discount) || 0;
-  const tax = Math.round((subtotal - discountNum) * 0.1 * 100) / 100;
-  const total = subtotal - discountNum + tax;
+  const activePlan = plans.find((p) => p.id === selectedPlan) ?? plans[0];
 
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/dashboard/sales"
-            className="text-sm flex items-center gap-1 hover:text-[#111310]"
-            style={{ color: "#5E625A" }}
-          >
-            ← Back to Sales
-          </Link>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
           <div>
-            <span
-              className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
-              style={{ color: "#526B00" }}
-            >
-              GROW
-            </span>
-            <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
-              New Sale
-            </h1>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              GROW · SALES
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Create Sale</h1>
+            <Link href="/dashboard/sales" className="text-sm text-[#5E625A] mt-1 inline-flex items-center gap-1 hover:text-[#111310]">
+              ← Back to Sales
+            </Link>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Left — col-span-3 */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              {/* Find Member */}
-              <h2
-                className="text-base font-semibold mb-4"
-                style={{ color: "#111310" }}
-              >
-                Find Member
-              </h2>
-              <div className="relative mb-2">
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                  style={{ color: "#8A8E85" }}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="M21 21l-4.35-4.35" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search by name or phone..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setSelectedMember(null);
-                  }}
-                  className="w-full border border-[#DADCD3] rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
-                  style={{ color: "#111310" }}
-                />
+      <div className="p-8">
+        <div className="flex gap-6">
+          {/* Left: Member + Plan */}
+          <div className="flex-1 space-y-5">
+            {/* Member search */}
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#111310] mb-3">Member</h2>
+              <input
+                type="text"
+                placeholder="Search member name..."
+                defaultValue="Jane Doe"
+                className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent mb-3"
+              />
+              {/* Mock result */}
+              <div className="flex items-center gap-3 border border-[#D7FF3F] bg-[#F9FFDF] rounded-lg px-4 py-3">
+                <div className="w-9 h-9 rounded-full bg-[#D7FF3F] flex items-center justify-center text-sm font-bold text-[#111310]">
+                  JD
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#111310]">Jane Doe</p>
+                  <p className="text-xs text-[#5E625A]">jane.doe@email.com · No active membership</p>
+                </div>
+                <span className="ml-auto text-[#526B00]">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M13 4L6 11L3 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </span>
               </div>
+            </div>
 
-              {showDropdown && (
-                <div className="border border-[#DADCD3] rounded-lg overflow-hidden mb-4">
-                  {mockMembers
-                    .filter((m) =>
-                      m.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((m) => (
-                      <div
-                        key={m}
-                        className="flex items-center gap-3 px-4 py-3 border-b border-[#F0F0EB] last:border-0 hover:bg-[#F5F5F0] cursor-pointer"
-                        onClick={() => {
-                          setSelectedMember(m);
-                          setSearchQuery(m);
-                        }}
-                      >
-                        <div
-                          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                          style={{ background: "#E8FFAA", color: "#526B00" }}
-                        >
-                          {m.charAt(0)}
+            {/* Plan picker */}
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#111310] mb-3">Select plan</h2>
+              <div className="space-y-3">
+                {plans.map((plan) => (
+                  <button
+                    key={plan.id}
+                    onClick={() => setSelectedPlan(plan.id)}
+                    className={`w-full text-left border rounded-xl px-4 py-4 transition-colors ${
+                      selectedPlan === plan.id
+                        ? 'border-[#D7FF3F] bg-[#F9FFDF]'
+                        : 'border-[#DADCD3] bg-white hover:bg-[#F5F5F0]'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className={`w-4 h-4 rounded-full border-2 mt-0.5 flex items-center justify-center ${
+                          selectedPlan === plan.id ? 'border-[#526B00]' : 'border-[#DADCD3]'
+                        }`}>
+                          {selectedPlan === plan.id && (
+                            <div className="w-2 h-2 rounded-full bg-[#526B00]" />
+                          )}
                         </div>
                         <div>
-                          <p
-                            className="text-sm font-semibold"
-                            style={{ color: "#111310" }}
-                          >
-                            {m}
-                          </p>
-                          <p className="text-xs" style={{ color: "#8A8E85" }}>
-                            Active member
-                          </p>
+                          <p className="text-sm font-semibold text-[#111310]">{plan.name}</p>
+                          <p className="text-xs text-[#5E625A] mt-0.5">{plan.description}</p>
                         </div>
                       </div>
-                    ))}
-                </div>
-              )}
-
-              {selectedMember && (
-                <div
-                  className="flex items-center gap-3 p-3 rounded-lg border border-[#DADCD3] mb-6"
-                  style={{ background: "#F5F5F0" }}
-                >
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-                    style={{ background: "#D7FF3F", color: "#111310" }}
-                  >
-                    {selectedMember.charAt(0)}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold" style={{ color: "#111310" }}>
-                      {selectedMember}
-                    </p>
-                    <p className="text-xs" style={{ color: "#8A8E85" }}>
-                      Current plan: Perform
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => { setSelectedMember(null); setSearchQuery(""); }}
-                    className="text-base"
-                    style={{ color: "#8A8E85" }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              {/* Select Plan */}
-              <h2
-                className="text-base font-semibold mb-4"
-                style={{ color: "#111310" }}
-              >
-                Select Plan
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-                {plans.map((plan) => {
-                  const isSelected = selectedPlan?.id === plan.id;
-                  return (
-                    <button
-                      key={plan.id}
-                      onClick={() => setSelectedPlan(isSelected ? null : plan)}
-                      className="text-left p-4 rounded-xl border-2 transition-colors"
-                      style={
-                        isSelected
-                          ? {
-                              borderColor: "#D7FF3F",
-                              background: "#FAFFF0",
-                            }
-                          : {
-                              borderColor: "#DADCD3",
-                              background: "#fff",
-                            }
-                      }
-                    >
-                      <div
-                        className="text-base font-bold mb-1"
-                        style={{ color: "#111310" }}
-                      >
-                        {plan.name}
-                      </div>
-                      <div
-                        className="text-xl font-bold mb-1"
-                        style={{ color: "#526B00" }}
-                      >
-                        {plan.price}
-                        <span
-                          className="text-xs font-normal"
-                          style={{ color: "#8A8E85" }}
-                        >
-                          /mo
-                        </span>
-                      </div>
-                      <div className="text-xs" style={{ color: "#5E625A" }}>
-                        {plan.desc}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Start Date */}
-              <h2
-                className="text-base font-semibold mb-3"
-                style={{ color: "#111310" }}
-              >
-                Start Date
-              </h2>
-              <input
-                type="date"
-                className="w-full border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
-                style={{ color: "#111310" }}
-              />
-            </div>
-          </div>
-
-          {/* Right — Order Summary col-span-2 */}
-          <div className="lg:col-span-2">
-            <div
-              className="bg-white rounded-xl border border-[#DADCD3] p-6"
-              style={{ position: "sticky", top: "2rem" }}
-            >
-              <h2
-                className="text-base font-semibold mb-5"
-                style={{ color: "#111310" }}
-              >
-                Order Summary
-              </h2>
-
-              {/* Member + plan row */}
-              <div
-                className="flex justify-between text-sm mb-2"
-                style={{ color: "#5E625A" }}
-              >
-                <span>Member</span>
-                <span style={{ color: "#111310", fontWeight: 500 }}>
-                  {selectedMember || "—"}
-                </span>
-              </div>
-              <div
-                className="flex justify-between text-sm mb-4 pb-4 border-b border-[#DADCD3]"
-                style={{ color: "#5E625A" }}
-              >
-                <span>Plan</span>
-                <span style={{ color: "#111310", fontWeight: 500 }}>
-                  {selectedPlan ? selectedPlan.name : "—"}
-                </span>
-              </div>
-
-              {/* Price breakdown */}
-              <div
-                className="flex justify-between text-sm mb-2"
-                style={{ color: "#5E625A" }}
-              >
-                <span>Subtotal</span>
-                <span style={{ color: "#111310" }}>
-                  ${subtotal.toFixed(2)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center text-sm mb-2">
-                <span style={{ color: "#5E625A" }}>Discount</span>
-                <div className="flex items-center gap-1">
-                  <span style={{ color: "#5E625A" }}>-$</span>
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    value={discount}
-                    onChange={(e) => setDiscount(e.target.value)}
-                    className="w-20 border border-[#DADCD3] rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-1 focus:ring-[#D7FF3F]"
-                    style={{ color: "#111310" }}
-                  />
-                </div>
-              </div>
-
-              <div
-                className="flex justify-between text-sm mb-4 pb-4 border-b border-[#DADCD3]"
-                style={{ color: "#5E625A" }}
-              >
-                <span>Tax (10%)</span>
-                <span style={{ color: "#111310" }}>${tax.toFixed(2)}</span>
-              </div>
-
-              <div className="flex justify-between items-center mb-6">
-                <span
-                  className="text-base font-bold"
-                  style={{ color: "#111310" }}
-                >
-                  Total
-                </span>
-                <span
-                  className="text-xl font-bold"
-                  style={{ color: "#111310" }}
-                >
-                  ${total.toFixed(2)}
-                </span>
-              </div>
-
-              {/* Payment method pills */}
-              <p className="text-xs mb-2" style={{ color: "#8A8E85" }}>
-                Payment Method
-              </p>
-              <div className="flex gap-2 mb-6">
-                {paymentMethods.map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setPaymentMethod(m)}
-                    className="flex-1 py-2 text-xs font-semibold rounded-lg border transition-colors"
-                    style={
-                      paymentMethod === m
-                        ? {
-                            background: "#D7FF3F",
-                            borderColor: "#D7FF3F",
-                            color: "#111310",
-                          }
-                        : {
-                            background: "#fff",
-                            borderColor: "#DADCD3",
-                            color: "#5E625A",
-                          }
-                    }
-                  >
-                    {m}
+                      <p className="text-base font-bold text-[#111310]">£{plan.price}<span className="text-xs font-normal text-[#5E625A]">/mo</span></p>
+                    </div>
                   </button>
                 ))}
               </div>
+            </div>
+          </div>
 
-              <button
-                className="w-full py-3 text-sm font-semibold rounded-lg mb-3"
-                style={{ background: "#D7FF3F", color: "#111310" }}
-              >
-                Confirm Sale
+          {/* Right: Order summary */}
+          <div className="w-80 shrink-0">
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-5 sticky top-6">
+              <h2 className="text-sm font-semibold text-[#111310] mb-5">Order summary</h2>
+
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-[#5E625A]">Plan</span>
+                <span className="text-sm font-semibold text-[#111310]">{activePlan.name}</span>
+              </div>
+              <div className="flex items-center justify-between mb-5 pb-5 border-b border-[#DADCD3]">
+                <span className="text-sm text-[#5E625A]">Monthly price</span>
+                <span className="text-sm font-semibold text-[#111310]">£{activePlan.price}</span>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-1.5">
+                  Start date
+                </label>
+                <input
+                  type="date"
+                  defaultValue="2025-07-15"
+                  className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent"
+                />
+              </div>
+
+              <div className="mb-5">
+                <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-2">
+                  Payment method
+                </label>
+                <div className="space-y-2">
+                  {[{ id: 'card', label: 'Card' }, { id: 'bank', label: 'Bank transfer' }].map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => setPaymentMethod(method.id)}
+                      className={`w-full flex items-center gap-3 border rounded-lg px-3 py-2.5 text-sm ${
+                        paymentMethod === method.id
+                          ? 'border-[#D7FF3F] bg-[#F9FFDF] text-[#111310]'
+                          : 'border-[#DADCD3] bg-white text-[#5E625A]'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                        paymentMethod === method.id ? 'border-[#526B00]' : 'border-[#DADCD3]'
+                      }`}>
+                        {paymentMethod === method.id && (
+                          <div className="w-2 h-2 rounded-full bg-[#526B00]" />
+                        )}
+                      </div>
+                      {method.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between py-3 border-t border-[#DADCD3] mb-4">
+                <span className="text-sm font-semibold text-[#111310]">Total</span>
+                <span className="text-lg font-bold text-[#111310]">£{activePlan.price}</span>
+              </div>
+
+              <button className="w-full bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2.5 text-sm hover:opacity-90">
+                Complete sale
               </button>
-              <button
-                className="w-full py-3 text-sm font-semibold rounded-lg border border-[#DADCD3] hover:bg-[#F5F5F0] transition-colors"
-                style={{ color: "#111310" }}
-              >
-                Save as Draft
-              </button>
+
+              <Link href="/dashboard/sales" className="block text-center text-sm text-[#5E625A] mt-3 hover:text-[#111310]">
+                Cancel
+              </Link>
             </div>
           </div>
         </div>

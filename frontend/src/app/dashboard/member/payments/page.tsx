@@ -1,142 +1,90 @@
-"use client";
-
-const transactions = [
-  { date: "Jul 30, 2025", desc: "Perform Plan — August", amount: "$59.00", status: "Paid" },
-  { date: "Jun 30, 2025", desc: "Perform Plan — July", amount: "$59.00", status: "Paid" },
-  { date: "May 30, 2025", desc: "Perform Plan — June", amount: "$59.00", status: "Paid" },
-  { date: "May 15, 2025", desc: "PT Session Pack (5×)", amount: "$149.00", status: "Paid" },
-  { date: "Apr 30, 2025", desc: "Perform Plan — May", amount: "$59.00", status: "Paid" },
-  { date: "Mar 30, 2025", desc: "Perform Plan — April", amount: "$59.00", status: "Paid" },
+const payments = [
+  { date: '14 Jul 2025', description: 'Perform — Monthly', amount: '£49.00', status: 'Paid' },
+  { date: '14 Jun 2025', description: 'Perform — Monthly', amount: '£49.00', status: 'Paid' },
+  { date: '14 May 2025', description: 'Perform — Monthly', amount: '£49.00', status: 'Paid' },
+  { date: '14 Apr 2025', description: 'Perform — Monthly', amount: '£49.00', status: 'Paid' },
+  { date: '14 Mar 2025', description: 'Perform — Monthly', amount: '£49.00', status: 'Paid' },
+  { date: '14 Feb 2025', description: 'Perform — Monthly', amount: '£49.00', status: 'Paid' },
+  { date: '14 Jan 2025', description: 'Move → Perform upgrade', amount: '£20.00', status: 'Paid' },
+  { date: '14 Dec 2024', description: 'Move — Monthly', amount: '£29.00', status: 'Paid' },
 ];
 
-const statCards = [
-  { label: "Paid Total", value: "$708", sub: "all time" },
-  { label: "Next Payment", value: "$59", sub: "Aug 30, 2025" },
-  { label: "Payment Method", value: "Visa", sub: "••••4242" },
-  { label: "Member Since", value: "Jan", sub: "2025" },
-];
+const statusStyle: Record<string, string> = {
+  Paid: 'bg-green-50 text-green-700',
+  Pending: 'bg-yellow-50 text-yellow-700',
+  Failed: 'bg-red-50 text-red-700',
+};
 
-export default function MemberPaymentsPage() {
+export default function PaymentsPage() {
   return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div>
-          <span
-            className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "#526B00" }}
-          >
-            MEMBER
-          </span>
-          <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
-            Payments
-          </h1>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              MEMBER · PAYMENTS
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">Payments &amp; Membership</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Manage your subscription and billing history</p>
+          </div>
         </div>
-        <button
-          className="px-4 py-2 text-sm font-semibold rounded-lg border border-[#DADCD3] hover:bg-[#F5F5F0] transition-colors"
-          style={{ color: "#111310" }}
-        >
-          Update Payment Method
-        </button>
       </div>
 
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
-        {/* Membership card — dark */}
-        <div
-          className="rounded-xl p-6 mb-6 flex items-start justify-between"
-          style={{ background: "#171A16" }}
-        >
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#5E625A" }}>
-              Current Plan
-            </p>
-            <p className="text-3xl font-bold mb-1" style={{ color: "#fff" }}>
-              Perform
-            </p>
-            <p className="text-2xl font-bold mb-3" style={{ color: "#D7FF3F" }}>
-              $59
-              <span className="text-sm font-normal" style={{ color: "#5E625A" }}>
-                /month
-              </span>
-            </p>
-            <p className="text-sm" style={{ color: "#5E625A" }}>
-              Next billing date: Aug 30, 2025
-            </p>
-          </div>
-          <span
-            className="text-xs font-bold px-3 py-1 rounded-full"
-            style={{ background: "#D7FF3F", color: "#111310" }}
-          >
-            Active
-          </span>
-        </div>
-
-        {/* 4 stat cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          {statCards.map((s) => (
-            <div
-              key={s.label}
-              className="bg-white rounded-xl border border-[#DADCD3] p-5"
-            >
-              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#8A8E85" }}>
-                {s.label}
-              </p>
-              <p className="text-2xl font-bold" style={{ color: "#111310" }}>
-                {s.value}
-              </p>
-              <p className="text-xs mt-1" style={{ color: "#5E625A" }}>
-                {s.sub}
-              </p>
+      <div className="p-8 space-y-8">
+        {/* Membership card */}
+        <div className="bg-[#171A16] rounded-2xl p-7 text-white">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A8E85] mb-2">Current plan</p>
+              <h2 className="text-3xl font-bold text-[#ECEDE6] mb-1">Perform</h2>
+              <p className="text-[#8A8E85] text-sm">Full gym access + group classes</p>
             </div>
-          ))}
+            <span className="text-xs font-semibold bg-[#D7FF3F] text-[#111310] px-3 py-1 rounded-full">
+              Active
+            </span>
+          </div>
+
+          <div className="flex items-end justify-between mt-6 pt-6 border-t border-[#2A2E29]">
+            <div>
+              <p className="text-[11px] text-[#8A8E85] mb-1">Monthly price</p>
+              <p className="text-2xl font-bold text-[#ECEDE6]">£49 <span className="text-sm font-normal text-[#8A8E85]">/ month</span></p>
+              <p className="text-xs text-[#8A8E85] mt-1">Next payment: 14 Aug 2025</p>
+            </div>
+            <button className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2 text-sm hover:opacity-90">
+              Manage membership
+            </button>
+          </div>
         </div>
 
-        {/* Transaction history table */}
-        <div className="bg-white rounded-xl border border-[#DADCD3] overflow-hidden">
-          <div className="px-6 py-4 border-b border-[#DADCD3]">
-            <h2 className="text-base font-semibold" style={{ color: "#111310" }}>
-              Transaction History
-            </h2>
-          </div>
-          <table className="w-full">
-            <thead>
-              <tr style={{ background: "#F5F5F0" }}>
-                {["Date", "Description", "Amount", "Status"].map((col) => (
-                  <th
-                    key={col}
-                    className="text-left px-6 py-3 text-xs font-bold uppercase tracking-wider"
-                    style={{ color: "#8A8E85" }}
-                  >
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F0F0EB]">
-              {transactions.map((tx, i) => (
-                <tr key={i}>
-                  <td className="px-6 py-4 text-sm" style={{ color: "#5E625A" }}>
-                    {tx.date}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium" style={{ color: "#111310" }}>
-                    {tx.desc}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-semibold" style={{ color: "#111310" }}>
-                    {tx.amount}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                      style={{ background: "#E8FFAA", color: "#526B00" }}
-                    >
-                      {tx.status}
-                    </span>
-                  </td>
-                </tr>
+        {/* Payment history */}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-3">Payment history</p>
+          <div className="bg-white border border-[#DADCD3] rounded-xl overflow-hidden">
+            <div className="grid px-6 py-3 bg-[#F5F5F0]" style={{ gridTemplateColumns: '1.5fr 3fr 1fr 1fr' }}>
+              {['Date', 'Description', 'Amount', 'Status'].map((col) => (
+                <span key={col} className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A8E85]">
+                  {col}
+                </span>
               ))}
-            </tbody>
-          </table>
+            </div>
+            <div>
+              {payments.map((payment, i) => (
+                <div
+                  key={i}
+                  className="grid px-6 py-3.5 items-center border-t border-[#DADCD3]"
+                  style={{ gridTemplateColumns: '1.5fr 3fr 1fr 1fr' }}
+                >
+                  <span className="text-sm text-[#5E625A]">{payment.date}</span>
+                  <span className="text-sm font-medium text-[#111310]">{payment.description}</span>
+                  <span className="text-sm font-semibold text-[#111310]">{payment.amount}</span>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full w-fit ${statusStyle[payment.status] ?? 'bg-[#F0F0EB] text-[#5E625A]'}`}>
+                    {payment.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

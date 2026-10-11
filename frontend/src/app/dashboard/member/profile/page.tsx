@@ -1,299 +1,174 @@
-"use client";
-import { useState } from "react";
-
-const fitnessGoals = [
-  "Lose weight",
-  "Build muscle",
-  "Improve cardio",
-  "Flexibility",
-  "Sport performance",
-];
-
-const notifSettings = [
-  { key: "email", label: "Email reminders" },
-  { key: "sms", label: "SMS alerts" },
-  { key: "cancel", label: "Class cancellations" },
-  { key: "progress", label: "Progress updates" },
-];
-
-function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+export default function ProfilePage() {
   return (
-    <div
-      onClick={onClick}
-      className="relative cursor-pointer flex-shrink-0"
-      style={{
-        width: 44,
-        height: 24,
-        borderRadius: 12,
-        background: on ? "#D7FF3F" : "#DADCD3",
-        transition: "background 0.2s",
-      }}
-      role="switch"
-      aria-checked={on}
-    >
-      <div
-        className="absolute top-0.5 rounded-full"
-        style={{
-          width: 20,
-          height: 20,
-          background: "#fff",
-          left: on ? 22 : 2,
-          transition: "left 0.2s",
-        }}
-      />
-    </div>
-  );
-}
-
-export default function MemberProfilePage() {
-  const [goals, setGoals] = useState<Record<string, boolean>>({
-    "Lose weight": true,
-    "Build muscle": true,
-    "Improve cardio": false,
-    Flexibility: false,
-    "Sport performance": false,
-  });
-
-  const [notifs, setNotifs] = useState<Record<string, boolean>>({
-    email: true,
-    sms: false,
-    cancel: true,
-    progress: true,
-  });
-
-  function toggleGoal(g: string) {
-    setGoals((prev) => ({ ...prev, [g]: !prev[g] }));
-  }
-
-  function toggleNotif(k: string) {
-    setNotifs((prev) => ({ ...prev, [k]: !prev[k] }));
-  }
-
-  return (
-    <div>
-      {/* Page header */}
-      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
-        <div>
-          <span
-            className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "#526B00" }}
-          >
-            MEMBER
-          </span>
-          <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
-            My Profile
-          </h1>
+    <div className="min-h-screen bg-[#F5F5F0]">
+      {/* Page Header */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-1">
+              MEMBER · PROFILE
+            </p>
+            <h1 className="text-2xl font-bold text-[#111310]">My Profile</h1>
+            <p className="text-sm text-[#5E625A] mt-1">Manage your personal information</p>
+          </div>
+          <button className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-4 py-2 text-sm hover:opacity-90">
+            Save changes
+          </button>
         </div>
-        <button
-          className="px-4 py-2 text-sm font-semibold rounded-lg"
-          style={{ background: "#D7FF3F", color: "#111310" }}
-        >
-          Save Changes
-        </button>
       </div>
 
-      {/* Content */}
-      <div className="p-8 bg-[#F5F5F0] min-h-screen">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT — col-span-2 */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
-            {/* Personal info card */}
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <h2
-                className="text-base font-semibold mb-6"
-                style={{ color: "#111310" }}
-              >
-                Personal Information
-              </h2>
-
-              {/* Avatar upload */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="relative">
-                  <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold"
-                    style={{
-                      background: "linear-gradient(135deg, #a78bfa, #60a5fa)",
-                      color: "#fff",
-                    }}
-                  >
-                    T
-                  </div>
-                  <button
-                    className="absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center text-xs"
-                    style={{ background: "#D7FF3F", color: "#111310" }}
-                  >
-                    ✎
-                  </button>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: "#111310" }}>
-                    Nguyễn Thị Trâm
-                  </p>
-                  <p className="text-xs mt-1" style={{ color: "#8A8E85" }}>
-                    Click the icon to upload a new photo
-                  </p>
-                </div>
+      <div className="p-8">
+        <div className="flex gap-6">
+          {/* Left: personal info */}
+          <div className="flex-1 space-y-5">
+            {/* Avatar + name */}
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-5 flex items-center gap-5">
+              <div className="w-20 h-20 rounded-full bg-[#D7FF3F] flex items-center justify-center text-2xl font-bold text-[#111310] shrink-0">
+                JD
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-[13px] font-medium mb-1" style={{ color: "#111310" }}>
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="Nguyễn Thị Trâm"
-                    className="w-full border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
-                    style={{ color: "#111310" }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium mb-1" style={{ color: "#111310" }}>
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    defaultValue="tram@example.com"
-                    className="w-full border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
-                    style={{ color: "#111310" }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium mb-1" style={{ color: "#111310" }}>
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    defaultValue="0901 234 567"
-                    className="w-full border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
-                    style={{ color: "#111310" }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium mb-1" style={{ color: "#111310" }}>
-                    Date of Birth
-                  </label>
-                  <input
-                    type="date"
-                    defaultValue="1998-04-15"
-                    className="w-full border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
-                    style={{ color: "#111310" }}
-                  />
-                </div>
-              </div>
-
               <div>
-                <label className="block text-[13px] font-medium mb-1" style={{ color: "#111310" }}>
-                  Bio
-                </label>
-                <textarea
-                  rows={3}
-                  defaultValue="Fitness enthusiast focused on strength training and overall wellness."
-                  className="w-full border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none resize-none"
-                  style={{ color: "#111310" }}
-                />
+                <p className="text-lg font-bold text-[#111310]">Jane Doe</p>
+                <p className="text-sm text-[#5E625A]">jane.doe@email.com</p>
+                <button className="text-xs text-[#526B00] font-semibold mt-1 hover:underline">
+                  Change photo
+                </button>
               </div>
             </div>
 
-            {/* Fitness goals card */}
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <h2
-                className="text-base font-semibold mb-4"
-                style={{ color: "#111310" }}
-              >
-                Fitness Goals
-              </h2>
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                {fitnessGoals.map((goal) => (
-                  <label
-                    key={goal}
-                    className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-[#DADCD3] hover:border-[#D7FF3F] transition-colors"
-                    style={
-                      goals[goal]
-                        ? { background: "#FAFFF0", borderColor: "#D7FF3F" }
-                        : {}
-                    }
-                  >
-                    <input
-                      type="checkbox"
-                      checked={!!goals[goal]}
-                      onChange={() => toggleGoal(goal)}
-                      className="w-4 h-4"
-                      style={{ accentColor: "#D7FF3F" }}
-                    />
-                    <span className="text-sm font-medium" style={{ color: "#111310" }}>
-                      {goal}
-                    </span>
+            {/* Form fields */}
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-6">
+              <h2 className="text-sm font-semibold text-[#111310] mb-5">Personal details</h2>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-1.5">
+                    First name
                   </label>
-                ))}
+                  <input
+                    type="text"
+                    defaultValue="Jane"
+                    className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-1.5">
+                    Last name
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="Doe"
+                    className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent"
+                  />
+                </div>
               </div>
 
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#8A8E85" }}>
-                  Current Plan
-                </p>
-                <span
-                  className="text-sm font-semibold px-3 py-1.5 rounded-lg border border-[#DADCD3]"
-                  style={{ color: "#111310" }}
-                >
-                  Perform — $59/month
-                </span>
+              <div className="mb-4">
+                <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-1.5">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  defaultValue="jane.doe@email.com"
+                  className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-1.5">
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  defaultValue="+44 7700 123456"
+                  className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-1.5">
+                    Date of birth
+                  </label>
+                  <input
+                    type="date"
+                    defaultValue="1994-03-22"
+                    className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.08em] text-[#8A8E85] mb-1.5">
+                    Emergency contact
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="John Doe — +44 7700 654321"
+                    className="w-full border border-[#DADCD3] rounded-lg px-3 py-2.5 text-sm text-[#111310] bg-white focus:outline-none focus:ring-2 focus:ring-[#D7FF3F] focus:border-transparent"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT — col-span-1 */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
-            {/* Studio info card */}
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <h3
-                className="text-sm font-semibold mb-4"
-                style={{ color: "#111310" }}
-              >
-                Studio Information
-              </h3>
-              {[
-                { label: "Membership Plan", value: "Perform" },
-                { label: "Trainer Assigned", value: "Coach Văn Quân" },
-                { label: "Studio Location", value: "Pulse District 2" },
-                { label: "Member Since", value: "Jan 2025" },
-                { label: "Sessions Left", value: "6 PT sessions" },
-              ].map((row) => (
-                <div
-                  key={row.label}
-                  className="flex justify-between py-2.5 border-b border-[#F0F0EB] last:border-0"
-                >
-                  <span className="text-sm" style={{ color: "#5E625A" }}>
-                    {row.label}
-                  </span>
-                  <span className="text-sm font-semibold" style={{ color: "#111310" }}>
-                    {row.value}
-                  </span>
-                </div>
-              ))}
+          {/* Right: Goals, membership, notifications */}
+          <div className="w-80 shrink-0 space-y-4">
+            {/* Goals */}
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-[#111310] mb-4">My goals</h3>
+              <div className="space-y-3">
+                {[
+                  { label: 'Lose weight', checked: false },
+                  { label: 'Build strength', checked: true },
+                  { label: 'Improve fitness', checked: true },
+                ].map((goal) => (
+                  <label key={goal.label} className="flex items-center gap-3 cursor-pointer">
+                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${goal.checked ? 'border-[#526B00] bg-[#D7FF3F]' : 'border-[#DADCD3]'}`}>
+                      {goal.checked && (
+                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                          <path d="M1 4L3.5 6.5L9 1" stroke="#111310" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-sm text-[#111310]">{goal.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
-            {/* Notifications card */}
-            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
-              <h3
-                className="text-sm font-semibold mb-4"
-                style={{ color: "#111310" }}
-              >
-                Notifications
-              </h3>
-              <div className="flex flex-col">
-                {notifSettings.map((n, i) => (
-                  <div
-                    key={n.key}
-                    className="flex items-center justify-between py-3 border-b border-[#F0F0EB] last:border-0"
-                  >
-                    <span className="text-sm" style={{ color: "#111310" }}>
-                      {n.label}
-                    </span>
-                    <Toggle
-                      on={notifs[n.key]}
-                      onClick={() => toggleNotif(n.key)}
-                    />
+            {/* Membership status */}
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-[#111310] mb-3">Membership</h3>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-[#5E625A]">Plan</span>
+                <span className="text-sm font-semibold text-[#111310]">Perform</span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-[#5E625A]">Status</span>
+                <span className="text-xs font-semibold bg-[#D7FF3F] text-[#526B00] px-2 py-0.5 rounded-full">Active</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[#5E625A]">Renews</span>
+                <span className="text-sm font-semibold text-[#111310]">14 Aug 2025</span>
+              </div>
+            </div>
+
+            {/* Notification preferences */}
+            <div className="bg-white border border-[#DADCD3] rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-[#111310] mb-4">Notifications</h3>
+              <div className="space-y-4">
+                {[
+                  { label: 'Class reminders', sublabel: '1 hour before class', enabled: true },
+                  { label: 'Weekly summary', sublabel: 'Every Monday', enabled: true },
+                  { label: 'Promotional offers', sublabel: 'Deals and events', enabled: false },
+                ].map((pref) => (
+                  <div key={pref.label} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-[#111310] font-medium">{pref.label}</p>
+                      <p className="text-xs text-[#8A8E85]">{pref.sublabel}</p>
+                    </div>
+                    {/* Static toggle */}
+                    <div className={`w-10 h-5 rounded-full relative ${pref.enabled ? 'bg-[#D7FF3F]' : 'bg-[#DADCD3]'}`}>
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${pref.enabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    </div>
                   </div>
                 ))}
               </div>
