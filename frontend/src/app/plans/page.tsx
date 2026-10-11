@@ -1,306 +1,147 @@
-"use client";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import Link from 'next/link';
 
-function CheckIcon({ dark }: { dark?: boolean }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="8" cy="8" r="8" fill={dark ? '#D7FF3F' : '#526B00'} opacity={dark ? 1 : 0.12} />
-      <path
-        d="M4.5 8.5l2.5 2.5 4.5-5"
-        stroke={dark ? '#111310' : '#526B00'}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-const memberPlans = [
+const plans = [
   {
     name: 'Move',
-    price: '$29',
-    period: '/mo',
-    desc: '8 classes per month',
-    features: [
-      'All group classes',
-      'App booking',
-      'Workout tracking',
-      'Progress dashboard',
-      'Cancel anytime',
-    ],
+    price: '£29',
+    period: '/month',
+    desc: 'Perfect for getting started',
+    features: ['Up to 8 classes/month', 'App access', 'Progress tracking', 'Community access'],
     highlight: false,
-    badge: null,
-    cta: 'Get started',
   },
   {
     name: 'Perform',
-    price: '$59',
-    period: '/mo',
-    desc: 'Unlimited classes',
-    features: [
-      'Unlimited class booking',
-      '2 PT sessions included',
-      'AI Coach insights',
-      'Priority booking',
-      'Nutrition brief',
-      'All Move features',
-      'Dedicated support',
-    ],
+    price: '£49',
+    period: '/month',
+    desc: 'Our most popular plan',
+    features: ['Unlimited classes', 'AI coaching', 'Priority booking', 'Nutrition guidance', 'Monthly check-in'],
     highlight: true,
-    badge: 'MOST POPULAR',
-    cta: 'Get started',
   },
   {
     name: 'PT Focus',
-    price: '$99',
-    period: '/mo',
-    desc: '8 PT sessions / month',
-    features: [
-      'Dedicated trainer',
-      'Custom workout plan',
-      'Monthly body metrics',
-      'Nutrition coaching',
-      'Unlimited classes',
-      'Progress reports',
-      'VIP booking priority',
-      'All Perform features',
-    ],
+    price: '£89',
+    period: '/month',
+    desc: 'Maximum results with personal training',
+    features: ['Unlimited classes', '4 PT sessions/month', 'Custom programme', 'Body composition tracking', 'Direct trainer access'],
     highlight: false,
-    badge: null,
-    cta: 'Get started',
   },
 ];
 
 const ptPackages = [
-  {
-    sessions: '5 sessions',
-    name: 'Starter Pack',
-    price: '$149',
-    features: ['Program assessment', 'Technique coaching', 'Session summary'],
-  },
-  {
-    sessions: '10 sessions',
-    name: 'Focus Pack',
-    price: '$249',
-    features: ['All Starter features', 'Weekly check-in', 'Nutrition brief'],
-  },
-  {
-    sessions: '20 sessions',
-    name: 'Transform Pack',
-    price: '$449',
-    features: ['All Focus features', 'Body composition tracking', 'Monthly progress report'],
-  },
+  { sessions: '4 sessions', price: '£120', per: 'per month', note: '£30/session' },
+  { sessions: '8 sessions', price: '£200', per: 'per month', note: '£25/session — best value' },
+  { sessions: '12 sessions', price: '£270', per: 'per month', note: '£22.50/session' },
 ];
 
 const faqs = [
-  { q: 'Can I pause my membership?', a: 'Yes, you can pause for up to 2 months per year. Request via the app or at the front desk.' },
-  { q: 'Is there a joining fee?', a: 'No joining fee, ever. You pay only for the plan you choose.' },
-  { q: 'How do I book PT sessions?', a: 'Book through the FITOS app or ask at reception. PT sessions are pre-loaded after purchase.' },
-  { q: 'Can I switch plans?', a: 'Yes. Upgrade or downgrade at the start of each billing cycle. Your history and bookings stay intact.' },
-  { q: 'What happens after my free trial?', a: 'After 14 days, choose a plan or your account pauses. No automatic charges without your confirmation.' },
-  { q: 'Do PT packages expire?', a: 'PT packages are valid for 3 months from purchase. Extensions can be arranged with your coach.' },
+  { q: 'Is there a joining fee?', a: 'No — never. Just your chosen monthly plan.' },
+  { q: 'Can I switch plans?', a: 'Yes, upgrade or downgrade at any time. Changes take effect from the next billing cycle.' },
+  { q: 'Can I cancel?', a: 'Yes — 30 days notice, no phone calls, directly in the app.' },
+  { q: 'Do PT sessions roll over?', a: 'Unused sessions roll over for up to one month.' },
+  { q: 'Are there student / corporate rates?', a: 'Yes — contact us for group and corporate pricing.' },
+  { q: 'What payment methods do you accept?', a: 'Credit/debit card and bank transfer. No cash or cheques.' },
 ];
 
 export default function PlansPage() {
   return (
     <>
       <Header />
-      <main>
-
-        {/* 1. Hero */}
-        <section className="pt-24 pb-16 px-10" style={{ background: '#F5F5F0' }}>
-          <div className="max-w-[1280px] mx-auto text-center">
-            <p className="uppercase text-[11px] font-semibold tracking-[0.1em] mb-4" style={{ color: '#526B00' }}>
-              MEMBERSHIPS &amp; PT · NO JOINING FEE
-            </p>
-            <h1 className="font-bold mb-4" style={{ fontSize: 40, color: '#111310' }}>
-              Flexible plans for every fitness goal
-            </h1>
-            <p className="mx-auto mb-8" style={{ fontSize: 17, color: '#5E625A', maxWidth: 560 }}>
-              Transparent pricing, no contracts, no joining fees. Pause or cancel anytime.
-            </p>
-            <div className="flex items-center justify-center gap-3 flex-wrap">
-              <span
-                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full"
-                style={{ background: '#fff', border: '1px solid #DADCD3', color: '#111310' }}
-              >
-                <span style={{ color: '#526B00' }}>✓</span> Cancel anytime
-              </span>
-              <span
-                className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-full"
-                style={{ background: '#fff', border: '1px solid #DADCD3', color: '#111310' }}
-              >
-                <span style={{ color: '#526B00' }}>✓</span> 14-day free trial
-              </span>
+      <main className="pt-16">
+        {/* Hero */}
+        <section className="bg-[#F5F5F0] py-20">
+          <div className="max-w-[1280px] mx-auto px-10">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-3">MEMBERSHIP PLANS</p>
+            <h1 className="text-[52px] font-bold text-[#111310] mb-4">Choose your plan</h1>
+            <p className="text-lg text-[#5E625A] max-w-md mb-8">Flexible memberships for every goal. No joining fee, no contracts — just great training.</p>
+            <div className="inline-flex items-center gap-2 bg-[#D7FF3F] rounded-full px-4 py-1.5">
+              <span className="text-xs font-bold text-[#111310]">🎉 NO JOINING FEE — LIMITED TIME</span>
             </div>
           </div>
         </section>
 
-        {/* 2. Pricing cards */}
-        <section className="py-16 px-10 bg-white">
-          <div className="max-w-[1280px] mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {memberPlans.map((plan) => (
-                <div
-                  key={plan.name}
-                  className="relative flex flex-col"
-                  style={{
-                    background: plan.highlight ? '#171A16' : '#fff',
-                    border: plan.highlight ? 'none' : '1px solid #DADCD3',
-                    borderRadius: 12,
-                    padding: 28,
-                  }}
-                >
-                  {plan.badge && (
-                    <span
-                      className="absolute top-4 right-4 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full"
-                      style={{ background: '#D7FF3F', color: '#111310' }}
-                    >
-                      {plan.badge}
-                    </span>
+        {/* Pricing cards */}
+        <section className="bg-white py-20">
+          <div className="max-w-[1280px] mx-auto px-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl">
+              {plans.map((p) => (
+                <div key={p.name} className={`rounded-2xl p-7 border ${
+                  p.highlight ? 'bg-[#171A16] border-[#D7FF3F]' : 'bg-white border-[#DADCD3]'
+                }`}>
+                  {p.highlight && (
+                    <div className="inline-block bg-[#D7FF3F] text-[#111310] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mb-4">Most popular</div>
                   )}
-                  <h3
-                    className="font-bold mb-3"
-                    style={{ fontSize: 18, color: plan.highlight ? '#ECEDE6' : '#111310', marginRight: plan.badge ? 90 : 0 }}
-                  >
-                    {plan.name}
-                  </h3>
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span
-                      className="font-bold"
-                      style={{ fontSize: 40, color: plan.highlight ? '#D7FF3F' : '#111310' }}
-                    >
-                      {plan.price}
-                    </span>
-                    <span className="text-sm" style={{ color: plan.highlight ? '#5E625A' : '#8A8E85' }}>
-                      {plan.period}
-                    </span>
+                  <h2 className={`text-lg font-bold mb-1 ${ p.highlight ? 'text-white' : 'text-[#111310]' }`}>{p.name}</h2>
+                  <p className={`text-xs mb-4 ${ p.highlight ? 'text-[#8A8E85]' : 'text-[#5E625A]' }`}>{p.desc}</p>
+                  <div className="flex items-baseline gap-1 mb-6">
+                    <span className={`text-4xl font-bold ${ p.highlight ? 'text-[#D7FF3F]' : 'text-[#111310]' }`}>{p.price}</span>
+                    <span className={`text-sm ${ p.highlight ? 'text-[#8A8E85]' : 'text-[#5E625A]' }`}>{p.period}</span>
                   </div>
-                  <p className="text-xs mb-6" style={{ color: plan.highlight ? '#5E625A' : '#8A8E85' }}>
-                    {plan.desc}
-                  </p>
-                  <ul className="flex-1 flex flex-col gap-2.5 mb-8">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm" style={{ color: plan.highlight ? '#ECEDE6' : '#111310' }}>
-                        <CheckIcon dark={plan.highlight} />
+                  <ul className="space-y-2.5 mb-8">
+                    {p.features.map((f) => (
+                      <li key={f} className={`flex items-start gap-2 text-sm ${ p.highlight ? 'text-[#ECEDE6]' : 'text-[#5E625A]' }`}>
+                        <span className={`mt-0.5 ${ p.highlight ? 'text-[#D7FF3F]' : 'text-[#526B00]' }`}>✓</span>
                         {f}
                       </li>
                     ))}
                   </ul>
-                  <Link
-                    href="/register"
-                    className="block text-center font-semibold text-sm w-full py-2.5 rounded-lg"
-                    style={{
-                      background: plan.highlight ? '#D7FF3F' : 'transparent',
-                      color: '#111310',
-                      border: plan.highlight ? 'none' : '1px solid #171A16',
-                    }}
-                  >
-                    {plan.cta}
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 3. PT Packages */}
-        <section className="py-16 px-10" style={{ background: '#F5F5F0' }}>
-          <div className="max-w-[1280px] mx-auto">
-            <p className="uppercase text-[11px] font-semibold tracking-[0.1em] mb-3" style={{ color: '#526B00' }}>
-              PERSONAL TRAINING
-            </p>
-            <h2 className="font-bold mb-3" style={{ fontSize: 36, color: '#111310' }}>
-              Personal Training Packages
-            </h2>
-            <p className="mb-10" style={{ fontSize: 16, color: '#5E625A', maxWidth: 520 }}>
-              Results-focused PT packages with your dedicated coach. Choose the commitment that suits your goals.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {ptPackages.map((pkg) => (
-                <div
-                  key={pkg.name}
-                  className="flex flex-col"
-                  style={{ background: '#fff', border: '1px solid #DADCD3', borderRadius: 12, padding: 24 }}
-                >
-                  <span
-                    className="uppercase text-[11px] font-semibold tracking-[0.08em] mb-3 block"
-                    style={{ color: '#526B00' }}
-                  >
-                    {pkg.sessions}
-                  </span>
-                  <h3 className="font-bold mb-2" style={{ fontSize: 18, color: '#111310' }}>{pkg.name}</h3>
-                  <div className="flex items-baseline gap-1 mb-1">
-                    <span className="font-bold" style={{ fontSize: 32, color: '#111310' }}>{pkg.price}</span>
-                  </div>
-                  <p className="text-xs mb-5" style={{ color: '#8A8E85' }}>one-time package</p>
-                  <ul className="flex-1 flex flex-col gap-2.5 mb-6">
-                    {pkg.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm" style={{ color: '#111310' }}>
-                        <CheckIcon />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    type="button"
-                    className="w-full font-semibold text-sm py-2.5 rounded-lg"
-                    style={{ background: '#D7FF3F', color: '#111310' }}
-                  >
+                  <a href="/register" className={`block text-center font-semibold rounded-lg px-5 py-2.5 text-sm ${
+                    p.highlight
+                      ? 'bg-[#D7FF3F] text-[#111310] hover:bg-[#C4E82E]'
+                      : 'bg-[#171A16] text-[#ECEDE6] hover:bg-black/80'
+                  } transition-colors`}>
                     Get started
-                  </button>
+                  </a>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* 4. FAQ */}
-        <section className="py-16 px-10 bg-white">
-          <div className="max-w-[1280px] mx-auto">
-            <h2 className="font-bold mb-10 text-center" style={{ fontSize: 36, color: '#111310' }}>Plans FAQ</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">
-              {faqs.map((item, i) => (
-                <div key={i}>
-                  <p className="font-bold mb-2" style={{ fontSize: 15, color: '#111310' }}>{item.q}</p>
-                  <p className="text-sm leading-relaxed" style={{ color: '#5E625A' }}>{item.a}</p>
+        {/* PT Packages */}
+        <section className="bg-[#F5F5F0] py-16">
+          <div className="max-w-[1280px] mx-auto px-10">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-3">PERSONAL TRAINING</p>
+            <h2 className="text-[38px] font-bold text-[#111310] mb-10">PT packages</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {ptPackages.map((pt) => (
+                <div key={pt.sessions} className="bg-white border border-[#DADCD3] rounded-xl p-6">
+                  <h3 className="text-base font-bold text-[#111310] mb-1">{pt.sessions}</h3>
+                  <p className="text-xs text-[#8A8E85] mb-4">{pt.note}</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-bold text-[#111310]">{pt.price}</span>
+                    <span className="text-sm text-[#5E625A]">{pt.per}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* 5. Dark CTA */}
-        <section className="py-20 px-10" style={{ background: '#171A16' }}>
-          <div className="max-w-[1280px] mx-auto text-center">
-            <h2 className="font-bold mb-4" style={{ fontSize: 42, color: '#ECEDE6' }}>
-              Ready to transform your studio?
-            </h2>
-            <p className="mx-auto mb-10" style={{ fontSize: 18, color: '#8A8E85', maxWidth: 560 }}>
-              Start a free 14-day trial. No credit card required, no joining fee, no commitment.
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href="/register"
-                className="font-semibold rounded-lg px-5 py-2.5 text-sm"
-                style={{ background: '#D7FF3F', color: '#111310' }}
-              >
-                Start free trial
-              </Link>
-              <button
-                type="button"
-                className="font-semibold rounded-lg px-5 py-2.5 text-sm"
-                style={{ border: '1px solid rgba(255,255,255,0.25)', color: '#ECEDE6' }}
-              >
-                Talk to sales
-              </button>
+        {/* FAQ */}
+        <section className="bg-white py-16">
+          <div className="max-w-[1280px] mx-auto px-10">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#526B00] mb-3">FAQ</p>
+            <h2 className="text-[38px] font-bold text-[#111310] mb-10">Questions about plans</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl">
+              {faqs.map((f) => (
+                <div key={f.q} className="bg-[#F5F5F0] rounded-xl p-5">
+                  <h3 className="text-sm font-bold text-[#111310] mb-2">{f.q}</h3>
+                  <p className="text-sm text-[#5E625A]">{f.a}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
+        {/* Dark CTA */}
+        <section className="bg-[#171A16] py-16">
+          <div className="max-w-[1280px] mx-auto px-10 text-center">
+            <h2 className="text-[38px] font-bold text-white mb-4">Ready to join FITOS?</h2>
+            <p className="text-base text-[#8A8E85] max-w-sm mx-auto mb-8">Sign up in 2 minutes. First class is on us.</p>
+            <a href="/register" className="bg-[#D7FF3F] text-[#111310] font-semibold rounded-lg px-6 py-3 text-sm hover:bg-[#C4E82E] transition-colors inline-block">Start free trial</a>
+          </div>
+        </section>
       </main>
       <Footer />
     </>
