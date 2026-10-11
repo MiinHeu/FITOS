@@ -1,219 +1,173 @@
-"use client"
-import { useState } from 'react'
+"use client";
+import { useState, useRef, useEffect } from "react";
 
-const initialMessages = [
-  { role: 'ai', text: 'Chào Trâm! Tôi là AI Coach của bạn. Hôm nay bạn muốn tập gì?' },
-  { role: 'user', text: 'Tôi muốn tập chân hôm nay, bạn có gợi ý gì không?' },
-  { role: 'ai', text: 'Tuyệt vời! Dựa trên lịch tập tuần này của bạn, tôi gợi ý: Squat 4×6, Romanian Deadlift 3×8, Leg Press 3×10, và Calf Raise 4×15. Bạn có muốn điều chỉnh khối lượng không?' },
-  { role: 'user', text: 'Trọng lượng Squat nên bắt đầu từ bao nhiêu kg?' },
-  { role: 'ai', text: 'Dựa trên kỷ lục cá nhân của bạn (80kg × 5), tôi gợi ý warm-up ở 50kg, sau đó tăng dần: 60kg, 70kg, và working sets ở 72-75kg. Đây là 90% của 1RM ước tính. Bạn cảm thấy ổn không?' },
-  { role: 'user', text: 'Ổn rồi, cảm ơn bạn!' },
-]
+interface Message {
+  role: "user" | "ai";
+  text: string;
+}
+
+const initialMessages: Message[] = [
+  {
+    role: "ai",
+    text: "Hi Trâm! I'm your AI Coach. What would you like to work on today?",
+  },
+  {
+    role: "user",
+    text: "I want to do a leg workout today. Any suggestions?",
+  },
+  {
+    role: "ai",
+    text: "Great choice! Based on your training history, I recommend: Squat 4×6, Romanian Deadlift 3×8, Leg Press 3×10, and Calf Raise 4×15. Want me to adjust the weights?",
+  },
+  {
+    role: "user",
+    text: "What weight should I start squats with?",
+  },
+  {
+    role: "ai",
+    text: "Based on your PR (80kg×5), I suggest warm-ups at 50kg, then ramp up: 60kg, 70kg, and working sets at 72–75kg. That's ~90% of your estimated 1RM. How does that feel?",
+  },
+];
 
 const quickPrompts = [
-  'Bài tập hôm nay',
-  'Lịch tập tuần này',
-  'Phục hồi sau tập',
-  'Chế độ ăn',
-  'Cải thiện squat',
-  'Đặt lịch PT',
-]
-
-const contextRows = [
-  { label: 'Gói hiện tại', value: 'Perform' },
-  { label: 'Mục tiêu', value: 'Giảm mỡ + Tăng cơ' },
-  { label: 'Số buổi/tuần', value: '4' },
-  { label: 'HLV được chỉ định', value: 'Coach Văn Quân' },
-  { label: 'Streak hiện tại', value: '3 ngày 🔥' },
-]
+  "Create a workout plan",
+  "How to improve my squat?",
+  "Nutrition tips for muscle gain",
+  "Analyze my progress",
+  "Schedule this week",
+];
 
 export default function AiCoachPage() {
-  const [messages, setMessages] = useState(initialMessages)
-  const [input, setInput] = useState('')
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [input, setInput] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   function handleSend() {
-    const trimmed = input.trim()
-    if (!trimmed) return
-    setMessages(prev => [...prev, { role: 'user', text: trimmed }])
-    setInput('')
+    const trimmed = input.trim();
+    if (!trimmed) return;
+    setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
+    setInput("");
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSend()
+  function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   }
 
   return (
     <div>
       {/* Page header */}
-      <div
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #DADCD3',
-          padding: '28px 28px',
-        }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            textTransform: 'uppercase' as const,
-            letterSpacing: '0.08em',
-            color: '#526B00',
-            display: 'block',
-            marginBottom: 4,
-          }}
-        >
-          AI COACH
-        </span>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111310', margin: 0 }}>
-          AI Coach của bạn
-        </h1>
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
+        <div>
+          <span
+            className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
+            style={{ color: "#526B00" }}
+          >
+            MEMBER
+          </span>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
+              AI Coach
+            </h1>
+            <span
+              className="text-xs font-bold px-2 py-0.5 rounded-full"
+              style={{ background: "#D7FF3F", color: "#111310" }}
+            >
+              BETA
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Content */}
       <div
-        style={{
-          padding: '24px 28px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 320px',
-          gap: 24,
-          height: 'calc(100vh - 120px)',
-        }}
+        className="flex gap-6 p-8"
+        style={{ height: "calc(100vh - 89px)", background: "#F5F5F0" }}
       >
-        {/* LEFT — chat area */}
+        {/* LEFT — Chat */}
         <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column' as const,
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            overflow: 'hidden',
-          }}
+          className="flex-1 flex flex-col bg-white rounded-xl border border-[#DADCD3]"
+          style={{ minWidth: 0 }}
         >
           {/* Messages */}
-          <div
-            style={{
-              flex: 1,
-              overflowY: 'auto' as const,
-              padding: '20px',
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column' as const }}>
+          <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex flex-col gap-4">
               {messages.map((msg, i) => (
                 <div
                   key={i}
-                  style={{
-                    alignSelf: msg.role === 'ai' ? 'flex-start' : 'flex-end',
-                    maxWidth: '80%',
-                    marginBottom: 12,
-                  }}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {/* Role label */}
-                  <div
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: '#8A8E85',
-                      textTransform: 'uppercase' as const,
-                      marginBottom: 4,
-                      textAlign: msg.role === 'ai' ? 'left' as const : 'right' as const,
-                    }}
-                  >
-                    {msg.role === 'ai' ? 'AI Coach' : 'Bạn'}
-                  </div>
-                  <div
-                    style={{
-                      background: msg.role === 'ai' ? '#F5F5F0' : '#D7FF3F',
-                      borderRadius: msg.role === 'ai' ? '12px 12px 12px 0' : '12px 12px 0 12px',
-                      padding: '12px 16px',
-                    }}
-                  >
-                    <span style={{ fontSize: 14, color: '#111310' }}>{msg.text}</span>
+                  <div style={{ maxWidth: "75%" }}>
+                    <p
+                      className="text-[10px] font-bold uppercase mb-1"
+                      style={{
+                        color: "#8A8E85",
+                        textAlign: msg.role === "user" ? "right" : "left",
+                      }}
+                    >
+                      {msg.role === "user" ? "You" : "AI Coach"}
+                    </p>
+                    <div
+                      className="px-4 py-3 text-sm"
+                      style={{
+                        background: msg.role === "user" ? "#D7FF3F" : "#fff",
+                        border: msg.role === "ai" ? "1px solid #DADCD3" : "none",
+                        borderRadius:
+                          msg.role === "user"
+                            ? "12px 12px 0 12px"
+                            : "12px 12px 12px 0",
+                        color: "#111310",
+                      }}
+                    >
+                      {msg.text}
+                    </div>
                   </div>
                 </div>
               ))}
+              <div ref={bottomRef} />
             </div>
           </div>
 
           {/* Input area */}
-          <div
-            style={{
-              borderTop: '1px solid #DADCD3',
-              padding: '16px 20px',
-              display: 'flex',
-              gap: 12,
-            }}
-          >
-            <textarea
-              rows={2}
+          <div className="border-t border-[#DADCD3] p-4 flex gap-3 items-center">
+            <input
+              type="text"
               value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Hỏi AI Coach..."
-              style={{
-                flex: 1,
-                border: '1px solid #DADCD3',
-                borderRadius: 10,
-                padding: '10px 14px',
-                fontSize: 14,
-                resize: 'none' as const,
-                fontFamily: 'inherit',
-                outline: 'none',
-              }}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKey}
+              placeholder="Ask your AI Coach anything..."
+              className="flex-1 border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
+              style={{ color: "#111310" }}
             />
             <button
               onClick={handleSend}
-              style={{
-                background: '#D7FF3F',
-                color: '#111310',
-                borderRadius: 10,
-                padding: '10px 16px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: 600,
-                fontSize: 14,
-                alignSelf: 'flex-end',
-              }}
+              className="px-4 py-2.5 text-sm font-semibold rounded-lg flex-shrink-0"
+              style={{ background: "#D7FF3F", color: "#111310" }}
             >
-              Gửi
+              Send →
             </button>
           </div>
         </div>
 
-        {/* RIGHT column */}
-        <div style={{ display: 'flex', flexDirection: 'column' as const, overflowY: 'auto' as const }}>
-          {/* Quick prompts */}
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              border: '1px solid #DADCD3',
-              padding: 20,
-              marginBottom: 16,
-            }}
-          >
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#111310', marginBottom: 12 }}>
-              Gợi ý nhanh
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: 8 }}>
+        {/* RIGHT — Quick prompts + profile */}
+        <div className="w-72 flex flex-col gap-4">
+          <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
+            <h3 className="text-sm font-semibold mb-4" style={{ color: "#111310" }}>
+              Suggested Prompts
+            </h3>
+            <div className="flex flex-col gap-2">
               {quickPrompts.map((prompt, i) => (
                 <button
                   key={i}
                   onClick={() => setInput(prompt)}
-                  style={{
-                    border: '1px solid #DADCD3',
-                    borderRadius: 20,
-                    padding: '6px 12px',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    background: '#fff',
-                    cursor: 'pointer',
-                    color: '#111310',
-                  }}
+                  className="text-left p-3 text-sm rounded-lg border border-[#DADCD3] hover:border-[#D7FF3F] transition-colors"
+                  style={{ color: "#111310" }}
                 >
                   {prompt}
                 </button>
@@ -221,36 +175,38 @@ export default function AiCoachPage() {
             </div>
           </div>
 
-          {/* Context card */}
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              border: '1px solid #DADCD3',
-              padding: 20,
-            }}
-          >
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#111310', marginBottom: 4 }}>
-              Ngữ cảnh của bạn
-            </div>
-            {contextRows.map((row, i) => (
+          {/* AI Coach profile */}
+          <div className="bg-white rounded-xl border border-[#DADCD3] p-5">
+            <div className="flex items-center gap-3 mb-3">
               <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  padding: '8px 0',
-                  borderBottom: i < contextRows.length - 1 ? '1px solid #DADCD3' : 'none',
-                  fontSize: 13,
-                }}
+                className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0"
+                style={{ background: "#171A16", color: "#D7FF3F" }}
               >
-                <span style={{ color: '#5E625A' }}>{row.label}</span>
-                <span style={{ fontWeight: 600, color: '#111310' }}>{row.value}</span>
+                🤖
               </div>
-            ))}
+              <div>
+                <p className="text-sm font-semibold" style={{ color: "#111310" }}>
+                  FITOS AI Coach
+                </p>
+                <p className="text-xs" style={{ color: "#8A8E85" }}>
+                  Powered by AI
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {["Strength", "Nutrition", "Recovery", "Planning"].map((s) => (
+                <span
+                  key={s}
+                  className="text-xs px-2 py-0.5 rounded-full"
+                  style={{ background: "#E8FFAA", color: "#526B00" }}
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

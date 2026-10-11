@@ -1,352 +1,222 @@
-"use client"
+"use client";
 
-const stats = [
-  { label: 'Buổi tập tháng này', value: '12' },
-  { label: 'Tổng buổi', value: '47' },
-  { label: 'Streak hiện tại', value: '3 ngày 🔥' },
-  { label: 'Cân nặng đã ghi', value: '68.5 kg' },
-]
+const statCards = [
+  { label: "Weight", value: "72", unit: "kg" },
+  { label: "Body Fat", value: "18", unit: "%" },
+  { label: "Classes Attended", value: "48", unit: "" },
+  { label: "Streak", value: "12", unit: "days" },
+];
 
-const weeklyData = [
-  { week: 'T1', sessions: 2 },
-  { week: 'T2', sessions: 4 },
-  { week: 'T3', sessions: 3 },
-  { week: 'T4', sessions: 5 },
-  { week: 'T5', sessions: 4 },
-  { week: 'T6', sessions: 6 },
-  { week: 'T7', sessions: 3 },
-  { week: 'T8', sessions: 5 },
-]
+const measurements = [
+  { label: "Chest", value: "96 cm", date: "Jul 10" },
+  { label: "Waist", value: "78 cm", date: "Jul 10" },
+  { label: "Hips", value: "90 cm", date: "Jul 10" },
+  { label: "Arms", value: "34 cm", date: "Jul 10" },
+];
+
+const weeklyAttendance = [
+  { week: "W1", classes: 3 },
+  { week: "W2", classes: 5 },
+  { week: "W3", classes: 4 },
+  { week: "W4", classes: 6 },
+  { week: "W5", classes: 3 },
+  { week: "W6", classes: 5 },
+  { week: "W7", classes: 4 },
+  { week: "W8", classes: 6 },
+];
+
+const maxClasses = Math.max(...weeklyAttendance.map((w) => w.classes));
 
 const personalRecords = [
-  { exercise: 'Squat', weight: '80 kg', reps: '5 rep', date: '10/07/2025' },
-  { exercise: 'Deadlift', weight: '100 kg', reps: '3 rep', date: '05/07/2025' },
-  { exercise: 'Bench Press', weight: '60 kg', reps: '5 rep', date: '08/07/2025' },
-  { exercise: 'Overhead Press', weight: '40 kg', reps: '6 rep', date: '03/07/2025' },
-]
-
-const recentWorkouts = [
-  { date: '14/07', name: 'Strength Lab', duration: '60 phút', summary: 'Squat, Deadlift, Leg Press' },
-  { date: '12/07', name: 'HIIT Blast', duration: '45 phút', summary: 'HIIT Circuit, Jump Rope' },
-  { date: '10/07', name: 'Upper Push', duration: '55 phút', summary: 'Bench Press, OHP, Fly' },
-  { date: '08/07', name: 'Pull Day', duration: '60 phút', summary: 'Pull-up, Row, Curl' },
-]
-
-const currentWeight = 68.5
-const targetWeight = 65.0
-const startWeight = 72
-
-const progressPct = Math.round(((startWeight - currentWeight) / (startWeight - targetWeight)) * 100)
-const maxSessions = Math.max(...weeklyData.map(d => d.sessions))
+  { exercise: "Squat", weight: "80 kg", date: "Jul 10, 2025", improvement: "+5 kg" },
+  { exercise: "Deadlift", weight: "100 kg", date: "Jul 5, 2025", improvement: "+10 kg" },
+  { exercise: "Bench Press", weight: "60 kg", date: "Jul 8, 2025", improvement: "+2.5 kg" },
+  { exercise: "Overhead Press", weight: "40 kg", date: "Jul 3, 2025", improvement: "+2.5 kg" },
+  { exercise: "Pull-up", weight: "BW+10 kg", date: "Jun 28, 2025", improvement: "+5 kg" },
+];
 
 export default function MemberProgressPage() {
   return (
     <div>
       {/* Page header */}
-      <div
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #DADCD3',
-          padding: '28px 28px',
-        }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            textTransform: 'uppercase' as const,
-            letterSpacing: '0.08em',
-            color: '#526B00',
-            display: 'block',
-            marginBottom: 4,
-          }}
-        >
-          MEMBER
-        </span>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111310', margin: 0 }}>
-          Tiến trình của bạn
-        </h1>
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
+        <div>
+          <span
+            className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
+            style={{ color: "#526B00" }}
+          >
+            MEMBER
+          </span>
+          <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
+            My Progress
+          </h1>
+        </div>
       </div>
 
       {/* Content */}
-      <div style={{ padding: '24px 28px' }}>
-
-        {/* Stats row */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 16,
-            marginBottom: 24,
-          }}
-        >
-          {stats.map((s, i) => (
+      <div className="p-8 bg-[#F5F5F0] min-h-screen">
+        {/* 4 stat cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          {statCards.map((s) => (
             <div
-              key={i}
-              style={{
-                background: '#fff',
-                borderRadius: 16,
-                border: '1px solid #DADCD3',
-                padding: '20px 24px',
-              }}
+              key={s.label}
+              className="bg-white rounded-xl border border-[#DADCD3] p-5"
             >
-              <div style={{ fontSize: 12, color: '#5E625A', fontWeight: 600, marginBottom: 8 }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: "#8A8E85" }}>
                 {s.label}
-              </div>
-              <div style={{ fontSize: 26, fontWeight: 800, color: '#111310' }}>
+              </p>
+              <p className="text-3xl font-bold" style={{ color: "#111310" }}>
                 {s.value}
-              </div>
+                <span className="text-base font-normal" style={{ color: "#5E625A" }}>
+                  {s.unit}
+                </span>
+              </p>
             </div>
           ))}
         </div>
 
-        {/* Body metrics card */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            padding: 24,
-            marginBottom: 24,
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 24,
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#5E625A', marginBottom: 8 }}>
-              Cân nặng hiện tại
-            </div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#111310' }}>
-              {currentWeight} kg
-            </div>
-            <div style={{ fontSize: 12, color: '#8A8E85', marginTop: 4 }}>
-              Bắt đầu: {startWeight} kg
+        {/* Body metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Body Metrics */}
+          <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
+            <h2 className="text-base font-semibold mb-5" style={{ color: "#111310" }}>
+              Body Metrics
+            </h2>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {[
+                { label: "Weight", value: "72", unit: "kg", trend: "↓ 3kg" },
+                { label: "Height", value: "165", unit: "cm", trend: "" },
+                { label: "BMI", value: "26.4", unit: "", trend: "Normal" },
+              ].map((m) => (
+                <div key={m.label}>
+                  <p className="text-3xl font-bold" style={{ color: "#111310" }}>
+                    {m.value}
+                    <span className="text-sm font-normal" style={{ color: "#5E625A" }}>
+                      {m.unit}
+                    </span>
+                  </p>
+                  <p className="text-xs uppercase tracking-wider mt-1" style={{ color: "#8A8E85" }}>
+                    {m.label}
+                  </p>
+                  {m.trend && (
+                    <p className="text-xs font-semibold mt-1" style={{ color: "#526B00" }}>
+                      {m.trend}
+                    </p>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#5E625A', marginBottom: 8 }}>
-              Mục tiêu
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 600, color: '#111310' }}>
-              {targetWeight} kg
-            </div>
-            <div style={{ marginTop: 12 }}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontSize: 12,
-                  color: '#5E625A',
-                  marginBottom: 6,
-                }}
-              >
-                <span>Tiến độ</span>
-                <span style={{ fontWeight: 700, color: '#526B00' }}>{progressPct}%</span>
-              </div>
-              <div
-                style={{
-                  background: '#ECEDE6',
-                  height: 12,
-                  borderRadius: 6,
-                  overflow: 'hidden',
-                }}
-              >
+
+          {/* Measurements */}
+          <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
+            <h2 className="text-base font-semibold mb-5" style={{ color: "#111310" }}>
+              Measurements
+            </h2>
+            <div className="flex flex-col">
+              {measurements.map((m, i) => (
                 <div
-                  style={{
-                    width: `${progressPct}%`,
-                    height: '100%',
-                    background: '#D7FF3F',
-                    borderRadius: 6,
-                  }}
-                />
-              </div>
+                  key={i}
+                  className="flex items-center justify-between py-2.5 border-b border-[#F0F0EB] last:border-0"
+                >
+                  <span className="text-sm" style={{ color: "#5E625A" }}>
+                    {m.label}
+                  </span>
+                  <div className="text-right">
+                    <span className="text-sm font-semibold" style={{ color: "#111310" }}>
+                      {m.value}
+                    </span>
+                    <span className="text-xs ml-2" style={{ color: "#8A8E85" }}>
+                      {m.date}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Weekly bar chart */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            padding: 24,
-            marginBottom: 24,
-          }}
-        >
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#111310', marginBottom: 20 }}>
-            Buổi tập 8 tuần gần nhất
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 120 }}>
-            {weeklyData.map((d, i) => {
-              const isLast = i === weeklyData.length - 1
-              const barHeight = Math.round((d.sessions / maxSessions) * 100)
+        {/* Weekly class attendance bar chart */}
+        <div className="bg-white rounded-xl border border-[#DADCD3] p-6 mb-6">
+          <h2 className="text-base font-semibold mb-5" style={{ color: "#111310" }}>
+            Weekly Class Attendance (8 weeks)
+          </h2>
+          <div className="flex items-end gap-3" style={{ height: "120px" }}>
+            {weeklyAttendance.map((w, i) => {
+              const isLast = i === weeklyAttendance.length - 1;
+              const barPct = Math.round((w.classes / maxClasses) * 100);
               return (
                 <div
                   key={i}
-                  style={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column' as const,
-                    alignItems: 'center',
-                    gap: 4,
-                    height: '100%',
-                    justifyContent: 'flex-end',
-                  }}
+                  className="flex-1 flex flex-col items-center gap-1"
+                  style={{ height: "100%", justifyContent: "flex-end" }}
                 >
-                  <div style={{ fontSize: 11, fontWeight: 600, color: '#111310' }}>
-                    {d.sessions}
-                  </div>
+                  <span className="text-xs font-semibold" style={{ color: "#111310" }}>
+                    {w.classes}
+                  </span>
                   <div
+                    className="w-full rounded-t-lg"
                     style={{
-                      width: '100%',
-                      height: `${barHeight}%`,
-                      background: isLast ? '#D7FF3F' : '#ECEDE6',
-                      borderRadius: '4px 4px 0 0',
+                      height: `${barPct}%`,
+                      background: isLast ? "#D7FF3F" : "#ECEDE6",
                     }}
                   />
-                  <div style={{ fontSize: 10, color: '#8A8E85' }}>{d.week}</div>
+                  <span className="text-xs" style={{ color: "#8A8E85" }}>
+                    {w.week}
+                  </span>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
 
-        {/* Personal records table */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            padding: 24,
-            marginBottom: 24,
-          }}
-        >
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#111310', marginBottom: 16 }}>
-            Kỷ lục cá nhân
+        {/* Personal Records table */}
+        <div className="bg-white rounded-xl border border-[#DADCD3] overflow-hidden">
+          <div className="px-6 py-4 border-b border-[#DADCD3]">
+            <h2 className="text-base font-semibold" style={{ color: "#111310" }}>
+              Personal Records
+            </h2>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse' as const }}>
+          <table className="w-full">
             <thead>
-              <tr>
-                {['BÀI TẬP', 'TRỌNG LƯỢNG TỐT NHẤT', 'SỐ REP TỐT NHẤT', 'NGÀY ĐẠT'].map(col => (
+              <tr style={{ background: "#F5F5F0" }}>
+                {["Exercise", "Weight", "Date", "Improvement"].map((col) => (
                   <th
                     key={col}
-                    style={{
-                      textAlign: 'left' as const,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: '#8A8E85',
-                      textTransform: 'uppercase' as const,
-                      letterSpacing: '0.06em',
-                      paddingBottom: 12,
-                      borderBottom: '1px solid #DADCD3',
-                    }}
+                    className="text-left px-6 py-3 text-xs font-bold uppercase tracking-wider"
+                    style={{ color: "#8A8E85" }}
                   >
                     {col}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-[#F0F0EB]">
               {personalRecords.map((pr, i) => (
                 <tr key={i}>
-                  <td
-                    style={{
-                      padding: '12px 0',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: '#111310',
-                      borderBottom: i < personalRecords.length - 1 ? '1px solid #DADCD3' : 'none',
-                    }}
-                  >
+                  <td className="px-6 py-4 text-sm font-semibold" style={{ color: "#111310" }}>
                     {pr.exercise}
                   </td>
-                  <td
-                    style={{
-                      padding: '12px 0',
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: '#526B00',
-                      borderBottom: i < personalRecords.length - 1 ? '1px solid #DADCD3' : 'none',
-                    }}
-                  >
+                  <td className="px-6 py-4 text-sm font-bold" style={{ color: "#526B00" }}>
                     {pr.weight}
                   </td>
-                  <td
-                    style={{
-                      padding: '12px 0',
-                      fontSize: 14,
-                      color: '#111310',
-                      borderBottom: i < personalRecords.length - 1 ? '1px solid #DADCD3' : 'none',
-                    }}
-                  >
-                    {pr.reps}
-                  </td>
-                  <td
-                    style={{
-                      padding: '12px 0',
-                      fontSize: 13,
-                      color: '#8A8E85',
-                      borderBottom: i < personalRecords.length - 1 ? '1px solid #DADCD3' : 'none',
-                    }}
-                  >
+                  <td className="px-6 py-4 text-sm" style={{ color: "#8A8E85" }}>
                     {pr.date}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                      style={{ background: "#E8FFAA", color: "#526B00" }}
+                    >
+                      {pr.improvement}
+                    </span>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-
-        {/* Recent workouts */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            padding: 24,
-          }}
-        >
-          <div style={{ fontSize: 15, fontWeight: 700, color: '#111310', marginBottom: 16 }}>
-            Buổi tập gần đây
-          </div>
-          {recentWorkouts.map((w, i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                gap: 12,
-                padding: '14px 0',
-                borderBottom: i < recentWorkouts.length - 1 ? '1px solid #DADCD3' : 'none',
-                alignItems: 'center',
-              }}
-            >
-              <div
-                style={{
-                  width: 48,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#5E625A',
-                  flexShrink: 0,
-                }}
-              >
-                {w.date}
-              </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#111310', flex: 1 }}>
-                {w.name}
-              </div>
-              <div style={{ fontSize: 12, color: '#8A8E85', flexShrink: 0 }}>
-                {w.duration}
-              </div>
-              <div style={{ fontSize: 12, color: '#5E625A', flexShrink: 0 }}>
-                {w.summary}
-              </div>
-            </div>
-          ))}
-        </div>
-
       </div>
     </div>
-  )
+  );
 }

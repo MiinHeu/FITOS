@@ -1,165 +1,78 @@
-"use client";
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import Link from "next/link";
 
 const receiptRows = [
-  { label: 'Thành viên',  value: 'Nguyễn Thị Trâm' },
-  { label: 'Gói',         value: 'Perform' },
-  { label: 'Số tiền',     value: '1,490,000 ₫' },
-  { label: 'Phương thức', value: 'Chuyển khoản' },
-  { label: 'Ngày',        value: '15/07/2025' },
-  { label: 'Mã hóa đơn',  value: '#INV-20250715-0042' },
+  { label: "Member", value: "Nguyễn Thị Trâm" },
+  { label: "Plan", value: "Perform" },
+  { label: "Amount", value: "$59.00" },
+  { label: "Date", value: "Jul 15, 2025" },
 ];
 
 export default function PaymentConfirmedPage() {
-  const [countdown, setCountdown] = useState(10);
-
-  useEffect(() => {
-    if (countdown <= 0) return;
-    const timer = setInterval(() => {
-      setCountdown((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [countdown]);
-
   return (
     <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#F5F5F0',
-      }}
+      className="min-h-screen flex items-center justify-center p-8"
+      style={{ background: "#F5F5F0" }}
     >
-      <div style={{ maxWidth: 520, width: '100%', padding: 24 }}>
-        {/* Checkmark hero */}
+      <div
+        className="bg-white rounded-2xl border border-[#DADCD3] p-10 max-w-md w-full text-center"
+      >
+        {/* Checkmark circle */}
         <div
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: '50%',
-            background: '#D7FF3F',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 24px',
-          }}
+          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
+          style={{ background: "#D7FF3F" }}
         >
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 40 40"
-            fill="none"
-            stroke="#111310"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M8 20 L17 29 L32 13" />
-          </svg>
+          <span className="text-3xl font-bold" style={{ color: "#111310" }}>
+            ✓
+          </span>
         </div>
 
+        {/* Heading */}
         <h1
-          style={{
-            fontSize: 28,
-            fontWeight: 800,
-            color: '#111310',
-            textAlign: 'center',
-            margin: 0,
-          }}
+          className="text-3xl font-bold mt-6"
+          style={{ color: "#111310" }}
         >
-          Thanh toán thành công!
+          Payment confirmed!
         </h1>
         <p
-          style={{
-            fontSize: 14,
-            color: '#5E625A',
-            textAlign: 'center',
-            marginTop: 8,
-            marginBottom: 0,
-          }}
+          className="text-[15px] mt-2"
+          style={{ color: "#5E625A" }}
         >
-          Đã kích hoạt hội viên thành công
+          Membership activated successfully.
         </p>
 
         {/* Receipt card */}
         <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            padding: 24,
-            marginTop: 24,
-          }}
+          className="rounded-xl p-5 mt-6 text-left"
+          style={{ background: "#F5F5F0" }}
         >
           {receiptRows.map((row, i) => (
             <div
-              key={row.label}
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '10px 0',
-                borderBottom: i < receiptRows.length - 1 ? '1px solid #DADCD3' : 'none',
-              }}
+              key={i}
+              className="flex justify-between text-sm py-2.5 border-b border-[#DADCD3] last:border-0"
             >
-              <span style={{ fontSize: 13, color: '#5E625A' }}>{row.label}</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#111310' }}>{row.value}</span>
+              <span style={{ color: "#5E625A" }}>{row.label}</span>
+              <span className="font-semibold" style={{ color: "#111310" }}>
+                {row.value}
+              </span>
             </div>
           ))}
         </div>
 
-        {/* Action buttons */}
-        <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-          <button
-            style={{
-              flex: 1,
-              border: '1px solid #DADCD3',
-              background: 'transparent',
-              borderRadius: 10,
-              padding: '12px 0',
-              fontSize: 14,
-              fontWeight: 600,
-              color: '#111310',
-              cursor: 'pointer',
-            }}
-          >
-            In hóa đơn
-          </button>
-          <Link
-            href="/dashboard/sales"
-            style={{
-              flex: 1,
-              background: '#171A16',
-              color: '#ECEDE6',
-              borderRadius: 10,
-              padding: '12px 0',
-              fontSize: 14,
-              fontWeight: 600,
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            Quay lại bán hàng
-          </Link>
-        </div>
-
-        {/* Countdown */}
-        <p
-          style={{
-            textAlign: 'center',
-            marginTop: 16,
-            fontSize: 13,
-            color: '#8A8E85',
-          }}
+        {/* Buttons */}
+        <Link
+          href="/dashboard/customers"
+          className="mt-8 block w-full py-3 text-sm font-semibold rounded-lg text-center"
+          style={{ background: "#D7FF3F", color: "#111310" }}
         >
-          {countdown > 0
-            ? `Tự động quay lại trong ${countdown}s`
-            : 'Đang chuyển hướng...'}
-        </p>
+          View Member Profile
+        </Link>
+        <Link
+          href="/dashboard"
+          className="mt-3 block w-full py-3 text-sm font-semibold rounded-lg border border-[#DADCD3] hover:bg-[#F5F5F0] transition-colors text-center"
+          style={{ color: "#111310" }}
+        >
+          Back to Dashboard
+        </Link>
       </div>
     </div>
   );

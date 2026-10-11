@@ -1,321 +1,259 @@
-"use client"
-import { useState } from 'react'
-import Link from 'next/link'
+"use client";
+import { useState } from "react";
+import Link from "next/link";
 
-const classes = [
-  { name: 'Yoga Flow', instructor: 'Coach Thanh Hà', time: '07:00–08:00', studio: 'Studio A', spots: 5, type: 'Yoga' },
-  { name: 'HIIT Blast', instructor: 'Coach Minh Tuấn', time: '08:30–09:15', studio: 'Studio B', spots: 12, type: 'HIIT' },
-  { name: 'Cycling Power', instructor: 'Coach Phương Linh', time: '09:00–09:50', studio: 'Studio C', spots: 3, type: 'Cycling' },
-  { name: 'Strength Lab', instructor: 'Coach Văn Quân', time: '18:30–19:30', studio: 'Studio A', spots: 0, type: 'Strength' },
-  { name: 'Yin Yoga', instructor: 'Coach Mai Anh', time: '19:00–20:15', studio: 'Studio A', spots: 8, type: 'Yoga' },
-]
+type Tab = "Classes" | "Personal Training";
 
-const trainers = [
-  { name: 'Coach Văn Quân', specialty: 'Strength & Powerlifting', available: true },
-  { name: 'Coach Minh Tuấn', specialty: 'HIIT & Conditioning', available: true },
-  { name: 'Coach Thanh Hà', specialty: 'Yoga & Mindfulness', available: false },
-  { name: 'Coach Phương Linh', specialty: 'Cycling & Cardio', available: true },
-]
-
-const typeColors: Record<string, { bg: string; color: string }> = {
-  Yoga:     { bg: '#E9EDFF', color: '#3B4FA8' },
-  HIIT:     { bg: '#D7FF3F', color: '#526B00' },
-  Cycling:  { bg: '#FFF3E0', color: '#B87000' },
-  Strength: { bg: '#ECEDE6', color: '#5E625A' },
+function getWeekDays() {
+  const abbr = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const today = new Date();
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    return {
+      label: abbr[d.getDay()],
+      date: d.getDate(),
+      isToday: i === 0,
+    };
+  });
 }
 
-function getNext7Days() {
-  const days = []
-  const dayAbbr = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-  const today = new Date()
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today)
-    d.setDate(today.getDate() + i)
-    days.push({ label: dayAbbr[d.getDay()], date: d.getDate(), isToday: i === 0 })
-  }
-  return days
+interface ClassItem {
+  time: string;
+  type: string;
+  name: string;
+  instructor: string;
+  duration: string;
+  spotsTaken: number;
+  spotsTotal: number;
+  booked: boolean;
 }
 
-export default function BookSessionPage() {
-  const [activeTab, setActiveTab] = useState<'classes' | 'pt'>('classes')
-  const [selectedDay, setSelectedDay] = useState(0)
-  const next7Days = getNext7Days()
+const classes: ClassItem[] = [
+  {
+    time: "07:00",
+    type: "Yoga",
+    name: "Morning Yoga Flow",
+    instructor: "Coach Thanh Hà",
+    duration: "60 min",
+    spotsTaken: 7,
+    spotsTotal: 12,
+    booked: true,
+  },
+  {
+    time: "08:30",
+    type: "HIIT",
+    name: "HIIT Blast",
+    instructor: "Coach Minh Tuấn",
+    duration: "45 min",
+    spotsTaken: 15,
+    spotsTotal: 15,
+    booked: false,
+  },
+  {
+    time: "09:00",
+    type: "Cycling",
+    name: "Cycling Power",
+    instructor: "Coach Phương Linh",
+    duration: "50 min",
+    spotsTaken: 12,
+    spotsTotal: 18,
+    booked: false,
+  },
+  {
+    time: "18:30",
+    type: "Strength",
+    name: "Strength Lab",
+    instructor: "Coach Văn Quân",
+    duration: "60 min",
+    spotsTaken: 9,
+    spotsTotal: 15,
+    booked: false,
+  },
+  {
+    time: "19:00",
+    type: "Yoga",
+    name: "Yin Yoga",
+    instructor: "Coach Mai Anh",
+    duration: "75 min",
+    spotsTaken: 18,
+    spotsTotal: 18,
+    booked: false,
+  },
+];
+
+const typeChip: Record<string, { bg: string; color: string }> = {
+  Yoga: { bg: "#E9EDFF", color: "#3B4FA8" },
+  HIIT: { bg: "#D7FF3F", color: "#526B00" },
+  Cycling: { bg: "#FFF3E0", color: "#B87000" },
+  Strength: { bg: "#ECEDE6", color: "#5E625A" },
+};
+
+export default function BookPage() {
+  const [activeTab, setActiveTab] = useState<Tab>("Classes");
+  const [selectedDay, setSelectedDay] = useState(0);
+  const days = getWeekDays();
 
   return (
     <div>
       {/* Page header */}
-      <div
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #DADCD3',
-          padding: '28px 28px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
           <Link
             href="/dashboard/member"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: '#ECEDE6',
-              color: '#111310',
-              textDecoration: 'none',
-              fontSize: 18,
-            }}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-lg"
+            style={{ background: "#ECEDE6", color: "#111310", textDecoration: "none" }}
           >
             ←
           </Link>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111310', margin: 0 }}>
-            Đặt lịch
-          </h1>
+          <div>
+            <span
+              className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
+              style={{ color: "#526B00" }}
+            >
+              MEMBER
+            </span>
+            <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
+              Book a Class
+            </h1>
+          </div>
         </div>
       </div>
 
-      {/* Tabs row */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 8,
-          padding: '0 28px',
-          background: '#fff',
-          borderBottom: '1px solid #DADCD3',
-        }}
-      >
-        {(['classes', 'pt'] as const).map(tab => (
+      {/* Tab row */}
+      <div className="bg-white border-b border-[#DADCD3] px-8 flex gap-6">
+        {(["Classes", "Personal Training"] as Tab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            style={{
-              padding: '16px 0',
-              marginRight: 24,
-              fontSize: 14,
-              fontWeight: 600,
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              borderBottom: activeTab === tab ? '2px solid #D7FF3F' : '2px solid transparent',
-              color: activeTab === tab ? '#111310' : '#8A8E85',
-            }}
+            className="py-4 text-sm font-semibold border-b-2 transition-colors"
+            style={
+              activeTab === tab
+                ? { borderColor: "#D7FF3F", color: "#111310" }
+                : { borderColor: "transparent", color: "#8A8E85" }
+            }
           >
-            {tab === 'classes' ? 'Lớp học' : 'Personal Training'}
+            {tab}
           </button>
         ))}
       </div>
 
       {/* Content */}
-      <div style={{ padding: '24px 28px' }}>
-        {activeTab === 'classes' && (
-          <div>
-            {/* Date strip */}
-            <div
-              style={{
-                display: 'flex',
-                gap: 8,
-                marginBottom: 20,
-                overflowX: 'auto' as const,
-              }}
+      <div className="p-8 bg-[#F5F5F0] min-h-screen">
+        {/* Date strip */}
+        <div className="flex gap-2 mb-6 overflow-x-auto">
+          {days.map((d, i) => (
+            <button
+              key={i}
+              onClick={() => setSelectedDay(i)}
+              className="rounded-xl px-4 py-3 text-center flex-shrink-0 border transition-colors min-w-[56px]"
+              style={
+                selectedDay === i
+                  ? { background: "#D7FF3F", borderColor: "#D7FF3F", color: "#111310" }
+                  : { background: "#fff", borderColor: "#DADCD3", color: "#5E625A" }
+              }
             >
-              {next7Days.map((d, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelectedDay(i)}
-                  style={{
-                    borderRadius: 10,
-                    padding: '10px 14px',
-                    textAlign: 'center' as const,
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    border: selectedDay === i ? 'none' : '1px solid #DADCD3',
-                    background: selectedDay === i ? '#D7FF3F' : '#fff',
-                    color: selectedDay === i ? '#111310' : '#5E625A',
-                    minWidth: 56,
-                  }}
-                >
-                  <div style={{ fontSize: 11, fontWeight: 600 }}>{d.label}</div>
-                  <div style={{ fontSize: 18, fontWeight: 700, marginTop: 2 }}>{d.date}</div>
-                </button>
-              ))}
-            </div>
+              <p className="text-xs font-semibold">{d.label}</p>
+              <p className="text-xl font-bold mt-0.5">{d.date}</p>
+            </button>
+          ))}
+        </div>
 
-            {/* Class cards */}
-            <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 12 }}>
-              {classes.map((cls, i) => {
-                const tc = typeColors[cls.type] ?? { bg: '#ECEDE6', color: '#5E625A' }
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      background: '#fff',
-                      borderRadius: 12,
-                      border: '1px solid #DADCD3',
-                      padding: '16px 20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <div>
-                      <span
-                        style={{
-                          display: 'inline-block',
-                          background: tc.bg,
-                          color: tc.color,
-                          borderRadius: 6,
-                          padding: '2px 8px',
-                          fontSize: 11,
-                          fontWeight: 700,
-                          marginBottom: 6,
-                        }}
-                      >
-                        {cls.type}
-                      </span>
-                      <div style={{ fontSize: 16, fontWeight: 700, color: '#111310' }}>{cls.name}</div>
-                      <div style={{ fontSize: 13, color: '#5E625A', marginTop: 2 }}>
-                        {cls.instructor} · {cls.studio}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right' as const }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#111310' }}>{cls.time}</div>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: cls.spots === 0 ? '#E53E3E' : '#526B00',
-                          background: cls.spots === 0 ? '#FFF5F5' : '#E8FFAA',
-                          borderRadius: 6,
-                          padding: '2px 8px',
-                          display: 'inline-block',
-                          marginTop: 4,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {cls.spots === 0 ? 'Hết chỗ' : `${cls.spots} chỗ trống`}
-                      </div>
-                      <div>
-                        <button
-                          style={{
-                            marginTop: 8,
-                            background: cls.spots === 0 ? '#ECEDE6' : '#D7FF3F',
-                            color: cls.spots === 0 ? '#8A8E85' : '#111310',
-                            border: 'none',
-                            borderRadius: 8,
-                            padding: '6px 14px',
-                            fontSize: 13,
-                            fontWeight: 700,
-                            cursor: cls.spots === 0 ? 'default' : 'pointer',
-                          }}
-                        >
-                          {cls.spots === 0 ? 'Waitlist' : 'Đặt chỗ'}
-                        </button>
-                      </div>
-                    </div>
+        {/* Classes grid */}
+        {activeTab === "Classes" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {classes.map((cls, i) => {
+              const chip = typeChip[cls.type] ?? { bg: "#ECEDE6", color: "#5E625A" };
+              const spotsLeft = cls.spotsTotal - cls.spotsTaken;
+              const full = spotsLeft === 0;
+              const pct = Math.round((cls.spotsTaken / cls.spotsTotal) * 100);
+
+              return (
+                <div
+                  key={i}
+                  className="bg-white border border-[#DADCD3] rounded-xl p-5"
+                >
+                  {/* Top row: time + type chip */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold" style={{ color: "#111310" }}>
+                      {cls.time}
+                    </span>
+                    <span
+                      className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                      style={{ background: chip.bg, color: chip.color }}
+                    >
+                      {cls.type}
+                    </span>
                   </div>
-                )
-              })}
-            </div>
+
+                  {/* Class name */}
+                  <h3 className="text-base font-bold mb-0.5" style={{ color: "#111310" }}>
+                    {cls.name}
+                  </h3>
+                  <p className="text-sm mb-3" style={{ color: "#5E625A" }}>
+                    {cls.instructor} · {cls.duration}
+                  </p>
+
+                  {/* Spots */}
+                  <div className="mb-3">
+                    <div
+                      className="w-full h-1.5 rounded-full mb-1"
+                      style={{ background: "#ECEDE6" }}
+                    >
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${pct}%`,
+                          background: full ? "#E53E3E" : "#D7FF3F",
+                        }}
+                      />
+                    </div>
+                    <p className="text-xs" style={{ color: full ? "#E53E3E" : "#5E625A" }}>
+                      {full ? "Class full" : `${spotsLeft} spots left`}
+                    </p>
+                  </div>
+
+                  {/* CTA */}
+                  {cls.booked ? (
+                    <button
+                      disabled
+                      className="w-full py-2.5 text-sm font-semibold rounded-lg"
+                      style={{ background: "#D7FF3F", color: "#111310", opacity: 0.7 }}
+                    >
+                      Booked ✓
+                    </button>
+                  ) : full ? (
+                    <button
+                      className="w-full py-2.5 text-sm font-semibold rounded-lg border border-[#DADCD3] hover:bg-[#F5F5F0] transition-colors"
+                      style={{ color: "#111310" }}
+                    >
+                      Join Waitlist
+                    </button>
+                  ) : (
+                    <button
+                      className="w-full py-2.5 text-sm font-semibold rounded-lg"
+                      style={{ background: "#D7FF3F", color: "#111310" }}
+                    >
+                      Book Now
+                    </button>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
-        {activeTab === 'pt' && (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-              gap: 16,
-            }}
-          >
-            {trainers.map((trainer, i) => (
-              <div
-                key={i}
-                style={{
-                  background: '#fff',
-                  borderRadius: 16,
-                  border: '1px solid #DADCD3',
-                  padding: 20,
-                  display: 'flex',
-                  flexDirection: 'column' as const,
-                  alignItems: 'center',
-                }}
-              >
-                {/* Avatar */}
-                <div
-                  style={{
-                    width: 60,
-                    height: 60,
-                    borderRadius: '50%',
-                    background: '#ECEDE6',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 22,
-                    fontWeight: 700,
-                    color: '#111310',
-                  }}
-                >
-                  {trainer.name.split(' ').pop()?.charAt(0) ?? '?'}
-                </div>
-                <div
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: '#111310',
-                    marginTop: 12,
-                    textAlign: 'center' as const,
-                  }}
-                >
-                  {trainer.name}
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: '#5E625A',
-                    textAlign: 'center' as const,
-                    marginTop: 4,
-                  }}
-                >
-                  {trainer.specialty}
-                </div>
-                <div
-                  style={{
-                    marginTop: 8,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: trainer.available ? '#526B00' : '#E53E3E',
-                    background: trainer.available ? '#E8FFAA' : '#FFF5F5',
-                    borderRadius: 6,
-                    padding: '2px 10px',
-                  }}
-                >
-                  {trainer.available ? 'Còn lịch' : 'Hết lịch'}
-                </div>
-                <button
-                  disabled={!trainer.available}
-                  style={{
-                    marginTop: 12,
-                    width: '100%',
-                    background: trainer.available ? '#D7FF3F' : '#ECEDE6',
-                    color: trainer.available ? '#111310' : '#8A8E85',
-                    border: 'none',
-                    borderRadius: 10,
-                    padding: '10px 0',
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: trainer.available ? 'pointer' : 'not-allowed',
-                  }}
-                >
-                  Yêu cầu buổi
-                </button>
-              </div>
-            ))}
+        {activeTab === "Personal Training" && (
+          <div className="bg-white rounded-xl border border-[#DADCD3] p-8 text-center">
+            <p className="text-base font-semibold mb-2" style={{ color: "#111310" }}>
+              Request a PT Session
+            </p>
+            <p className="text-sm" style={{ color: "#5E625A" }}>
+              Select a date above and contact your assigned trainer.
+            </p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

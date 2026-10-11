@@ -1,577 +1,361 @@
 "use client";
-import { useState } from 'react';
-import Link from 'next/link';
-
-interface SearchResult {
-  name: string;
-  plan: string;
-}
-
-const searchResults: SearchResult[] = [
-  { name: 'Nguyễn Thị Trâm', plan: 'Perform' },
-  { name: 'Lê Văn Hùng',     plan: 'Move' },
-  { name: 'Phạm Minh Châu',  plan: 'PT Focus' },
-];
+import { useState } from "react";
+import Link from "next/link";
 
 interface Plan {
   id: string;
   name: string;
-  price: number;
-  priceLabel: string;
+  price: string;
+  priceNum: number;
+  desc: string;
 }
 
 const plans: Plan[] = [
-  { id: 'move',    name: 'Move',     price: 890000,   priceLabel: '890,000' },
-  { id: 'perform', name: 'Perform',  price: 1490000,  priceLabel: '1,490,000' },
-  { id: 'pt',      name: 'PT Focus', price: 3200000,  priceLabel: '3,200,000' },
+  { id: "move", name: "Move", price: "$29", priceNum: 29, desc: "Access all group classes" },
+  { id: "perform", name: "Perform", price: "$59", priceNum: 59, desc: "Classes + open gym" },
+  { id: "pt", name: "PT Focus", price: "$99", priceNum: 99, desc: "Personal training included" },
 ];
 
-interface Addon {
-  id: string;
-  label: string;
-  price: number;
-  priceLabel: string;
-}
-
-const addons: Addon[] = [
-  { id: 'pt_session', label: 'Buổi PT',           price: 500000, priceLabel: '500,000 ₫/buổi' },
-  { id: 'locker',     label: 'Tủ locker',          price: 150000, priceLabel: '150,000 ₫/tháng' },
-  { id: 'towel',      label: 'Dịch vụ khăn tắm',  price: 100000, priceLabel: '100,000 ₫/tháng' },
-];
-
-const paymentMethods = [
-  { id: 'cash',     label: 'Tiền mặt',     icon: '💵' },
-  { id: 'card',     label: 'Thẻ ngân hàng', icon: '💳' },
-  { id: 'transfer', label: 'Chuyển khoản', icon: '📲' },
-];
-
-function formatVND(amount: number): string {
-  return amount.toLocaleString('vi-VN') + ' ₫';
-}
+const paymentMethods = ["Card", "Cash", "Bank Transfer"];
 
 export default function CreateSalePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedMember, setSelectedMember] = useState<SearchResult | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [checkedAddons, setCheckedAddons] = useState<Set<string>>(new Set());
-  const [discount, setDiscount] = useState('');
-  const [selectedMethod, setSelectedMethod] = useState<string>('cash');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [discount, setDiscount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Card");
 
-  const toggleAddon = (id: string) => {
-    setCheckedAddons((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const mockMembers = ["Nguyễn Thị Trâm", "Lê Văn Hùng", "Phạm Minh Châu"];
+  const showDropdown = searchQuery.length > 0 && !selectedMember;
 
-  const planObj = plans.find((p) => p.id === selectedPlan);
-  const addonItems = addons.filter((a) => checkedAddons.has(a.id));
-  const subtotal =
-    (planObj ? planObj.price : 0) +
-    addonItems.reduce((sum, a) => sum + a.price, 0);
-  const discountNum = parseInt(discount.replace(/\D/g, '') || '0', 10);
-  const total = Math.max(0, subtotal - discountNum);
-
-  const showResults = searchQuery.length > 0 && !selectedMember;
+  const subtotal = selectedPlan ? selectedPlan.priceNum : 0;
+  const discountNum = parseFloat(discount) || 0;
+  const tax = Math.round((subtotal - discountNum) * 0.1 * 100) / 100;
+  const total = subtotal - discountNum + tax;
 
   return (
     <div>
       {/* Page header */}
-      <div
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #DADCD3',
-          padding: '20px 28px 24px',
-        }}
-      >
-        <Link
-          href="/dashboard/sales"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 13,
-            color: '#5E625A',
-            textDecoration: 'none',
-            marginBottom: 8,
-          }}
-        >
-          ← Quay lại
-        </Link>
-        <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111310', margin: 0 }}>
-          Tạo đơn bán hàng
-        </h1>
-      </div>
-
-      {/* Two-column layout */}
-      <div
-        style={{
-          padding: '24px 28px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 360px',
-          gap: 24,
-          alignItems: 'start',
-        }}
-      >
-        {/* LEFT COLUMN */}
-        <div>
-          {/* Member search card */}
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              border: '1px solid #DADCD3',
-              padding: 20,
-            }}
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/sales"
+            className="text-sm flex items-center gap-1 hover:text-[#111310]"
+            style={{ color: "#5E625A" }}
           >
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#111310', margin: '0 0 12px 0' }}>
-              Tìm hội viên
-            </p>
-
-            {/* Search input */}
-            <div style={{ position: 'relative' }}>
-              <svg
-                style={{
-                  position: 'absolute',
-                  left: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 16,
-                  height: 16,
-                  color: '#8A8E85',
-                }}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                viewBox="0 0 24 24"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Nhập tên hoặc số điện thoại..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setSelectedMember(null);
-                }}
-                style={{
-                  width: '100%',
-                  paddingLeft: 40,
-                  paddingRight: 16,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  fontSize: 13,
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  color: '#111310',
-                }}
-              />
-            </div>
-
-            {/* Selected member display */}
-            {selectedMember && (
-              <div
-                style={{
-                  marginTop: 12,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '10px 14px',
-                  background: '#F5F5F0',
-                  borderRadius: 10,
-                  border: '1px solid #DADCD3',
-                }}
-              >
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: '50%',
-                    background: '#D7FF3F',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: '#111310',
-                    flexShrink: 0,
-                  }}
-                >
-                  {selectedMember.name.charAt(0)}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#111310', margin: 0 }}>
-                    {selectedMember.name}
-                  </p>
-                  <p style={{ fontSize: 12, color: '#8A8E85', margin: '2px 0 0 0' }}>
-                    Gói hiện tại: {selectedMember.plan}
-                  </p>
-                </div>
-                <button
-                  onClick={() => { setSelectedMember(null); setSearchQuery(''); }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: 16,
-                    color: '#8A8E85',
-                    padding: 4,
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-
-            {/* Search results dropdown */}
-            {showResults && (
-              <div
-                style={{
-                  marginTop: 8,
-                  border: '1px solid #DADCD3',
-                  borderRadius: 10,
-                  overflow: 'hidden',
-                  background: '#fff',
-                }}
-              >
-                {searchResults.map((r, i) => (
-                  <div
-                    key={r.name}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: '10px 14px',
-                      borderBottom: i < searchResults.length - 1 ? '1px solid #DADCD3' : 'none',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: '50%',
-                        background: '#E8FFAA',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: '#526B00',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {r.name.charAt(0)}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#111310', margin: 0 }}>
-                        {r.name}
-                      </p>
-                      <p style={{ fontSize: 12, color: '#8A8E85', margin: '2px 0 0 0' }}>
-                        {r.plan}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setSelectedMember(r);
-                        setSearchQuery(r.name);
-                      }}
-                      style={{
-                        background: '#D7FF3F',
-                        border: 'none',
-                        borderRadius: 8,
-                        padding: '6px 14px',
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color: '#111310',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Chọn
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Plan selector card */}
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              border: '1px solid #DADCD3',
-              padding: 20,
-              marginTop: 20,
-            }}
-          >
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#111310', margin: '0 0 12px 0' }}>
-              Chọn gói
-            </p>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 12,
-              }}
+            ← Back to Sales
+          </Link>
+          <div>
+            <span
+              className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
+              style={{ color: "#526B00" }}
             >
-              {plans.map((p) => {
-                const isSelected = selectedPlan === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => setSelectedPlan(isSelected ? null : p.id)}
-                    style={{
-                      background: isSelected ? '#FAFFF0' : '#fff',
-                      border: isSelected ? '2px solid #D7FF3F' : '1px solid #DADCD3',
-                      borderRadius: 12,
-                      padding: '16px 14px',
-                      textAlign: 'left',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: '#111310',
-                        margin: '0 0 6px 0',
-                      }}
-                    >
-                      {p.name}
-                    </p>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: '#526B00', margin: 0 }}>
-                      đ{p.priceLabel}
-                      <span style={{ fontSize: 11, fontWeight: 400, color: '#8A8E85' }}>
-                        /tháng
-                      </span>
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Add-ons card */}
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              border: '1px solid #DADCD3',
-              padding: 20,
-              marginTop: 20,
-            }}
-          >
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#111310', margin: '0 0 12px 0' }}>
-              Dịch vụ bổ sung
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {addons.map((addon) => {
-                const checked = checkedAddons.has(addon.id);
-                return (
-                  <label
-                    key={addon.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      cursor: 'pointer',
-                      padding: '10px 14px',
-                      borderRadius: 10,
-                      border: checked ? '1px solid #D7FF3F' : '1px solid #DADCD3',
-                      background: checked ? '#FAFFF0' : '#fff',
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleAddon(addon.id)}
-                      style={{ width: 16, height: 16, accentColor: '#D7FF3F', cursor: 'pointer' }}
-                    />
-                    <div style={{ flex: 1 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#111310' }}>
-                        {addon.label}
-                      </span>
-                    </div>
-                    <span style={{ fontSize: 12, color: '#8A8E85' }}>{addon.priceLabel}</span>
-                  </label>
-                );
-              })}
-            </div>
+              GROW
+            </span>
+            <h1 className="text-2xl font-bold" style={{ color: "#111310" }}>
+              New Sale
+            </h1>
           </div>
         </div>
+      </div>
 
-        {/* RIGHT COLUMN — order summary (sticky) */}
-        <div style={{ position: 'sticky', top: 24 }}>
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 16,
-              border: '1px solid #DADCD3',
-              padding: 20,
-            }}
-          >
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#111310', margin: '0 0 16px 0' }}>
-              Tóm tắt đơn hàng
-            </p>
-
-            {/* Selected items */}
-            {!planObj && addonItems.length === 0 && (
-              <p style={{ fontSize: 13, color: '#8A8E85', margin: '0 0 16px 0' }}>
-                Chưa chọn sản phẩm
-              </p>
-            )}
-            {planObj && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: 8,
-                }}
+      {/* Content */}
+      <div className="p-8 bg-[#F5F5F0] min-h-screen">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Left — col-span-3 */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-xl border border-[#DADCD3] p-6">
+              {/* Find Member */}
+              <h2
+                className="text-base font-semibold mb-4"
+                style={{ color: "#111310" }}
               >
-                <span style={{ fontSize: 13, color: '#5E625A' }}>Gói {planObj.name}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#111310' }}>
-                  đ{planObj.priceLabel}
-                </span>
+                Find Member
+              </h2>
+              <div className="relative mb-2">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                  style={{ color: "#8A8E85" }}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search by name or phone..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setSelectedMember(null);
+                  }}
+                  className="w-full border border-[#DADCD3] rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
+                  style={{ color: "#111310" }}
+                />
               </div>
-            )}
-            {addonItems.map((a) => (
-              <div
-                key={a.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: 8,
-                }}
-              >
-                <span style={{ fontSize: 13, color: '#5E625A' }}>{a.label}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#111310' }}>
-                  {formatVND(a.price)}
-                </span>
-              </div>
-            ))}
 
-            {/* Subtotal */}
-            {(planObj || addonItems.length > 0) && (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  paddingTop: 12,
-                  borderTop: '1px solid #DADCD3',
-                  marginBottom: 12,
-                }}
-              >
-                <span style={{ fontSize: 13, color: '#5E625A' }}>Tạm tính</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#111310' }}>
-                  {formatVND(subtotal)}
-                </span>
-              </div>
-            )}
+              {showDropdown && (
+                <div className="border border-[#DADCD3] rounded-lg overflow-hidden mb-4">
+                  {mockMembers
+                    .filter((m) =>
+                      m.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((m) => (
+                      <div
+                        key={m}
+                        className="flex items-center gap-3 px-4 py-3 border-b border-[#F0F0EB] last:border-0 hover:bg-[#F5F5F0] cursor-pointer"
+                        onClick={() => {
+                          setSelectedMember(m);
+                          setSearchQuery(m);
+                        }}
+                      >
+                        <div
+                          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                          style={{ background: "#E8FFAA", color: "#526B00" }}
+                        >
+                          {m.charAt(0)}
+                        </div>
+                        <div>
+                          <p
+                            className="text-sm font-semibold"
+                            style={{ color: "#111310" }}
+                          >
+                            {m}
+                          </p>
+                          <p className="text-xs" style={{ color: "#8A8E85" }}>
+                            Active member
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
 
-            {/* Discount input */}
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 12, color: '#8A8E85', display: 'block', marginBottom: 6 }}>
-                Giảm giá
-              </label>
+              {selectedMember && (
+                <div
+                  className="flex items-center gap-3 p-3 rounded-lg border border-[#DADCD3] mb-6"
+                  style={{ background: "#F5F5F0" }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                    style={{ background: "#D7FF3F", color: "#111310" }}
+                  >
+                    {selectedMember.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold" style={{ color: "#111310" }}>
+                      {selectedMember}
+                    </p>
+                    <p className="text-xs" style={{ color: "#8A8E85" }}>
+                      Current plan: Perform
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setSelectedMember(null); setSearchQuery(""); }}
+                    className="text-base"
+                    style={{ color: "#8A8E85" }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* Select Plan */}
+              <h2
+                className="text-base font-semibold mb-4"
+                style={{ color: "#111310" }}
+              >
+                Select Plan
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                {plans.map((plan) => {
+                  const isSelected = selectedPlan?.id === plan.id;
+                  return (
+                    <button
+                      key={plan.id}
+                      onClick={() => setSelectedPlan(isSelected ? null : plan)}
+                      className="text-left p-4 rounded-xl border-2 transition-colors"
+                      style={
+                        isSelected
+                          ? {
+                              borderColor: "#D7FF3F",
+                              background: "#FAFFF0",
+                            }
+                          : {
+                              borderColor: "#DADCD3",
+                              background: "#fff",
+                            }
+                      }
+                    >
+                      <div
+                        className="text-base font-bold mb-1"
+                        style={{ color: "#111310" }}
+                      >
+                        {plan.name}
+                      </div>
+                      <div
+                        className="text-xl font-bold mb-1"
+                        style={{ color: "#526B00" }}
+                      >
+                        {plan.price}
+                        <span
+                          className="text-xs font-normal"
+                          style={{ color: "#8A8E85" }}
+                        >
+                          /mo
+                        </span>
+                      </div>
+                      <div className="text-xs" style={{ color: "#5E625A" }}>
+                        {plan.desc}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Start Date */}
+              <h2
+                className="text-base font-semibold mb-3"
+                style={{ color: "#111310" }}
+              >
+                Start Date
+              </h2>
               <input
-                type="text"
-                placeholder="0 ₫"
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '9px 12px',
-                  fontSize: 13,
-                  border: '1px solid #DADCD3',
-                  borderRadius: 8,
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  color: '#111310',
-                }}
+                type="date"
+                className="w-full border border-[#DADCD3] rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-[#D7FF3F] focus:outline-none"
+                style={{ color: "#111310" }}
               />
             </div>
+          </div>
 
-            {/* Divider + total */}
+          {/* Right — Order Summary col-span-2 */}
+          <div className="lg:col-span-2">
             <div
-              style={{
-                borderTop: '1px solid #DADCD3',
-                paddingTop: 14,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 20,
-              }}
+              className="bg-white rounded-xl border border-[#DADCD3] p-6"
+              style={{ position: "sticky", top: "2rem" }}
             >
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#111310' }}>Tổng cộng</span>
-              <span style={{ fontSize: 20, fontWeight: 800, color: '#111310' }}>
-                {formatVND(total)}
-              </span>
-            </div>
+              <h2
+                className="text-base font-semibold mb-5"
+                style={{ color: "#111310" }}
+              >
+                Order Summary
+              </h2>
 
-            {/* Payment method selector */}
-            <p style={{ fontSize: 12, color: '#8A8E85', margin: '0 0 10px 0' }}>
-              Phương thức thanh toán
-            </p>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: 8,
-                marginBottom: 20,
-              }}
-            >
-              {paymentMethods.map((m) => {
-                const active = selectedMethod === m.id;
-                return (
+              {/* Member + plan row */}
+              <div
+                className="flex justify-between text-sm mb-2"
+                style={{ color: "#5E625A" }}
+              >
+                <span>Member</span>
+                <span style={{ color: "#111310", fontWeight: 500 }}>
+                  {selectedMember || "—"}
+                </span>
+              </div>
+              <div
+                className="flex justify-between text-sm mb-4 pb-4 border-b border-[#DADCD3]"
+                style={{ color: "#5E625A" }}
+              >
+                <span>Plan</span>
+                <span style={{ color: "#111310", fontWeight: 500 }}>
+                  {selectedPlan ? selectedPlan.name : "—"}
+                </span>
+              </div>
+
+              {/* Price breakdown */}
+              <div
+                className="flex justify-between text-sm mb-2"
+                style={{ color: "#5E625A" }}
+              >
+                <span>Subtotal</span>
+                <span style={{ color: "#111310" }}>
+                  ${subtotal.toFixed(2)}
+                </span>
+              </div>
+
+              <div className="flex justify-between items-center text-sm mb-2">
+                <span style={{ color: "#5E625A" }}>Discount</span>
+                <div className="flex items-center gap-1">
+                  <span style={{ color: "#5E625A" }}>-$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value)}
+                    className="w-20 border border-[#DADCD3] rounded px-2 py-1 text-sm text-right focus:outline-none focus:ring-1 focus:ring-[#D7FF3F]"
+                    style={{ color: "#111310" }}
+                  />
+                </div>
+              </div>
+
+              <div
+                className="flex justify-between text-sm mb-4 pb-4 border-b border-[#DADCD3]"
+                style={{ color: "#5E625A" }}
+              >
+                <span>Tax (10%)</span>
+                <span style={{ color: "#111310" }}>${tax.toFixed(2)}</span>
+              </div>
+
+              <div className="flex justify-between items-center mb-6">
+                <span
+                  className="text-base font-bold"
+                  style={{ color: "#111310" }}
+                >
+                  Total
+                </span>
+                <span
+                  className="text-xl font-bold"
+                  style={{ color: "#111310" }}
+                >
+                  ${total.toFixed(2)}
+                </span>
+              </div>
+
+              {/* Payment method pills */}
+              <p className="text-xs mb-2" style={{ color: "#8A8E85" }}>
+                Payment Method
+              </p>
+              <div className="flex gap-2 mb-6">
+                {paymentMethods.map((m) => (
                   <button
-                    key={m.id}
-                    onClick={() => setSelectedMethod(m.id)}
-                    style={{
-                      background: active ? '#D7FF3F' : '#F5F5F0',
-                      border: active ? '1.5px solid #B8D900' : '1px solid #DADCD3',
-                      borderRadius: 10,
-                      padding: '10px 6px',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                    }}
+                    key={m}
+                    onClick={() => setPaymentMethod(m)}
+                    className="flex-1 py-2 text-xs font-semibold rounded-lg border transition-colors"
+                    style={
+                      paymentMethod === m
+                        ? {
+                            background: "#D7FF3F",
+                            borderColor: "#D7FF3F",
+                            color: "#111310",
+                          }
+                        : {
+                            background: "#fff",
+                            borderColor: "#DADCD3",
+                            color: "#5E625A",
+                          }
+                    }
                   >
-                    <div style={{ fontSize: 18, marginBottom: 4 }}>{m.icon}</div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: active ? '#111310' : '#5E625A',
-                      }}
-                    >
-                      {m.label}
-                    </div>
+                    {m}
                   </button>
-                );
-              })}
-            </div>
+                ))}
+              </div>
 
-            {/* Confirm button */}
-            <button
-              style={{
-                background: '#D7FF3F',
-                color: '#111310',
-                border: 'none',
-                borderRadius: 10,
-                width: '100%',
-                padding: '14px',
-                fontSize: 15,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              Xác nhận thanh toán
-            </button>
+              <button
+                className="w-full py-3 text-sm font-semibold rounded-lg mb-3"
+                style={{ background: "#D7FF3F", color: "#111310" }}
+              >
+                Confirm Sale
+              </button>
+              <button
+                className="w-full py-3 text-sm font-semibold rounded-lg border border-[#DADCD3] hover:bg-[#F5F5F0] transition-colors"
+                style={{ color: "#111310" }}
+              >
+                Save as Draft
+              </button>
+            </div>
           </div>
         </div>
       </div>
