@@ -2,296 +2,187 @@
 import { useState } from 'react';
 
 interface Booking {
-  name: string;
-  cls: string;
   time: string;
-  status: string;
-  booked: string;
+  cls: string;
+  member: string;
+  status: 'booked' | 'checked-in' | 'no-show';
 }
 
 const bookings: Booking[] = [
-  { name: 'Nguyễn Thị Trâm', cls: 'Strength Lab', time: '18:30', status: 'checked-in', booked: '08:15' },
-  { name: 'Lê Văn Hùng', cls: 'HIIT Blast', time: '08:30', status: 'checked-in', booked: '20:00 hôm qua' },
-  { name: 'Phạm Minh Châu', cls: 'Yoga Flow', time: '07:00', status: 'booked', booked: '07:30 hôm qua' },
-  { name: 'Trần Thị Lan', cls: 'Cycling Power', time: '09:00', status: 'booked', booked: '09:45 hôm qua' },
-  { name: 'Hoàng Đức Mạnh', cls: 'Strength Lab', time: '18:30', status: 'no-show', booked: '10:20 hôm qua' },
-  { name: 'Vũ Thị Hoa', cls: 'Yin Yoga', time: '19:00', status: 'booked', booked: '11:00 hôm qua' },
-  { name: 'Đỗ Quang Huy', cls: 'HIIT Circuit', time: '19:00', status: 'booked', booked: '14:30 hôm qua' },
-  { name: 'Bùi Thị Ngọc', cls: 'Yoga Flow', time: '07:00', status: 'checked-in', booked: '06:50 hôm qua' },
-  { name: 'Ngô Minh Tú', cls: 'Boxing Basics', time: '17:00', status: 'no-show', booked: '15:00 hôm qua' },
-  { name: 'Lý Thị Mai', cls: 'Cycling Power', time: '09:00', status: 'checked-in', booked: '08:00 hôm qua' },
+  { time: '07:00', cls: 'Yoga Flow',      member: 'Phạm Minh Châu',  status: 'checked-in' },
+  { time: '07:00', cls: 'Yoga Flow',      member: 'Bùi Thị Ngọc',   status: 'checked-in' },
+  { time: '08:30', cls: 'HIIT Blast',     member: 'Lê Văn Hùng',    status: 'checked-in' },
+  { time: '09:00', cls: 'Cycling Power',  member: 'Lý Thị Mai',     status: 'checked-in' },
+  { time: '09:00', cls: 'Cycling Power',  member: 'Trần Thị Lan',   status: 'booked' },
+  { time: '17:00', cls: 'Boxing Basics',  member: 'Ngô Minh Tú',    status: 'no-show' },
+  { time: '18:30', cls: 'Strength Lab',   member: 'Nguyễn Thị Trâm',status: 'booked' },
+  { time: '18:30', cls: 'Strength Lab',   member: 'Hoàng Đức Mạnh', status: 'no-show' },
+  { time: '19:00', cls: 'HIIT Circuit',   member: 'Đỗ Quang Huy',   status: 'booked' },
+  { time: '19:00', cls: 'Yin Yoga',       member: 'Vũ Thị Hoa',     status: 'booked' },
 ];
 
-const statusBadge: Record<string, { background: string; color: string; label: string }> = {
-  'checked-in': { background: '#E8FFAA', color: '#526B00', label: 'Đã check-in' },
-  'booked':     { background: '#E9EDFF', color: '#3B4FA8', label: 'Đã đặt' },
-  'no-show':    { background: '#FFE4E1', color: '#B91C1C', label: 'Vắng' },
+const statusBadge: Record<Booking['status'], { background: string; color: string; label: string }> = {
+  'checked-in': { background: '#F0FDF4', color: '#15803D', label: 'Checked In' },
+  'booked':     { background: '#EFF6FF', color: '#1D4ED8', label: 'Booked' },
+  'no-show':    { background: '#FFF0F0', color: '#D93030', label: 'No-Show' },
 };
 
-const tableColumns = ['THÀNH VIÊN', 'LỚP HỌC', 'GIỜ', 'TRẠNG THÁI', 'THỜI GIAN ĐẶT', 'THAO TÁC'];
-const gridCols = '2fr 1.5fr 1fr 1fr 1.5fr 1fr';
-
 export default function BookingsPage() {
-  const [searchValue, setSearchValue] = useState('');
+  const [search, setSearch] = useState('');
+
+  const filtered = bookings.filter((b) =>
+    search === '' ||
+    b.member.toLowerCase().includes(search.toLowerCase()) ||
+    b.cls.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric',
+  });
 
   return (
     <div>
       {/* Page header */}
-      <div
-        style={{
-          background: '#fff',
-          borderBottom: '1px solid #DADCD3',
-          padding: '28px 28px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
+      <div className="bg-white border-b border-[#DADCD3] px-8 py-6 flex items-center justify-between">
         <div>
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              display: 'block',
-              marginBottom: 4,
-              color: '#526B00',
-            }}
-          >
-            RECEPTIONIST
+          <span className="block text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: '#526B00' }}>
+            OPERATE
           </span>
-          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#111310', margin: 0 }}>
-            Đặt lịch &amp; Điểm danh
-          </h1>
-          <p style={{ fontSize: 13, color: '#8A8E85', marginTop: 4, marginBottom: 0 }}>
-            Thứ Ba, 15/07/2025
-          </p>
+          <h1 className="text-2xl font-bold" style={{ color: '#111310' }}>Bookings &amp; Check-in</h1>
         </div>
-        <button
-          style={{
-            background: '#D7FF3F',
-            color: '#111310',
-            borderRadius: 10,
-            padding: '10px 20px',
-            fontWeight: 600,
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 14,
-          }}
-        >
-          Check in
-        </button>
+        <span className="text-sm" style={{ color: '#5E625A' }}>{today}</span>
       </div>
 
       {/* Content */}
-      <div style={{ padding: '24px 28px' }}>
+      <div className="p-8 bg-[#F5F5F0] min-h-screen">
 
-        {/* 1. Check-in strip */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            padding: 20,
-            marginBottom: 20,
-          }}
-        >
-          <p
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: '#111310',
-              margin: '0 0 12px 0',
-            }}
-          >
-            Quét thẻ / Check-in nhanh
-          </p>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <input
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Tìm tên hoặc quét mã thành viên..."
-              style={{
-                flex: 1,
-                border: '1px solid #DADCD3',
-                borderRadius: 10,
-                padding: '10px 14px',
-                fontSize: 14,
-                color: '#111310',
-                outline: 'none',
-                background: '#fff',
-              }}
-            />
-            <button
-              style={{
-                background: '#D7FF3F',
-                color: '#111310',
-                borderRadius: 10,
-                padding: '10px 20px',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: 14,
-                whiteSpace: 'nowrap',
-              }}
+        {/* Check-in strip */}
+        <div className="bg-white rounded-xl border border-[#DADCD3] p-4 flex items-center gap-4 mb-6">
+          <div className="relative flex-1">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+              style={{ color: '#5E625A' }}
+              fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
             >
-              Check in
-            </button>
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search member name or class..."
+              className="w-full border border-[#DADCD3] rounded-lg px-4 py-2 text-sm pl-9 focus:outline-none"
+              style={{ color: '#111310' }}
+            />
           </div>
+
+          <button
+            className="text-sm font-semibold rounded-lg px-4 py-2 flex-shrink-0"
+            style={{ background: '#D7FF3F', color: '#111310' }}
+          >
+            Check in
+          </button>
+
+          {/* QR icon button */}
+          <button
+            className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 border border-[#DADCD3]"
+            style={{ background: '#fff', color: '#5E625A' }}
+            title="Scan QR"
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <path d="M14 14h1M19 14h2M14 19h2M17 17h2M19 19v2" />
+            </svg>
+          </button>
         </div>
 
-        {/* 2. Stats row */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 16,
-            marginBottom: 20,
-          }}
-        >
+        {/* Stat cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'Checked In', value: '47', sub: 'Hôm nay' },
-            { label: 'Booked', value: '63', sub: 'Hôm nay' },
-            { label: 'No-shows', value: '8', sub: 'Chưa check-in' },
-            { label: 'Capacity', value: '74%', sub: 'Công suất' },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              style={{
-                background: '#fff',
-                borderRadius: 16,
-                border: '1px solid #DADCD3',
-                padding: 20,
-              }}
-            >
-              <p style={{ fontSize: 12, color: '#8A8E85', margin: '0 0 8px 0' }}>{stat.label}</p>
-              <p style={{ fontSize: 28, fontWeight: 800, color: '#111310', margin: 0 }}>{stat.value}</p>
-              <p style={{ fontSize: 12, color: '#8A8E85', marginTop: 4, marginBottom: 0 }}>{stat.sub}</p>
+            { label: "Today's Bookings", value: '48', change: 'Total registered', changeColor: '#5E625A' },
+            { label: 'Checked In', value: '32', change: '67% arrived', changeColor: '#526B00' },
+            { label: 'No-Shows', value: '4', change: '8% of bookings', changeColor: '#D93030' },
+            { label: 'Available Spots', value: '16', change: 'Across all classes', changeColor: '#5E625A' },
+          ].map((card, i) => (
+            <div key={i} className="bg-white rounded-xl border border-[#DADCD3] p-5">
+              <p className="text-xs mb-2" style={{ color: '#5E625A' }}>{card.label}</p>
+              <p className="text-[28px] font-bold" style={{ color: '#111310' }}>{card.value}</p>
+              <p className="text-xs mt-1 font-medium" style={{ color: card.changeColor }}>{card.change}</p>
             </div>
           ))}
         </div>
 
-        {/* 3. Bookings table */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 16,
-            border: '1px solid #DADCD3',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Table header */}
+        {/* Bookings table */}
+        <div className="bg-white rounded-xl border border-[#DADCD3] overflow-hidden">
+          {/* Header */}
           <div
+            className="grid px-5 py-3 text-xs font-medium uppercase tracking-wide"
             style={{
               background: '#F5F5F0',
-              padding: '12px 20px',
-              display: 'grid',
-              gridTemplateColumns: gridCols,
+              color: '#5E625A',
+              gridTemplateColumns: '1fr 2fr 2fr 1.5fr 1fr',
             }}
           >
-            {tableColumns.map((col) => (
-              <span
-                key={col}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: '#8A8E85',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                {col}
-              </span>
+            {['Time', 'Class', 'Member', 'Status', 'Actions'].map((col) => (
+              <span key={col}>{col}</span>
             ))}
           </div>
 
           {/* Rows */}
-          {bookings.map((row, i) => {
-            const badge = statusBadge[row.status];
-            const initials = row.name
-              .split(' ')
-              .slice(-2)
-              .map((w) => w[0])
-              .join('');
-            return (
-              <div
-                key={i}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: gridCols,
-                  padding: '14px 20px',
-                  borderBottom: i < bookings.length - 1 ? '1px solid #DADCD3' : 'none',
-                  alignItems: 'center',
-                }}
-              >
-                {/* Member */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: '50%',
-                      background: '#ECEDE6',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: '#111310',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {initials}
+          <div className="divide-y divide-[#F0F0EB]">
+            {filtered.map((row, i) => {
+              const badge = statusBadge[row.status];
+              const initials = row.member.split(' ').slice(-2).map((w) => w[0]).join('');
+              return (
+                <div
+                  key={i}
+                  className="grid px-5 py-3 items-center hover:bg-[#FAFAF8]"
+                  style={{ gridTemplateColumns: '1fr 2fr 2fr 1.5fr 1fr' }}
+                >
+                  <span className="text-sm font-semibold" style={{ color: '#111310' }}>{row.time}</span>
+
+                  <span className="text-sm" style={{ color: '#111310' }}>{row.cls}</span>
+
+                  {/* Member */}
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                      style={{ background: '#F0F0EB', color: '#111310' }}
+                    >
+                      {initials}
+                    </div>
+                    <span className="text-sm" style={{ color: '#111310' }}>{row.member}</span>
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#111310' }}>{row.name}</span>
+
+                  {/* Status */}
+                  <div>
+                    <span
+                      className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                      style={{ background: badge.background, color: badge.color }}
+                    >
+                      {badge.label}
+                    </span>
+                  </div>
+
+                  {/* Actions */}
+                  <div>
+                    <button
+                      className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#DADCD3]"
+                      style={{ background: '#F5F5F0', color: '#111310' }}
+                    >
+                      View
+                    </button>
+                  </div>
                 </div>
+              );
+            })}
+          </div>
 
-                {/* Class */}
-                <span style={{ fontSize: 13, color: '#111310' }}>{row.cls}</span>
-
-                {/* Time */}
-                <span style={{ fontSize: 13, color: '#111310' }}>{row.time}</span>
-
-                {/* Status badge */}
-                <div>
-                  <span
-                    style={{
-                      background: badge.background,
-                      color: badge.color,
-                      borderRadius: 20,
-                      padding: '2px 8px',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      display: 'inline-block',
-                    }}
-                  >
-                    {badge.label}
-                  </span>
-                </div>
-
-                {/* Booked at */}
-                <span style={{ fontSize: 13, color: '#8A8E85' }}>{row.booked}</span>
-
-                {/* Actions */}
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button
-                    style={{
-                      background: '#F5F5F0',
-                      color: '#111310',
-                      borderRadius: 8,
-                      padding: '4px 10px',
-                      fontSize: 12,
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Xem
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+          {filtered.length === 0 && (
+            <p className="text-sm text-center py-10" style={{ color: '#5E625A' }}>No bookings match your search.</p>
+          )}
         </div>
       </div>
     </div>
