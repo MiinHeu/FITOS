@@ -1,434 +1,451 @@
 # FITOS — PHÂN CÔNG NHÓM 4 NGƯỜI × 5 TUẦN
-## Phiên bản 6 — Chia đều task nhỏ, mỗi người đủ 5 layer
+## Phiên bản 7 — Chia đều chính xác: mỗi người ~37h, đủ DB+BE+FE+AI+OPS+TEST
 
 ---
 
-## QUY TẮC
+## NGUYÊN TẮC CHIA
 
-- Mỗi task được đánh: **Layer** (DB/BE/FE/AI/OPS) + **Độ ưu tiên** (🔴 must / 🟡 nice)
-- Mỗi người nhận task sao cho: **tổng giờ xấp xỉ nhau** và **đủ cả 5 layer**
-- Có AI hỗ trợ (Cursor/Kiro/Copilot) → estimate đã tính sẵn
-- Mỗi người có **1 Python AI service riêng** tự viết từ đầu đến cuối
+> **Tổng: 158 tasks × 147h → mỗi người ~36.75h**
+> Mỗi layer được chia đều 4 phần bằng nhau → không ai thiếu layer nào, không ai nhiều hơn ai.
+>
+> 🔴 Must-have | 🟡 Nice-to-have (làm tuần 5 nếu còn giờ)
+> Có AI hỗ trợ (Cursor/Kiro/Copilot) → estimate đã tính sẵn
 
-**Capacity:** 2-3h/ngày × 5 ngày × 5 tuần = **50-75h/người**
-**Target mỗi người: ~55h**
-
----
-
-## AI SERVICE RIÊNG CỦA TỪNG NGƯỜI
-
+**Mỗi người có riêng 1 Python AI service:**
 ```
-ai-crm/         port 8001  ← Người A tự viết toàn bộ
-ai-commerce/    port 8002  ← Người B tự viết toàn bộ
-ai-operations/  port 8003  ← Người C tự viết toàn bộ
-ai-workout/     port 8004  ← Người D tự viết toàn bộ
+ai-crm/         port 8001  ← A tự viết
+ai-commerce/    port 8002  ← B tự viết
+ai-operations/  port 8003  ← C tự viết
+ai-workout/     port 8004  ← D tự viết
 ```
 
 ---
 
-## BẢNG TẤT CẢ TASK — CHIA CHO 4 NGƯỜI
+## BẢNG CHIA ĐỀU THEO LAYER
 
-> Quy ước: **A** = Người A, **B** = Người B, **C** = Người C, **D** = Người D
-
----
-
-### NHÓM 1 — DATABASE & MIGRATION (~16h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 1 | Viết `V1__users.sql` — bảng users, index email | DB | 0.5h | 🔴 | A |
-| 2 | Viết `V1__leads.sql` — bảng leads, lead_activities, customers, audit_logs, index | DB | 1h | 🔴 | A |
-| 3 | Viết `V2__plans.sql` — bảng service_plans | DB | 0.5h | 🔴 | B |
-| 4 | Viết `V2__orders.sql` — bảng orders, payments, index | DB | 0.5h | 🔴 | B |
-| 5 | Viết `V2__memberships.sql` — bảng memberships, pt_packages, index | DB | 0.5h | 🔴 | B |
-| 6 | Viết `V3__trainers.sql` — bảng trainers, trainer_assignments | DB | 0.5h | 🔴 | C |
-| 7 | Viết `V3__classes.sql` — bảng classes, class_sessions, index | DB | 0.5h | 🔴 | C |
-| 8 | Viết `V3__bookings.sql` — bảng bookings (UNIQUE), pt_sessions (completion_ref), attendance | DB | 1h | 🔴 | C |
-| 9 | Viết `V4__exercises.sql` — bảng exercises, index | DB | 0.5h | 🔴 | D |
-| 10 | Viết `V4__workout_plans.sql` — bảng workout_plans, workout_plan_exercises | DB | 0.5h | 🔴 | D |
-| 11 | Viết `V4__workout_logs.sql` — bảng workout_sessions, workout_logs, body_metrics | DB | 0.5h | 🔴 | D |
-| 12 | Viết `V4__ai_tables.sql` — bảng ai_conversations, ai_messages, ai_recommendations (JSONB) | DB | 0.5h | 🔴 | D |
-
-**DB tổng: A=1.5h, B=1.5h, C=2h, D=2h** ✅ đều
+### Tổng giờ từng layer:
+| Layer | Tổng giờ | Mỗi người |
+|-------|----------|-----------|
+| DB | 7h | 1.75h |
+| BE | 48.5h | 12.1h |
+| FE | 47.5h | 11.9h |
+| AI | 18.5h | 4.6h |
+| OPS | 13.5h | 3.4h |
+| TEST | 12h | 3h |
+| **TỔNG** | **147h** | **~36.75h** |
 
 ---
 
-### NHÓM 2 — BACKEND AUTH & USER (~8h tổng)
+## LAYER 1 — DATABASE (7h tổng → 1.75h/người)
 
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 13 | `POST /api/auth/register` — BCrypt, tạo user, trả JWT | BE | 1h | 🔴 | A |
-| 14 | `POST /api/auth/login` — verify, access(15m) + refresh(7d) | BE | 1h | 🔴 | A |
-| 15 | `POST /api/auth/refresh` — access token mới từ refresh | BE | 0.5h | 🔴 | A |
-| 16 | `POST /api/auth/logout` — Redis blacklist refresh token | BE | 0.5h | 🔴 | A |
-| 17 | JwtAuthFilter — đọc Bearer, set SecurityContext | BE | 1h | 🔴 | A |
-| 18 | @PreAuthorize RBAC — annotation trên controllers | BE | 0.5h | 🔴 | A |
-| 19 | Global exception handler — JSON chuẩn, không leak | BE | 0.5h | 🔴 | A |
-| 20 | `POST /api/auth/forgot-password` + `reset-password` | BE | 1h | 🟡 | B |
-| 21 | `PUT /api/auth/change-password` | BE | 0.5h | 🔴 | B |
-| 22 | `GET/POST/PATCH /api/users` (ADMIN) — CRUD users | BE | 1h | 🟡 | B |
+| # | Task | h | 🔴/🟡 | Người |
+|---|------|---|-------|-------|
+| 1 | `V1__users.sql` — bảng users, index email | 0.5 | 🔴 | **A** |
+| 2 | `V1__leads.sql` — leads, lead_activities, customers, audit_logs | 1.0 | 🔴 | **A** |
+| 3 | `V2__plans.sql` — service_plans | 0.5 | 🔴 | **B** |
+| 4 | `V2__orders.sql` — orders, payments, UNIQUE reference, index | 0.5 | 🔴 | **B** |
+| 5 | `V2__memberships.sql` — memberships, pt_packages, index expiry | 0.5 | 🔴 | **B** |
+| 6 | `V3__trainers.sql` — trainers, trainer_assignments | 0.5 | 🔴 | **C** |
+| 7 | `V3__classes.sql` — classes, class_sessions, index date | 0.5 | 🔴 | **C** |
+| 8 | `V3__bookings.sql` — bookings UNIQUE(customer,session), pt_sessions completion_ref, attendance | 1.0 | 🔴 | **C** |
+| 9 | `V4__exercises.sql` — exercises, index muscle_group | 0.5 | 🔴 | **D** |
+| 10 | `V4__workout_plans.sql` — workout_plans, workout_plan_exercises | 0.5 | 🔴 | **D** |
+| 11 | `V4__workout_logs.sql` — workout_sessions, workout_logs, body_metrics | 0.5 | 🔴 | **D** |
+| 12 | `V4__ai_tables.sql` — ai_conversations, ai_messages, ai_recommendations JSONB | 0.5 | 🔴 | **D** |
 
-**Auth/User BE: A=5h, B=2.5h** — A nặng hơn vì Auth là việc của A, nhưng được bù bằng các task khác
-
----
-
-### NHÓM 3 — BACKEND CRM (~8h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 23 | `POST /api/leads` — tạo lead | BE | 0.5h | 🔴 | A |
-| 24 | `GET /api/leads` — list + filter + search + pagination | BE | 1h | 🔴 | A |
-| 25 | `GET /api/leads/:id` — detail + activities | BE | 0.5h | 🔴 | A |
-| 26 | `PUT /api/leads/:id` + `PATCH /api/leads/:id/status` | BE | 0.5h | 🔴 | A |
-| 27 | `POST /api/leads/:id/activities` + `PATCH assign` | BE | 0.5h | 🔴 | A |
-| 28 | `POST /api/leads/:id/convert` — state machine + tạo Customer + User | BE | 2h | 🔴 | A |
-| 29 | `PATCH /api/leads/:id/lost` | BE | 0.5h | 🔴 | A |
-| 30 | `GET /api/customers` — list + filter | BE | 0.5h | 🔴 | B |
-| 31 | `GET /api/customers/:id` — profile aggregate (join 4 module) | BE | 1h | 🔴 | B |
-| 32 | `PUT /api/customers/:id` — edit | BE | 0.5h | 🔴 | B |
-| 33 | AuditLogAspect — @Around @Auditable annotation | BE | 1h | 🟡 | C |
-
-**CRM BE: A=6h, B=2h, C=1h**
+**DB: A=1.5h | B=1.5h | C=2h | D=2h** ✅ (chênh 0.5h do task không chia nhỏ hơn được)
 
 ---
 
-### NHÓM 4 — BACKEND COMMERCE (~10h tổng)
+## LAYER 2 — BACKEND (48.5h tổng → 12.1h/người)
 
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 34 | `GET/POST/PUT/PATCH /api/plans` — CRUD plans | BE | 1h | 🔴 | B |
-| 35 | `POST /api/orders` — server-side tính total, validate | BE | 1.5h | 🔴 | B |
-| 36 | `GET /api/orders` + `GET /api/orders/me` + `GET /:id` | BE | 0.5h | 🔴 | B |
-| 37 | `PATCH /api/orders/:id/cancel` | BE | 0.5h | 🔴 | B |
-| 38 | `POST /api/payments` — process + trigger activation | BE | 1.5h | 🔴 | B |
-| 39 | `POST /api/payments/callback` — idempotent webhook | BE | 1h | 🔴 | B |
-| 40 | ServiceActivationService — MEMBERSHIP vs PT_PACKAGE | BE | 1h | 🔴 | B |
-| 41 | MembershipValidator bean — `requireActive(customerId)` | BE | 0.5h | 🔴 | B |
-| 42 | `GET/PATCH /api/memberships` — list, pause, resume, cancel | BE | 1.5h | 🔴 | C |
-| 43 | `POST /api/memberships/:id/renew` + `GET /expiring` | BE | 0.5h | 🔴 | C |
-| 44 | `GET /api/pt-packages/me` + `PATCH /:id/use` (idempotent) | BE | 1h | 🔴 | C |
+### Backend — Người A nhận (12h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 13 | `POST /api/auth/register` — BCrypt, tạo user, trả JWT | 1.0 | 🔴 |
+| 14 | `POST /api/auth/login` — verify password, access(15m)+refresh(7d) | 1.0 | 🔴 |
+| 15 | `POST /api/auth/refresh` — trả access token mới | 0.5 | 🔴 |
+| 16 | `POST /api/auth/logout` — Redis blacklist | 0.5 | 🔴 |
+| 17 | `JwtAuthFilter` — đọc Bearer token, set SecurityContext | 1.0 | 🔴 |
+| 18 | `@PreAuthorize` RBAC annotations trên controllers | 0.5 | 🔴 |
+| 19 | Global exception handler — JSON chuẩn, không leak stack trace | 0.5 | 🔴 |
+| 23 | `POST /api/leads` — tạo lead, gọi AI score | 0.5 | 🔴 |
+| 24 | `GET /api/leads` — list + filter(status,source) + search + pagination | 1.0 | 🔴 |
+| 25 | `GET /api/leads/:id` — detail + activities timeline | 0.5 | 🔴 |
+| 26 | `PUT /api/leads/:id` + `PATCH /leads/:id/status` | 0.5 | 🔴 |
+| 62 | `POST/GET /api/body-metrics/me` | 0.5 | 🔴 |
+| 63 | `GET /api/progress/me` — workouts/month, streak, personal records, weekly freq | 1.5 | 🔴 |
+| 67 | `GET /api/dashboard/stats` + `revenue-chart` + `crm-funnel` | 1.0 | 🔴 |
+| 57 | Cron job: auto-complete sessions sau end_time | 0.5 | 🟡 |
+| **A tổng BE** | | **11.5h** | |
 
-**Commerce BE: B=7.5h, C=3h**
+### Backend — Người B nhận (12h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 20 | `POST /api/auth/forgot-password` + `reset-password` | 1.0 | 🟡 |
+| 21 | `PUT /api/auth/change-password` | 0.5 | 🔴 |
+| 22 | `GET/POST/PATCH /api/users` (ADMIN) | 1.0 | 🟡 |
+| 30 | `GET /api/customers` — list + filter + search | 0.5 | 🔴 |
+| 31 | `GET /api/customers/:id` — aggregate profile (join 4 module) | 1.0 | 🔴 |
+| 32 | `PUT /api/customers/:id` — edit profile | 0.5 | 🔴 |
+| 34 | `GET/POST/PUT/PATCH /api/plans` — CRUD plans | 1.0 | 🔴 |
+| 35 | `POST /api/orders` — server-side tính total, validate | 1.5 | 🔴 |
+| 36 | `GET /api/orders` + `GET /api/orders/me` + `GET /:id` | 0.5 | 🔴 |
+| 37 | `PATCH /api/orders/:id/cancel` — chỉ PENDING | 0.5 | 🔴 |
+| 64 | `POST /api/ai/chat` proxy — validate auth → gọi ai-workout → lưu message | 1.0 | 🔴 |
+| 65 | `GET /api/ai/conversations/me` — load history | 0.5 | 🔴 |
+| 68 | `GET /api/reports/sales` + `memberships` + `classes` | 1.0 | 🟡 |
+| 46 | `GET /api/trainers/:id/schedule` | 0.5 | 🔴 |
+| **B tổng BE** | | **11.5h** | |
 
----
+### Backend — Người C nhận (12h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 27 | `POST /api/leads/:id/activities` + `PATCH /leads/:id/assign` | 0.5 | 🔴 |
+| 28 | `POST /api/leads/:id/convert` — state machine, tạo Customer+User, preserve history | 2.0 | 🔴 |
+| 29 | `PATCH /api/leads/:id/lost` | 0.5 | 🔴 |
+| 33 | `AuditLogAspect` — @Around @Auditable | 1.0 | 🟡 |
+| 38 | `POST /api/payments` — process + trigger ServiceActivation | 1.5 | 🔴 |
+| 39 | `POST /api/payments/callback` — idempotent webhook | 1.0 | 🔴 |
+| 40 | `ServiceActivationService` — MEMBERSHIP vs PT_PACKAGE logic | 1.0 | 🔴 |
+| 41 | `MembershipValidator` bean — `requireActive(customerId)` | 0.5 | 🔴 |
+| 42 | `GET/PATCH /api/memberships` — list, pause, resume, cancel | 1.5 | 🔴 |
+| 43 | `POST /api/memberships/:id/renew` + `GET /memberships/expiring` | 0.5 | 🔴 |
+| 66 | `POST /api/ai/recommend` + `PATCH accept/dismiss` | 1.0 | 🔴 |
+| 58 | `GET/POST/PUT /api/exercises` + seed 30 exercises | 1.0 | 🔴 |
+| **C tổng BE** | | **12h** | |
 
-### NHÓM 5 — BACKEND OPERATIONS (~12h tổng)
+### Backend — Người D nhận (13h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 44 | `GET /api/pt-packages/me` + `PATCH /:id/use` idempotent @Version | 1.0 | 🔴 |
+| 45 | `GET/POST/PUT /api/trainers` + assign customer | 1.0 | 🔴 |
+| 47 | `GET/POST/PUT /api/classes` | 0.5 | 🔴 |
+| 48 | `GET/POST/PUT /api/sessions` + PATCH cancel | 1.0 | 🔴 |
+| 49 | `POST /api/bookings` — SELECT FOR UPDATE + capacity + concurrency | 2.0 | 🔴 |
+| 50 | `GET /api/bookings/me` + `GET /api/bookings` | 0.5 | 🔴 |
+| 51 | `PATCH /api/bookings/:id/cancel` + `no-show` | 0.5 | 🔴 |
+| 52 | `POST /api/checkin` — validate membership + tạo attendance | 1.0 | 🔴 |
+| 53 | `GET /api/attendance` + `GET /api/attendance/me` | 0.5 | 🔴 |
+| 54 | `POST /api/pt-sessions` — schedule PT, validate trainer available | 1.0 | 🔴 |
+| 55 | `GET /api/pt-sessions` + `PATCH reschedule/cancel` | 0.5 | 🔴 |
+| 56 | `PATCH /api/pt-sessions/:id/complete` — idempotent via completion_ref | 1.0 | 🔴 |
+| 59 | `POST/GET/PUT /api/workout-plans` + PATCH activate/complete/cancel | 2.0 | 🔴 |
+| 60 | `POST /api/workout-sessions` + `PATCH complete` + `GET /me` | 1.0 | 🔴 |
+| 61 | `POST /api/workout-logs` + `GET /:id/logs` | 1.0 | 🔴 |
+| **D tổng BE** | | **15h** | |
 
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 45 | `GET/POST/PUT /api/trainers` + assign customer | BE | 1h | 🔴 | C |
-| 46 | `GET /api/trainers/:id/schedule` | BE | 0.5h | 🔴 | D |
-| 47 | `GET/POST/PUT /api/classes` | BE | 0.5h | 🔴 | C |
-| 48 | `GET/POST/PUT /api/sessions` + PATCH cancel | BE | 1h | 🔴 | C |
-| 49 | `POST /api/bookings` — SELECT FOR UPDATE + capacity check | BE | 2h | 🔴 | C |
-| 50 | `GET /api/bookings/me` + `GET /api/bookings` | BE | 0.5h | 🔴 | C |
-| 51 | `PATCH /api/bookings/:id/cancel` + `no-show` | BE | 0.5h | 🔴 | C |
-| 52 | `POST /api/checkin` — validate membership + tạo attendance | BE | 1h | 🔴 | D |
-| 53 | `GET /api/attendance` + `GET /api/attendance/me` | BE | 0.5h | 🔴 | D |
-| 54 | `POST /api/pt-sessions` — schedule PT, validate | BE | 1h | 🔴 | D |
-| 55 | `GET /api/pt-sessions` + `PATCH reschedule/cancel` | BE | 0.5h | 🔴 | D |
-| 56 | `PATCH /api/pt-sessions/:id/complete` — idempotent via completion_ref | BE | 1h | 🔴 | D |
-| 57 | Cron job: auto-complete sessions sau end_time | BE | 0.5h | 🟡 | A |
-
-**Operations BE: C=6h, D=3.5h, A=0.5h**
-
----
-
-### NHÓM 6 — BACKEND WORKOUT & PROGRESS (~10h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 58 | `GET/POST/PUT /api/exercises` + seed 30 exercises | BE | 1h | 🔴 | D |
-| 59 | `POST/GET/PUT /api/workout-plans` + PATCH activate/complete | BE | 2h | 🔴 | D |
-| 60 | `POST /api/workout-sessions` + `PATCH complete` + `GET /me` | BE | 1h | 🔴 | D |
-| 61 | `POST /api/workout-logs` + `GET /:id/logs` | BE | 1h | 🔴 | D |
-| 62 | `POST/GET /api/body-metrics/me` | BE | 0.5h | 🔴 | A |
-| 63 | `GET /api/progress/me` — workouts/month, streak, PRs, weekly freq | BE | 1.5h | 🔴 | A |
-| 64 | `POST /api/ai/chat` proxy — auth → gọi ai-workout → lưu message | BE | 1h | 🔴 | B |
-| 65 | `GET /api/ai/conversations/me` — load history | BE | 0.5h | 🔴 | B |
-| 66 | `POST /api/ai/recommend` + `PATCH accept/dismiss` | BE | 1h | 🔴 | C |
-| 67 | `GET /api/dashboard/stats` + `revenue-chart` + `crm-funnel` | BE | 1h | 🔴 | A |
-| 68 | `GET /api/reports/sales` + `memberships` + `classes` | BE | 1h | 🟡 | B |
-
-**Workout/Progress/AI BE: D=5.5h, A=3h, B=2.5h, C=1h**
-
----
-
-### NHÓM 7 — FRONTEND PUBLIC PAGES (~10h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 69 | `/login` page — form + JWT cookie + redirect theo role | FE | 1.5h | 🔴 | A |
-| 70 | `/register` page — form + role selector | FE | 1h | 🔴 | A |
-| 71 | `AuthContext` + `ProtectedRoute` + `RoleGuard` + `middleware.ts` | FE | 1.5h | 🔴 | A |
-| 72 | `/` landing page — Hero + features + CTA (đã có sẵn) | FE | 0.5h | 🔴 | B |
-| 73 | `/plans` — 3 plan cards, features, price | FE | 1h | 🔴 | B |
-| 74 | `/classes` — class grid + filter tabs | FE | 1h | 🔴 | C |
-
-**Public FE: A=4h, B=1.5h, C=1h**
-
----
-
-### NHÓM 8 — FRONTEND DASHBOARD AUTH/CRM (~10h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 75 | `/dashboard/leads` — filter tabs + search + table + score badge | FE | 2h | 🔴 | A |
-| 76 | `/dashboard/leads/create` — form tạo lead | FE | 1h | 🔴 | A |
-| 77 | `/dashboard/leads/[id]` — info card + timeline + add activity modal + actions | FE | 2h | 🔴 | A |
-| 78 | `/dashboard/customers` — table với badges | FE | 1h | 🔴 | B |
-| 79 | `/dashboard/customers/[id]` — 6 tabs: Overview/Membership/Bookings/Workouts/Payments/Activity | FE | 2h | 🔴 | B |
-| 80 | `/dashboard/profile` — xem + edit + đổi password | FE | 1h | 🔴 | C |
-| 81 | `/dashboard/users` (ADMIN) — list + change role + disable | FE | 1h | 🟡 | D |
-
-**CRM FE: A=5h, B=3h, C=1h, D=1h**
+> ⚠️ D nặng BE hơn 3h vì booking concurrency + workout là 2 feature kỹ thuật phức tạp nhất. Bù lại D nhận ít FE và ít OPS hơn (xem bên dưới).
 
 ---
 
-### NHÓM 9 — FRONTEND DASHBOARD COMMERCE (~10h tổng)
+## LAYER 3 — FRONTEND (47.5h tổng → ~12h/người)
 
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 82 | `/dashboard/sales` — 4 KPI cards + transaction table | FE | 1.5h | 🔴 | B |
-| 83 | `/dashboard/create-sale` — 3-step wizard | FE | 2h | 🔴 | B |
-| 84 | `/dashboard/payment-confirmed` — success screen + receipt + countdown | FE | 1h | 🔴 | B |
-| 85 | `/dashboard/plans` — table + toggle + create modal | FE | 1h | 🟡 | C |
-| 86 | `/dashboard/member/payments` — membership card + payment history | FE | 1.5h | 🔴 | C |
-| 87 | Membership status badge component (dùng chung) | FE | 0.5h | 🔴 | D |
-| 88 | Renewal risk widget — expiring list + AI risk badge | FE | 1.5h | 🟡 | A |
+### Frontend — Người A nhận (12h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 69 | `/login` — form + JWT cookie + redirect theo role | 1.5 | 🔴 |
+| 70 | `/register` — form + role selector | 1.0 | 🔴 |
+| 71 | `AuthContext` + `ProtectedRoute` + `RoleGuard` + `middleware.ts` | 1.5 | 🔴 |
+| 75 | `/dashboard/leads` — filter tabs + search debounce + table + score badge | 2.0 | 🔴 |
+| 76 | `/dashboard/leads/create` — form tạo lead | 1.0 | 🔴 |
+| 77 | `/dashboard/leads/[id]` — info + timeline + add activity modal + actions | 2.0 | 🔴 |
+| 93 | Book confirmation modal component | 0.5 | 🔴 |
+| 97 | `/dashboard/member` — home: 3 cards + quick actions + activity feed | 2.0 | 🔴 |
+| 101 | `/dashboard/reports` — tabs Sales/Members/Classes | 1.0 | 🟡 |
+| **A tổng FE** | | **12.5h** | |
 
-**Commerce FE: B=4.5h, C=3h, D=0.5h, A=1.5h**
+### Frontend — Người B nhận (12h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 72 | `/` landing — Hero + features + CTA (đã có sẵn, refine) | 0.5 | 🔴 |
+| 73 | `/plans` — 3 plan cards, price, features list, CTA | 1.0 | 🔴 |
+| 78 | `/dashboard/customers` — table với membership badge, expiry | 1.0 | 🔴 |
+| 79 | `/dashboard/customers/[id]` — 6 tabs: Overview/Membership/Bookings/Workouts/Payments/Activity | 2.0 | 🔴 |
+| 82 | `/dashboard/sales` — 4 KPI cards + transaction table | 1.5 | 🔴 |
+| 83 | `/dashboard/create-sale` — 3-step wizard | 2.0 | 🔴 |
+| 84 | `/dashboard/payment-confirmed` — success screen + receipt + countdown | 1.0 | 🔴 |
+| 94 | No-show prediction badge component | 0.5 | 🟡 |
+| 98 | `/dashboard/member/progress` — stats + pure CSS bar chart + PRs table + AI summary | 2.0 | 🔴 |
+| **B tổng FE** | | **11.5h** | |
 
----
+### Frontend — Người C nhận (12h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 74 | `/classes` — class grid + filter chips + type badges | 1.0 | 🔴 |
+| 80 | `/dashboard/profile` — xem + edit profile + đổi password | 1.0 | 🔴 |
+| 85 | `/dashboard/plans` — table + toggle status + create modal | 1.0 | 🟡 |
+| 86 | `/dashboard/member/payments` — membership card + payment history table | 1.5 | 🔴 |
+| 87 | Membership status badge component (ACTIVE/PAUSED/EXPIRED) | 0.5 | 🔴 |
+| 88 | Renewal risk widget — expiring list + AI risk badge | 1.5 | 🟡 |
+| 89 | `/dashboard/schedule` — 7-col weekly calendar + session cards màu theo type | 2.5 | 🔴 |
+| 90 | `/dashboard/bookings` — check-in strip + stats + bookings table | 2.0 | 🔴 |
+| 95 | Schedule AI suggestion banner | 1.0 | 🟡 |
+| **C tổng FE** | | **12h** | |
 
-### NHÓM 10 — FRONTEND DASHBOARD OPERATIONS (~12h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 89 | `/dashboard/schedule` — 7-col weekly calendar + session cards màu theo type | FE | 2.5h | 🔴 | C |
-| 90 | `/dashboard/bookings` — check-in strip + stats + table | FE | 2h | 🔴 | C |
-| 91 | `/dashboard/trainer` — today timeline + clients list + PT management | FE | 2h | 🔴 | D |
-| 92 | `/dashboard/member/book` — tabs Classes/PT + date strip + class cards | FE | 2h | 🔴 | D |
-| 93 | Book confirmation modal component | FE | 0.5h | 🔴 | A |
-| 94 | No-show prediction badge component | FE | 0.5h | 🟡 | B |
-| 95 | Schedule AI suggestion banner | FE | 1h | 🟡 | C |
-
-**Operations FE: C=5.5h, D=4h, A=0.5h, B=0.5h**
-
----
-
-### NHÓM 11 — FRONTEND DASHBOARD WORKOUT/AI/PROGRESS (~12h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 96 | `/dashboard/workout-builder` — plan form + week tabs + day cards + exercise sidebar | FE | 2.5h | 🔴 | D |
-| 97 | `/dashboard/member` — home: 3 cards + quick actions + activity feed | FE | 2h | 🔴 | A |
-| 98 | `/dashboard/member/progress` — stats + pure CSS bar chart + PRs table + AI summary | FE | 2h | 🔴 | B |
-| 99 | `/dashboard/member/ai-coach` — chat UI (bubbles + input + quick prompts + recommend card) | FE | 2h | 🔴 | C |
-| 100 | `/dashboard` (Manager) — 4 KPI + CSS revenue chart + CRM funnel + occupancy | FE | 2h | 🔴 | D |
-| 101 | `/dashboard/reports` — tabs Sales/Members/Classes | FE | 1h | 🟡 | A |
-
-**Workout/AI FE: D=4.5h, A=3h, B=2h, C=2h**
-
----
-
-### NHÓM 12 — AI SERVICE (MỖI NGƯỜI 1 SERVICE) (~20h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 102 | `ai-crm/` — setup FastAPI app, schemas, main.py | AI | 0.5h | 🔴 | A |
-| 103 | `ai-crm/ POST /score-lead` — rule-based scoring (source + goal + contact) | AI | 1h | 🔴 | A |
-| 104 | `ai-crm/ POST /suggest-followup` — LLM gợi ý next action | AI | 1.5h | 🔴 | A |
-| 105 | `ai-crm/ POST /conversion-tips` — LLM tips để convert lead | AI | 1h | 🟡 | A |
-| 106 | `ai-commerce/` — setup FastAPI app | AI | 0.5h | 🔴 | B |
-| 107 | `ai-commerce/ POST /predict-renewal` — rule-based churn probability | AI | 1h | 🔴 | B |
-| 108 | `ai-commerce/ POST /renewal-action` — LLM suggest retention action | AI | 1.5h | 🔴 | B |
-| 109 | `ai-commerce/ POST /suggest-upsell` — LLM suggest upgrade plan | AI | 1h | 🟡 | B |
-| 110 | `ai-operations/` — setup FastAPI app | AI | 0.5h | 🔴 | C |
-| 111 | `ai-operations/ POST /predict-noshow` — rule-based no-show probability | AI | 1h | 🔴 | C |
-| 112 | `ai-operations/ POST /suggest-schedule` — LLM optimize class schedule | AI | 1.5h | 🔴 | C |
-| 113 | `ai-operations/ POST /trainer-tips` — LLM coaching advice cho trainer | AI | 1h | 🟡 | C |
-| 114 | `ai-workout/` — setup FastAPI app + safety_filter.py | AI | 1h | 🔴 | D |
-| 115 | `ai-workout/ services/context_loader.py` — load customer fitness data từ DB | AI | 1.5h | 🔴 | D |
-| 116 | `ai-workout/ POST /chat` — safety check + context inject + OpenAI call | AI | 1.5h | 🔴 | D |
-| 117 | `ai-workout/ POST /recommend` — analyze logs → suggest workout changes | AI | 1.5h | 🔴 | D |
-| 118 | `ai-workout/ POST /progress-summary` — LLM narrative summary | AI | 1h | 🟡 | D |
-
-**AI: A=4h, B=4h, C=4h, D=6.5h** → D nặng hơn nhưng được bù bằng ít BE/FE hơn
+### Frontend — Người D nhận (12h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 81 | `/dashboard/users` (ADMIN) — list + change role + disable | 1.0 | 🟡 |
+| 91 | `/dashboard/trainer` — today timeline + clients list + PT management | 2.0 | 🔴 |
+| 92 | `/dashboard/member/book` — tabs Classes/PT + date strip + class cards | 2.0 | 🔴 |
+| 96 | `/dashboard/workout-builder` — plan form + week tabs + day cards + exercise sidebar | 2.5 | 🔴 |
+| 99 | `/dashboard/member/ai-coach` — chat bubbles + input + quick prompts + recommend card | 2.0 | 🔴 |
+| 100 | `/dashboard` Manager — 4 KPI + CSS revenue chart + CRM funnel + occupancy | 2.0 | 🔴 |
+| **D tổng FE** | | **11.5h** | |
 
 ---
 
-### NHÓM 13 — OPS: DOCKERFILE (~6h tổng)
+## LAYER 4 — AI SERVICE (18.5h tổng → 4.6h/người)
 
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 119 | `backend/Dockerfile` — multi-stage Java 21 | OPS | 0.5h | 🔴 | D |
-| 120 | `frontend/Dockerfile` — multi-stage Next.js standalone | OPS | 0.5h | 🔴 | B |
-| 121 | `ai-crm/Dockerfile` — Python slim | OPS | 0.5h | 🔴 | A |
-| 122 | `ai-commerce/Dockerfile` — Python slim | OPS | 0.5h | 🔴 | B |
-| 123 | `ai-operations/Dockerfile` — Python slim | OPS | 0.5h | 🔴 | C |
-| 124 | `ai-workout/Dockerfile` — Python slim | OPS | 0.5h | 🔴 | D |
-| 125 | `.env.example` — tất cả variables đầy đủ | OPS | 0.5h | 🔴 | A |
-| 126 | `docker-compose.yml` phần postgres + redis (infra) | OPS | 0.5h | 🔴 | C |
-| 127 | `docker-compose.yml` phần 4 services (backend/frontend/ai×4) | OPS | 1h | 🔴 | C |
-| 128 | `Makefile` — make up/down/migrate/seed | OPS | 0.5h | 🟡 | D |
+> Mỗi người viết **toàn bộ** Python service của mình từ đầu đến cuối.
 
-**OPS Dockerfile: A=1h, B=1h, C=2h, D=2h**
+### AI — Người A viết `ai-crm/` (4.5h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 102 | Setup FastAPI app, main.py, schemas.py, requirements.txt | 0.5 | 🔴 |
+| 103 | `POST /score-lead` — rule-based: source + goal + contact completeness (0–100) | 1.0 | 🔴 |
+| 104 | `POST /suggest-followup` — LLM: dựa status + activity → gợi ý next action | 1.5 | 🔴 |
+| 105 | `POST /conversion-tips` — LLM: tips convert lead dựa goal + activity count | 1.0 | 🟡 |
+| 150 | Python tests: test score ranges, edge cases | 0.5 | 🔴 |
+| **A tổng AI** | | **4.5h** | |
 
----
+### AI — Người B viết `ai-commerce/` (4.5h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 106 | Setup FastAPI app, main.py, schemas.py, requirements.txt | 0.5 | 🔴 |
+| 107 | `POST /predict-renewal` — rule-based: attendance + days_absent → probability 0–1 | 1.0 | 🔴 |
+| 108 | `POST /renewal-action` — LLM: suggest retention action cho high-risk member | 1.5 | 🔴 |
+| 109 | `POST /suggest-upsell` — LLM: gợi ý upgrade plan dựa usage | 1.0 | 🟡 |
+| 151 | Python tests: test renewal probability, ranges | 0.5 | 🔴 |
+| **B tổng AI** | | **4.5h** | |
 
-### NHÓM 14 — OPS: CI/CD (~8h tổng)
+### AI — Người C viết `ai-operations/` (4.5h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 110 | Setup FastAPI app, main.py, schemas.py, requirements.txt | 0.5 | 🔴 |
+| 111 | `POST /predict-noshow` — rule-based: days_ahead + history + time_of_day | 1.0 | 🔴 |
+| 112 | `POST /suggest-schedule` — LLM: analyze gaps + historical → suggest slots | 1.5 | 🔴 |
+| 113 | `POST /trainer-tips` — LLM: coaching advice cho trainer dựa client progress | 1.0 | 🟡 |
+| 152 | Python tests: test noshow probability | 0.5 | 🔴 |
+| **C tổng AI** | | **4.5h** | |
 
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 129 | `.github/workflows/ci-backend.yml` — mvn test + build | OPS | 1h | 🔴 | A |
-| 130 | `.github/workflows/ci-frontend.yml` — npm build | OPS | 0.5h | 🔴 | B |
-| 131 | `.github/workflows/ci-ai-crm.yml` — pytest ai-crm | OPS | 0.5h | 🔴 | A |
-| 132 | `.github/workflows/ci-ai-commerce.yml` — pytest ai-commerce | OPS | 0.5h | 🔴 | B |
-| 133 | `.github/workflows/ci-ai-operations.yml` — pytest ai-operations | OPS | 0.5h | 🔴 | C |
-| 134 | `.github/workflows/ci-ai-workout.yml` — pytest ai-workout | OPS | 0.5h | 🔴 | D |
-| 135 | `.github/workflows/ci-integration.yml` — integration test với real DB | OPS | 1h | 🔴 | C |
-| 136 | `.github/workflows/cd-deploy.yml` — build+push images+deploy | OPS | 1.5h | 🔴 | D |
-| 137 | Deploy backend lên Railway/Render | OPS | 1h | 🔴 | D |
-| 138 | Deploy frontend lên Vercel/Railway | OPS | 0.5h | 🔴 | B |
-| 139 | Deploy ai-workout lên Railway | OPS | 0.5h | 🔴 | D |
+### AI — Người D viết `ai-workout/` (5h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 114 | Setup FastAPI app + `safety_filter.py` (BLOCKED_TERMS list) | 1.0 | 🔴 |
+| 115 | `services/context_loader.py` — load customer fitness data từ DB (plan + sessions) | 1.5 | 🔴 |
+| 116 | `POST /chat` — safety check → load context → OpenAI call → response | 1.5 | 🔴 |
+| 117 | `POST /recommend` — analyze logs → JSON suggested_changes | 1.5 | 🔴 |
+| 118 | `POST /progress-summary` — LLM narrative summary | 1.0 | 🟡 |
+| 153 | Python test: safety_filter blocks medical questions | 0.5 | 🔴 |
+| 154 | Python test: context_loader không leak data customer khác | 0.5 | 🔴 |
+| **D tổng AI** | | **7.5h** | |
 
-**CI/CD: A=1.5h, B=1.5h, C=2h, D=4h**
-
----
-
-### NHÓM 15 — TESTING (~12h tổng)
-
-| # | Task | Layer | Giờ | Prio | Người |
-|---|------|-------|-----|------|-------|
-| 140 | Unit test AuthService (5 cases) | BE | 0.5h | 🔴 | A |
-| 141 | Unit test LeadService — convert, lost, score | BE | 0.5h | 🔴 | A |
-| 142 | Unit test OrderService — pricing, discount | BE | 0.5h | 🔴 | B |
-| 143 | Unit test PaymentService — idempotency | BE | 0.5h | 🔴 | B |
-| 144 | Unit test MembershipService — pause/resume date | BE | 0.5h | 🔴 | B |
-| 145 | Unit test BookingService — capacity, duplicate | BE | 0.5h | 🔴 | C |
-| 146 | **Concurrency test** BookingService — 2 req cùng slot cuối | BE | 1h | 🔴 | C |
-| 147 | Unit test PT complete idempotent | BE | 0.5h | 🔴 | C |
-| 148 | Unit test WorkoutPlanService — activate, complete | BE | 0.5h | 🔴 | D |
-| 149 | Unit test progress computation (streak, PRs) | BE | 0.5h | 🔴 | D |
-| 150 | Python test ai-crm: score ranges, edge cases | AI | 0.5h | 🔴 | A |
-| 151 | Python test ai-commerce: renewal probability range | AI | 0.5h | 🔴 | B |
-| 152 | Python test ai-operations: noshow probability | AI | 0.5h | 🔴 | C |
-| 153 | Python test ai-workout: safety_filter block medical | AI | 0.5h | 🔴 | D |
-| 154 | Python test ai-workout: context_loader no data leak | AI | 0.5h | 🔴 | D |
-| 155 | Integration test: Register→Login→Lead→Convert→Customer | BE | 1h | 🔴 | A |
-| 156 | Integration test: Order→Payment→Membership ACTIVE | BE | 1h | 🔴 | B |
-| 157 | Integration test: Book→Checkin→Attendance | BE | 1h | 🔴 | C |
-| 158 | Integration test: Workout→Log→Progress computed | BE | 1h | 🔴 | D |
-
-**Testing: A=2.5h, B=2.5h, C=3h, D=3h**
+> D nặng AI hơn vì ai-workout phức tạp nhất (context loader từ DB + safety filter). Bù lại D nhận ít OPS.
 
 ---
 
-## TỔNG KẾT GIỜ MỖI NGƯỜI
+## LAYER 5 — OPS (13.5h tổng → ~3.4h/người)
 
-| Nhóm task | A | B | C | D |
-|-----------|---|---|---|---|
-| DB migration | 1.5h | 1.5h | 2h | 2h |
-| BE Auth/User | 5h | 2.5h | — | — |
-| BE CRM | 6h | 2h | 1h | — |
-| BE Commerce | — | 7.5h | 3h | — |
-| BE Operations | 0.5h | — | 6h | 3.5h |
-| BE Workout/Progress/AI | 3h | 2.5h | 1h | 5.5h |
-| FE Public | 4h | 1.5h | 1h | — |
-| FE Auth/CRM | 5h | 3h | 1h | 1h |
-| FE Commerce | 1.5h | 4.5h | 3h | 0.5h |
-| FE Operations | 0.5h | 0.5h | 5.5h | 4h |
-| FE Workout/AI | 3h | 2h | 2h | 4.5h |
-| AI service | 4h | 4h | 4h | 6.5h |
-| OPS Dockerfile | 1h | 1h | 2h | 2h |
-| OPS CI/CD | 1.5h | 1.5h | 2h | 4h |
-| Testing | 2.5h | 2.5h | 3h | 3h |
-| **TỔNG** | **~39h** | **~40.5h** | **~36.5h** | **~36h** |
+### OPS — Người A (3.5h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 121 | `ai-crm/Dockerfile` — python:3.11-slim, expose 8001 | 0.5 | 🔴 |
+| 125 | `.env.example` — tất cả variables: DB, Redis, JWT, OpenAI, ports | 0.5 | 🔴 |
+| 129 | `.github/workflows/ci-backend.yml` — mvn test với postgres service | 1.0 | 🔴 |
+| 131 | `.github/workflows/ci-ai-crm.yml` — pytest ai-crm | 0.5 | 🔴 |
+| 155 | Integration test: Register→Login→Lead→Convert→Customer | 1.0 | 🔴 |
+| **A tổng OPS+TEST** | | **3.5h** | |
 
-> ⚠️ Còn dư ~15-20h/người cho: debug, review code, refactor, demo prep, nice-to-have tasks 🟡
+### OPS — Người B (3.5h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 120 | `frontend/Dockerfile` — multi-stage Next.js standalone output | 0.5 | 🔴 |
+| 122 | `ai-commerce/Dockerfile` — python:3.11-slim, expose 8002 | 0.5 | 🔴 |
+| 130 | `.github/workflows/ci-frontend.yml` — npm ci + npm run build | 0.5 | 🔴 |
+| 132 | `.github/workflows/ci-ai-commerce.yml` — pytest ai-commerce | 0.5 | 🔴 |
+| 138 | Deploy frontend lên Vercel/Railway | 0.5 | 🔴 |
+| 156 | Integration test: Order→Payment→Membership ACTIVE | 1.0 | 🔴 |
+| **B tổng OPS+TEST** | | **3.5h** | |
+
+### OPS — Người C (4.5h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 123 | `ai-operations/Dockerfile` — python:3.11-slim, expose 8003 | 0.5 | 🔴 |
+| 126 | `docker-compose.yml` phần infra: postgres + redis + healthcheck + volumes | 0.5 | 🔴 |
+| 127 | `docker-compose.yml` phần services: backend + frontend + 4 AI services + env vars | 1.0 | 🔴 |
+| 133 | `.github/workflows/ci-ai-operations.yml` — pytest ai-operations | 0.5 | 🔴 |
+| 135 | `.github/workflows/ci-integration.yml` — Spring Boot integration test với real postgres | 1.0 | 🔴 |
+| 157 | Integration test: Book→Checkin→Attendance | 1.0 | 🔴 |
+| **C tổng OPS+TEST** | | **4.5h** | |
+
+### OPS — Người D (3h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 119 | `backend/Dockerfile` — multi-stage Java 21 (builder + runner) | 0.5 | 🔴 |
+| 124 | `ai-workout/Dockerfile` — python:3.11-slim, expose 8004 | 0.5 | 🔴 |
+| 128 | `Makefile` — make up / down / migrate / seed / logs | 0.5 | 🟡 |
+| 134 | `.github/workflows/ci-ai-workout.yml` — pytest ai-workout | 0.5 | 🔴 |
+| 136 | `.github/workflows/cd-deploy.yml` — build+push GHCR+deploy Railway | 1.5 | 🔴 |
+| **D tổng OPS** | | **3.5h** | |
 
 ---
 
-## LAYER CHECK — MỖI NGƯỜI CÓ ĐỦ 5 LAYER
+## LAYER 6 — TESTING BE (12h tổng → 3h/người)
+
+### Testing — Người A (3h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 140 | Unit test `AuthService`: register, login, refresh, logout, disabled user | 0.5 | 🔴 |
+| 141 | Unit test `LeadService`: convert valid, convert invalid status, already converted | 0.5 | 🔴 |
+| 155 | Integration test: Register→Login→Lead create→Convert→Customer created | 1.0 | 🔴 |
+| Deploy backend lên Railway/Render + smoke test | 1.0 | 🔴 |
+| **A tổng TEST** | | **3h** | |
+
+### Testing — Người B (3h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 142 | Unit test `OrderService`: total calculation, discount, negative total | 0.5 | 🔴 |
+| 143 | Unit test `PaymentService`: idempotency same reference | 0.5 | 🔴 |
+| 144 | Unit test `MembershipService`: pause/resume end_date calculation | 0.5 | 🔴 |
+| 156 | Integration test: Create order→Payment→Membership ACTIVE | 1.0 | 🔴 |
+| Deploy ai-commerce lên Railway + smoke test | 0.5 | 🔴 |
+| **B tổng TEST** | | **3h** | |
+
+### Testing — Người C (3h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 145 | Unit test `BookingService`: capacity check, duplicate booking | 0.5 | 🔴 |
+| 146 | **Concurrency test**: 2 CompletableFuture cùng book last slot → đúng 1 thành công | 1.0 | 🔴 |
+| 147 | Unit test PT complete idempotent (gọi 2 lần → decrement 1 lần) | 0.5 | 🔴 |
+| 157 | Integration test: Book class→Checkin→Attendance recorded | 1.0 | 🔴 |
+| **C tổng TEST** | | **3h** | |
+
+### Testing — Người D (3h)
+| # | Task | h | 🔴/🟡 |
+|---|------|---|-------|
+| 148 | Unit test `WorkoutPlanService`: activate deactivates previous, complete | 0.5 | 🔴 |
+| 149 | Unit test progress computation: streak algorithm, personal records | 0.5 | 🔴 |
+| 158 | Integration test: Workout session→Log→Progress computed correctly | 1.0 | 🔴 |
+| Deploy ai-workout + backend → test AI chat end-to-end | 1.0 | 🔴 |
+| **D tổng TEST** | | **3h** | |
+
+---
+
+## TỔNG KẾT CUỐI — BẢNG ĐỀU
+
+| Layer | Người A | Người B | Người C | Người D |
+|-------|---------|---------|---------|---------|
+| DB | 1.5h | 1.5h | 2h | 2h |
+| BE | 11.5h | 11.5h | 12h | 15h* |
+| FE | 12.5h | 11.5h | 12h | 11.5h |
+| AI | 4.5h | 4.5h | 4.5h | 7.5h* |
+| OPS | 2h | 2h | 3h | 2h |
+| TEST | 3h | 3h | 3h | 3h |
+| **TỔNG** | **35h** | **34h** | **36.5h** | **41h** |
+
+> *D nặng BE và AI hơn vì 2 feature kỹ thuật phức tạp nhất: booking concurrency (2h) và ai-workout context_loader + safety_filter (3h). Tổng D ~41h vs A/B/C ~35h, chênh ~6h. Với AI hỗ trợ coding thì khoảng cách này thu hẹp còn ~2-3h thực tế.
+
+---
+
+## CÂN BẰNG LẠI: CHUYỂN 3 TASK TỪ D → A/B/C
+
+Để cân bằng hơn, chuyển 3 task nhỏ từ D sang:
+
+| Task chuyển | Từ D | Sang | Giờ |
+|-------------|------|------|-----|
+| `GET /api/trainers/:id/schedule` (#46) | D | B | 0.5h |
+| `Makefile` (#128) | D | C | 0.5h |
+| Deploy ai-workout smoke test | D | A | 0.5h |
+
+**Sau khi cân bằng: A=35.5h | B=34.5h | C=37h | D=39.5h** ✅
+
+---
+
+## LAYER CHECK — MỖI NGƯỜI ĐỦ 5 LAYER
 
 | Layer | A | B | C | D |
 |-------|---|---|---|---|
-| **DB** | V1 users+leads | V2 plans+orders+memberships | V3 trainers+bookings | V4 workout+ai |
-| **BE** | Auth JWT + CRM convert | Order pricing + Payment idempotency | Booking concurrency + check-in | Workout + Progress + AI proxy |
-| **FE** | /login /leads /member-home | /plans /create-sale /progress | /schedule /bookings /ai-coach | /workout-builder /trainer /dashboard |
-| **AI** | ai-crm/ scoring + followup | ai-commerce/ renewal + upsell | ai-operations/ noshow + schedule | ai-workout/ chat + context + safety |
-| **OPS** | ai-crm Dockerfile + CI backend | frontend Dockerfile + CI + deploy FE | docker-compose infra + CI integration | backend Dockerfile + CD pipeline + deploy |
+| **DB** | users, leads, customers | plans, orders, memberships | trainers, bookings, attendance | exercises, workout, ai tables |
+| **BE** | Auth JWT, Lead CRUD, Progress | Customers, Orders, Payments, AI proxy | Lead convert, Payment activation, Membership | PT sessions, Booking concurrency, Workout |
+| **FE** | /login, /leads, /member-home, /reports | /plans, /customers, /sales, /progress | /classes, /bookings, /schedule, /profile | /workout-builder, /trainer, /ai-coach, /dashboard |
+| **AI** | ai-crm: scoring + followup | ai-commerce: renewal + upsell | ai-operations: noshow + schedule | ai-workout: chat + context + safety |
+| **OPS** | ai-crm Dockerfile + CI backend | frontend Dockerfile + CI frontend | docker-compose full stack + CI integration | backend Dockerfile + CD deploy pipeline |
+| **TEST** | Auth + Lead + E2E auth flow | Order + Payment + E2E commerce | Booking concurrency + E2E booking | Workout + Progress + E2E workout+AI |
 
-✅ Mỗi người có đủ cả 5 layer
+✅ **Mỗi người đủ cả 6 layer**
 
 ---
 
 ## TIMELINE 5 TUẦN
 
 ```
-TUẦN 1 — Foundation
-  Tất cả: viết DB migration của mình + setup AI service + OPS cơ bản
-  A ưu tiên: Auth API xong trong 3 ngày đầu → B,C,D dùng được JWT
+TUẦN 1 — Foundation (tất cả làm cùng lúc)
+  A: V1 migration + Auth register/login + ai-crm setup + ci-backend.yml
+  B: V2 migration + Plans CRUD + ai-commerce setup + frontend Dockerfile
+  C: V3 migration + Trainers+Classes CRUD + ai-operations setup + docker-compose infra
+  D: V4 migration + Exercises CRUD + ai-workout setup + backend Dockerfile
+  ⚡ A xong Auth cuối ngày 3 → B,C,D có JWT để test
 
-TUẦN 2 — Core BE + FE
-  A: CRM lead CRUD + /login /register
-  B: Order + Payment + /plans /create-sale
-  C: Sessions + Booking + /schedule
-  D: Workout Plan + AI chat endpoint + /workout-builder
+TUẦN 2 — Core features
+  A: Lead CRUD (all endpoints) + /login /register /leads pages
+  B: Orders + Payments + /plans /customers /sales pages
+  C: Sessions + Booking concurrency + /schedule /classes pages
+  D: Workout Plans + Workout Sessions + /workout-builder /member/book pages
 
-TUẦN 3 — Complete + Integrate
-  A: Customer detail + Member home FE
-  B: Membership lifecycle + /member/payments
-  C: Check-in + PT + /bookings /member/book
-  D: Progress + AI recommend + /ai-coach /progress
+TUẦN 3 — Complete
+  A: Progress API + /member-home + ai-crm endpoints hoàn chỉnh
+  B: Membership lifecycle + /member/payments + ai-commerce endpoints
+  C: Check-in + PT Sessions + /bookings /profile + ai-operations endpoints
+  D: AI proxy API + /ai-coach /progress + ai-workout endpoints hoàn chỉnh
 
 TUẦN 4 — Test + Fix
-  Tất cả: viết unit tests + integration tests + fix bugs
+  Tất cả: viết unit tests + integration tests + fix bugs cross-module
 
 TUẦN 5 — Deploy + Polish
-  A: deploy + nice-to-have (reports, renewal widget)
-  B: deploy FE + upsell AI
-  C: deploy + schedule AI banner
-  D: deploy + CD pipeline hoàn chỉnh
+  A: Deploy backend + smoke test + /reports page (🟡)
+  B: Deploy frontend + Vercel + renewal risk widget (🟡)
+  C: Deploy + docker-compose full stack + schedule AI banner (🟡)
+  D: CD pipeline + deploy all services + conversion-tips (🟡)
 ```
 
 ---
 
 ## CÂU HỎI VẤND ĐÁP — MỖI NGƯỜI PHẢI TRẢ LỜI ĐƯỢC
 
-### Người A
-1. JWT access + refresh token khác nhau thế nào? Tại sao cần 2?
-2. Redis blacklist logout — không có Redis thì làm thế nào?
-3. Lead state machine: tại sao NEW không convert được thẳng?
-4. Convert lead tạo ra những record nào trong DB?
-5. lead_score tính thế nào trong Python service của mày?
-6. CI job test-backend chạy với DB thật hay mock?
+### Người A — Auth + CRM + Progress
+1. JWT: access token 15 phút vs refresh token 7 ngày, tại sao phân chia vậy?
+2. Redis blacklist: khi logout token bị invalidate thế nào?
+3. Lead convert: validate gì, tạo ra record nào, tại sao giữ lead_activities?
+4. Streak calculation: algorithm thế nào, edge case ngày nghỉ?
+5. lead_score: rule-based tính thế nào, input là gì?
+6. CI job: test chạy với DB thật hay mock? Tại sao cần service postgres?
 
-### Người B
-1. Tại sao total phải tính server-side?
-2. `reference UNIQUE` trong payments giải quyết vấn đề gì? DB-level vs app-level?
-3. Membership pause/resume: end_date tính thế nào?
-4. Service activation tách khỏi payment — tại sao không gộp?
-5. renewal_probability tính thế nào? Input là gì?
-6. Multi-stage Dockerfile Next.js — 2 stage làm gì?
+### Người B — Customers + Commerce + AI proxy
+1. Server-side pricing: tại sao không nhận total từ client?
+2. Payment idempotency: UNIQUE constraint vs application check, cái nào làm gì?
+3. ServiceActivation: tại sao tách khỏi PaymentService?
+4. Membership pause/resume: end_date tính thế nào khi resume?
+5. renewal_probability: input nào ảnh hưởng nhất, range output là gì?
+6. Multi-stage Dockerfile Next.js: stage builder vs runner làm gì khác nhau?
 
-### Người C
-1. Concurrency problem trong booking: xảy ra thế nào?
-2. SELECT FOR UPDATE là gì? Transaction isolation level nào?
-3. Tại sao cần cả SELECT FOR UPDATE lẫn UNIQUE constraint?
-4. booked_count denormalized — consistency risk là gì?
-5. PT complete idempotent với completion_ref — explain toàn bộ flow
-6. no-show probability: input nào ảnh hưởng nhiều nhất?
+### Người C — CRM convert + Booking + Operations AI
+1. Convert lead state machine: tại sao NEW không convert được?
+2. Booking concurrency: SELECT FOR UPDATE làm gì, isolation level nào?
+3. Tại sao cần cả pessimistic lock LẪN UNIQUE constraint?
+4. booked_count denormalized: risk gì, handle thế nào?
+5. PT complete idempotent: completion_ref UUID flow thế nào?
+6. docker-compose healthcheck: postgres healthcheck check gì, tại sao cần?
 
-### Người D
-1. Context injection: tại sao cần load DB data trước khi gọi OpenAI?
-2. Safety filter: keyword matching hay LLM? Ưu nhược điểm?
-3. JSONB cho suggested_changes — parse thế nào khi ACCEPT?
-4. Streak calculation algorithm: edge cases nào?
-5. Personal records SQL: GROUP BY + MAX thế nào?
-6. CD pipeline: push lên main → production xảy ra từng bước gì?
+### Người D — Workout + AI workout + CD
+1. Context injection: tại sao load DB data trước khi gọi OpenAI?
+2. Safety filter: keyword matching đủ chưa, false positive thế nào?
+3. JSONB suggested_changes: parse thế nào khi user ACCEPT recommendation?
+4. Personal records SQL: query GROUP BY + MAX trên workout_logs thế nào?
+5. Multi-stage Dockerfile Java: builder stage vs runner stage tiết kiệm gì?
+6. CD pipeline: push code lên main → production xảy ra từng bước gì?
 
 ---
 
-*Version 6.0 — 158 tasks, chia đều ~39-41h/người (chưa tính debug buffer), đủ 5 layer mỗi người*
+*Version 7.0 — 158 tasks | A≈35.5h | B≈34.5h | C≈37h | D≈39.5h | Đủ 6 layer mỗi người*
